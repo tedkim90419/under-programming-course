@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 10 — 구조체 | C 프로그래밍</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0d1117;
+  --bg2:    #161b22;
+  --bg3:    #21262d;
+  --border: #30363d;
+  --text:   #e6edf3;
+  --muted:  #8b949e;
+  --accent:  #e3b341;   /* amber/gold — lec10 */
+  --accent2: #3fb950;
+  --accent3: #f78166;
+  --accent4: #d2a8ff;
+  --accent5: #56cfe1;
+  --accent6: #ffa657;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:15px;line-height:1.7}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:0;left:0;width:240px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;z-index:100;padding:0 0 40px}
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.sidebar-logo .course{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.sidebar-logo .title{font-size:13px;font-weight:700;color:var(--accent);margin-top:4px}
+.sidebar-logo .lec-num{display:inline-block;background:var(--accent);color:var(--bg);font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:8px}
+.nav-section{padding:12px 0 4px}
+.nav-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:0 20px 6px}
+.nav-part{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accent);padding:10px 20px 4px;opacity:.7}
+.nav-item{display:block;padding:7px 20px;color:var(--muted);text-decoration:none;font-size:12px;border-left:2px solid transparent;transition:all .15s}
+.nav-item:hover,.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(227,179,65,.08)}
+.nav-item .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;margin-right:8px;vertical-align:middle}
+
+/* ── MAIN ── */
+.main{margin-left:240px;padding:40px 48px 80px;max-width:960px}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#1f1a0d 100%);border:1px solid var(--border);border-radius:12px;padding:40px 48px;margin-bottom:48px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(227,179,65,.14) 0%,transparent 70%)}
+.hero-tag{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);background:rgba(227,179,65,.1);border:1px solid rgba(227,179,65,.2);padding:3px 12px;border-radius:20px;display:inline-block;margin-bottom:16px}
+.hero h1{font-size:32px;font-weight:700;line-height:1.2;margin-bottom:8px}
+.hero h1 span{color:var(--accent)}
+.hero-sub{font-size:16px;color:var(--muted);margin-bottom:24px}
+.hero-pills{display:flex;flex-wrap:wrap;gap:8px}
+.hero-pill{font-size:12px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:20px;font-family:'Space Mono',monospace}
+
+/* ── PART DIVIDER ── */
+.part-divider{display:flex;align-items:center;gap:16px;margin:48px 0 32px}
+.part-divider-line{flex:1;height:1px;background:var(--border)}
+.part-divider-label{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);background:rgba(227,179,65,.1);border:1px solid rgba(227,179,65,.25);padding:4px 14px;border-radius:20px;white-space:nowrap}
+
+/* ── SECTION ── */
+.section{margin-bottom:56px;scroll-margin-top:24px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.section-num{font-family:'Space Mono',monospace;font-size:11px;color:var(--bg);background:var(--accent);padding:2px 10px;border-radius:4px;font-weight:700}
+.section h2{font-size:20px;font-weight:700}
+
+/* ── CONCEPT CARD ── */
+.concept-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px}
+.concept-card.hl-amber {border-color:rgba(227,179,65,.4); background:linear-gradient(135deg,var(--bg2),rgba(227,179,65,.04))}
+.concept-card.hl-green {border-color:rgba(63,185,80,.4);  background:linear-gradient(135deg,var(--bg2),rgba(63,185,80,.04))}
+.concept-card.hl-blue  {border-color:rgba(88,166,255,.4); background:linear-gradient(135deg,var(--bg2),rgba(88,166,255,.04))}
+.concept-card.hl-purple{border-color:rgba(210,168,255,.4);background:linear-gradient(135deg,var(--bg2),rgba(210,168,255,.04))}
+.concept-card.hl-orange{border-color:rgba(255,166,87,.4); background:linear-gradient(135deg,var(--bg2),rgba(255,166,87,.04))}
+.concept-card.hl-cyan  {border-color:rgba(86,207,225,.4); background:linear-gradient(135deg,var(--bg2),rgba(86,207,225,.04))}
+.concept-card.hl-red   {border-color:rgba(247,129,102,.4);background:linear-gradient(135deg,var(--bg2),rgba(247,129,102,.04))}
+.concept-card h3{font-size:15px;font-weight:700;margin-bottom:12px;color:var(--accent);display:flex;align-items:center;gap:8px}
+.concept-card p{color:#c9d1d9;font-size:14px;margin-bottom:10px}
+.concept-card ul{list-style:none;margin-top:8px}
+.concept-card ul li{color:#c9d1d9;font-size:14px;padding:4px 0 4px 20px;position:relative}
+.concept-card ul li::before{content:'▸';position:absolute;left:0;color:var(--accent)}
+
+/* ── CODE BLOCK ── */
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0}
+.code-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;justify-content:space-between}
+.code-filename{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
+.code-lang{font-family:'Space Mono',monospace;font-size:10px;color:var(--bg);background:var(--accent);padding:2px 8px;border-radius:3px}
+.copy-btn{background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;cursor:pointer;transition:all .15s}
+.copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+.copy-btn.copied{color:var(--accent2);border-color:var(--accent2)}
+.code-body{padding:20px;overflow-x:auto}
+.code-body pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;margin:0}
+.kw{color:#ff7b72}.ty{color:#79c0ff}.cm{color:#8b949e;font-style:italic}
+.nm{color:#ffa657}.st{color:#a5d6ff}.fn{color:#d2a8ff}
+.op{color:#e6edf3}.nb{color:#79c0ff}.pp{color:#ff7b72}
+
+/* ── CALLOUT ── */
+.callout{border-radius:8px;padding:14px 18px;margin:16px 0;font-size:13px;display:flex;gap:12px}
+.callout.tip   {background:rgba(63,185,80,.08);  border:1px solid rgba(63,185,80,.25)}
+.callout.warn  {background:rgba(255,166,87,.08); border:1px solid rgba(255,166,87,.3)}
+.callout.info  {background:rgba(227,179,65,.08); border:1px solid rgba(227,179,65,.25)}
+.callout.error {background:rgba(247,129,102,.08);border:1px solid rgba(247,129,102,.3)}
+.callout.purple{background:rgba(210,168,255,.08);border:1px solid rgba(210,168,255,.3)}
+.callout.cyan  {background:rgba(86,207,225,.08); border:1px solid rgba(86,207,225,.25)}
+.callout-icon{font-size:18px;flex-shrink:0}
+.callout-body{color:#c9d1d9;line-height:1.6}
+.callout-body strong{display:block;margin-bottom:4px}
+
+/* ── OUTPUT ── */
+.output-box{background:#010409;border:1px solid var(--accent);border-radius:6px;padding:10px 16px;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)}
+.output-box::before{content:'$ ';color:var(--muted)}
+
+/* ── CARD GRID ── */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.card-grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+
+/* ── DATA TABLE ── */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0}
+.data-table thead tr{background:var(--bg3)}
+.data-table th{text-align:left;padding:10px 14px;color:var(--muted);font-weight:700;font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase;border-bottom:2px solid var(--border)}
+.data-table td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:top;font-size:13px}
+.data-table tbody tr:hover{background:rgba(255,255,255,.02)}
+
+/* ── STRUCT VISUAL ── */
+.struct-box{background:#010409;border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;font-family:'JetBrains Mono',monospace}
+.struct-header{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.struct-members{display:flex;flex-direction:column;gap:4px}
+.struct-member{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:4px;border:1px solid var(--border);transition:all .2s;cursor:default}
+.struct-member:hover{border-color:var(--accent);background:rgba(227,179,65,.06)}
+.struct-member .m-type{color:#79c0ff;font-size:12px;min-width:80px;flex-shrink:0}
+.struct-member .m-name{color:var(--accent6);font-size:12px;min-width:80px;flex-shrink:0}
+.struct-member .m-size{margin-left:auto;font-size:10px;font-family:'Space Mono',monospace;color:var(--muted);background:var(--bg3);padding:2px 6px;border-radius:3px;flex-shrink:0}
+.struct-member .m-bar{flex:1;height:6px;border-radius:3px;background:rgba(227,179,65,.3)}
+
+/* ── MEMORY LAYOUT ── */
+.mem-layout{overflow-x:auto;padding:12px;background:#010409;border:1px solid var(--border);border-radius:8px;margin:12px 0}
+.mem-row{display:flex;gap:0;margin-bottom:2px;min-width:fit-content}
+.mem-cell-struct{height:40px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;border:1px solid var(--border);transition:all .2s;cursor:default;flex-shrink:0}
+.mem-cell-struct:hover{filter:brightness(1.2)}
+.mem-cell-struct.t-int   {background:rgba(227,179,65,.12); border-color:rgba(227,179,65,.4); color:var(--accent)}
+.mem-cell-struct.t-char  {background:rgba(63,185,80,.12);  border-color:rgba(63,185,80,.4);  color:var(--accent2)}
+.mem-cell-struct.t-double{background:rgba(210,168,255,.12);border-color:rgba(210,168,255,.4);color:var(--accent4)}
+.mem-cell-struct.t-ptr   {background:rgba(86,207,225,.12); border-color:rgba(86,207,225,.4); color:var(--accent5)}
+.mem-cell-struct.t-pad   {background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.1);color:var(--muted);font-size:9px}
+.mem-cell-struct.t-union {background:rgba(255,166,87,.18); border-color:rgba(255,166,87,.6); color:var(--accent6)}
+
+/* ── INTERACTIVE DEMO ── */
+.demo-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin:16px 0}
+.demo-title{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.demo-title::before{content:'▶';font-size:10px}
+.demo-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.demo-controls label{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
+.demo-btn{background:var(--accent);color:var(--bg);border:none;padding:6px 16px;border-radius:5px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.demo-btn:hover{opacity:.85}
+.demo-btn.secondary{background:var(--bg3);color:var(--muted);border:1px solid var(--border)}
+.demo-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;padding:4px 10px;border-radius:4px}
+
+/* ── ENUM COLOR CHIPS ── */
+.enum-row{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.enum-chip{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;border:1px solid;cursor:default;transition:all .2s}
+.enum-chip:hover{transform:translateY(-2px);filter:brightness(1.15)}
+
+/* ── TABS ── */
+.tabs{margin:16px 0}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab-btn{padding:8px 18px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:13px;border-bottom:2px solid transparent;transition:all .2s;position:relative;bottom:-1px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+
+/* ── QUIZ ── */
+.quiz-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:32px;margin-top:32px}
+.quiz-header{text-align:center;margin-bottom:32px}
+.quiz-header h2{font-size:22px;margin-bottom:8px}
+.quiz-header p{color:var(--muted);font-size:14px}
+.quiz-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:20px}
+.quiz-card .q-num{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:8px}
+.quiz-card .q-text{font-size:14px;font-weight:700;margin-bottom:14px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s;display:flex;align-items:flex-start;gap:10px;text-align:left}
+.quiz-opt:hover{border-color:var(--accent);background:rgba(227,179,65,.05)}
+.quiz-opt.correct{border-color:var(--accent2);background:rgba(63,185,80,.1);color:var(--accent2)}
+.quiz-opt.wrong  {border-color:var(--accent3);background:rgba(247,129,102,.1);color:var(--accent3)}
+.quiz-opt .opt-label{font-family:'Space Mono',monospace;font-size:11px;width:22px;height:22px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.quiz-feedback{margin-top:10px;font-size:13px;padding:10px 14px;border-radius:6px;display:none;line-height:1.6}
+.quiz-feedback.show{display:block}
+.quiz-feedback.correct{background:rgba(63,185,80,.1);color:var(--accent2);border:1px solid rgba(63,185,80,.3)}
+.quiz-feedback.wrong  {background:rgba(247,129,102,.1);color:var(--accent3);border:1px solid rgba(247,129,102,.3)}
+.quiz-score{text-align:center;padding:24px;background:var(--bg3);border-radius:8px;margin-top:20px;display:none}
+.quiz-score.show{display:block}
+.score-num{font-family:'Space Mono',monospace;font-size:48px;font-weight:700;color:var(--accent);line-height:1}
+.score-label{color:var(--muted);font-size:14px;margin-top:8px}
+.btn-primary{background:var(--accent);color:var(--bg);border:none;padding:10px 24px;border-radius:6px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:16px}
+.btn-primary:hover{opacity:.85}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+@media(max-width:800px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:20px 20px 60px}
+  .card-grid,.card-grid-3,.card-grid-4{grid-template-columns:1fr}
+  .hero{padding:24px}
+}
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="course">C 프로그래밍 및 실습</div>
+    <div class="title">구조체 / 공용체 / 열거형</div>
+    <div class="lec-num">Lecture 10</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">목차</div>
+    <div class="nav-part">Part 1 — 구조체</div>
+    <a class="nav-item active" href="#intro"><span class="dot"></span>C 데이터 타입 개요</a>
+    <a class="nav-item" href="#typedef"><span class="dot"></span>typedef</a>
+    <a class="nav-item" href="#define"><span class="dot"></span>구조체 정의</a>
+    <a class="nav-item" href="#init"><span class="dot"></span>선언 &amp; 초기화</a>
+    <a class="nav-item" href="#member"><span class="dot"></span>멤버 접근 (. / ->)</a>
+    <a class="nav-item" href="#ops"><span class="dot"></span>허용 연산자</a>
+    <a class="nav-item" href="#array"><span class="dot"></span>구조체 배열</a>
+    <a class="nav-item" href="#nested"><span class="dot"></span>중첩 구조체</a>
+    <a class="nav-item" href="#func"><span class="dot"></span>구조체와 함수</a>
+    <div class="nav-part">Part 2 — 공용체 / 열거형</div>
+    <a class="nav-item" href="#union"><span class="dot"></span>공용체 (Union)</a>
+    <a class="nav-item" href="#enum"><span class="dot"></span>열거형 (Enum)</a>
+    <a class="nav-item" href="#quiz"><span class="dot"></span>퀴즈 🎯</a>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="hero">
+    <div class="hero-tag">Lecture 10</div>
+    <h1>Structure, Union &amp; Enum<br><span>구조체, 공용체, 열거형</span></h1>
+    <p class="hero-sub">프로그래밍방법론및실습 — 서울시립대학교 기계정보공학과</p>
+    <div class="hero-pills">
+      <span class="hero-pill">struct</span>
+      <span class="hero-pill">typedef</span>
+      <span class="hero-pill">. operator</span>
+      <span class="hero-pill">-> operator</span>
+      <span class="hero-pill">union</span>
+      <span class="hero-pill">enum</span>
+      <span class="hero-pill">User-defined Type</span>
+    </div>
+  </div>
+
+  <!-- ══ PART 1 ══ -->
+  <div class="part-divider">
+    <div class="part-divider-line"></div>
+    <div class="part-divider-label">Part 1 — 구조체 (Structure)</div>
+    <div class="part-divider-line"></div>
+  </div>
+
+  <!-- ── SECTION 1: C 데이터 타입 ── -->
+  <section class="section" id="intro">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>C 언어 데이터 타입 전체 구조</h2>
+    </div>
+
+    <div class="concept-card hl-amber">
+      <h3><span>🗺️</span>C 데이터 타입 분류</h3>
+      <div class="card-grid-3" style="margin-top:12px">
+        <div style="background:var(--bg3);border:1px solid rgba(227,179,65,.3);border-radius:8px;padding:14px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);font-weight:700;margin-bottom:6px">Fundamental (기본형)</div>
+          <div style="font-size:12px;color:#c9d1d9">char, short, int, long<br>float, double, …</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid rgba(88,166,255,.3);border-radius:8px;padding:14px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:#79c0ff;font-weight:700;margin-bottom:6px">Derived (파생형)</div>
+          <div style="font-size:12px;color:#c9d1d9">pointer, array<br><strong style="color:var(--accent)">structure, union</strong></div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid rgba(63,185,80,.3);border-radius:8px;padding:14px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2);font-weight:700;margin-bottom:6px">User-defined (사용자 정의형)</div>
+          <div style="font-size:12px;color:#c9d1d9"><strong style="color:var(--accent)">typedef, enum</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="concept-card">
+      <h3><span>💡</span>배열 vs 구조체</h3>
+      <div class="card-grid">
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--accent2);margin-bottom:6px">배열 (Array)</div>
+          <p style="font-size:13px"><strong style="color:var(--accent2)">동일한</strong> 데이터 타입 여러 개를 하나의 이름으로 묶음</p>
+          <div class="code-block" style="margin-top:6px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="ty">int</span> <span class="nm">grades</span>[<span class="nb">5</span>]; <span class="cm">// int 5개</span></pre>
+          </div></div>
+        </div>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);margin-bottom:6px">구조체 (Structure)</div>
+          <p style="font-size:13px"><strong style="color:var(--accent)">서로 다른</strong> 데이터 타입 여러 개를 하나의 새로운 타입으로 정의</p>
+          <div class="code-block" style="margin-top:6px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="kw">struct</span> student {
+  <span class="ty">int</span>    number;
+  <span class="ty">char</span>   name[<span class="nb">10</span>];
+  <span class="ty">double</span> grade;
+};</pre>
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: typedef ── -->
+  <section class="section" id="typedef">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>typedef — 사용자 정의 타입 이름</h2>
+    </div>
+
+    <div class="concept-card hl-amber">
+      <h3><span>🏷️</span>typedef란?</h3>
+      <p>기존 자료형에 <strong style="color:var(--accent)">새로운 이름(별칭)</strong>을 붙이는 키워드입니다. 코드 가독성을 높이고 이식성을 개선합니다.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">typedef 기본 사용법</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="cm">/* 기본 형식 */</span>
+<span class="kw">typedef</span> primitive_type user_defined_name;
+
+<span class="cm">/* 예시 */</span>
+<span class="kw">typedef</span> <span class="ty">unsigned char</span>  BYTE;    <span class="cm">// BYTE = 1 byte unsigned</span>
+<span class="kw">typedef</span> <span class="ty">int</span>            INT32;   <span class="cm">// INT32 = 4 byte int</span>
+<span class="kw">typedef</span> <span class="ty">short</span>          INT16;   <span class="cm">// INT16 = 2 byte short</span>
+
+<span class="cm">/* 이제 아래처럼 사용 가능 */</span>
+<span class="nm">BYTE</span>  index;
+<span class="nm">INT32</span> i;
+<span class="nm">INT16</span> s;</pre>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card hl-green">
+        <h3 style="color:var(--accent2)"><span>✅</span>typedef 장점</h3>
+        <ul>
+          <li>타입 이름을 용도에 맞게 <strong style="color:var(--accent2)">친숙하게 변경</strong></li>
+          <li>플랫폼 간 이식 시 한 곳만 수정하면 됨</li>
+          <li>구조체 타입 선언을 간결하게 사용 가능</li>
+        </ul>
+      </div>
+      <div class="concept-card">
+        <h3 style="color:var(--accent)"><span>🔗</span>구조체와 typedef 조합</h3>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="cm">// struct student 선언 후 typedef</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> student Student;
+
+<span class="cm">// 또는 한 번에!</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+  <span class="ty">int</span> number;
+  <span class="ty">char</span> name[<span class="nb">10</span>];
+} Student;
+
+Student s1, s2; <span class="cm">// struct 생략 가능</span></pre>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: 구조체 정의 ── -->
+  <section class="section" id="define">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>구조체 정의 (Structure Definition)</h2>
+    </div>
+
+    <!-- 구조체 해부도 -->
+    <div class="demo-box">
+      <div class="demo-title">구조체 문법 해부 — 각 부분에 마우스를 올려보세요</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;line-height:2.2;padding:4px 0">
+        <span style="color:#ff7b72;cursor:default;position:relative" title="keyword: struct 키워드">struct</span>
+        <span> </span>
+        <span style="color:var(--accent);cursor:default" title="tag: 구조체 타입 이름 (구분자)">student</span>
+        <span style="color:var(--text)"> {</span><br>
+        <span style="padding-left:24px;display:inline-block">
+          <span style="color:#79c0ff">int</span>
+          <span>    </span>
+          <span style="color:var(--accent6)">number</span>
+          <span style="color:var(--text)">;</span>
+          <span style="color:#8b949e;font-style:italic;margin-left:16px">// member variable 1</span>
+        </span><br>
+        <span style="padding-left:24px;display:inline-block">
+          <span style="color:#79c0ff">char</span>
+          <span>   </span>
+          <span style="color:var(--accent6)">name[10]</span>
+          <span style="color:var(--text)">;</span>
+          <span style="color:#8b949e;font-style:italic;margin-left:16px">// member variable 2 (배열도 가능)</span>
+        </span><br>
+        <span style="padding-left:24px;display:inline-block">
+          <span style="color:#79c0ff">double</span>
+          <span> </span>
+          <span style="color:var(--accent6)">grade</span>
+          <span style="color:var(--text)">;</span>
+          <span style="color:#8b949e;font-style:italic;margin-left:16px">// member variable 3</span>
+        </span><br>
+        <span style="color:var(--text)">}</span><span style="color:var(--accent3)">;</span>
+        <span style="color:#8b949e;font-style:italic;margin-left:16px">// ← 세미콜론 필수!</span>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>구조체 타입 정의 ≠ 변수 선언!</strong>
+        위 선언은 <strong style="color:var(--accent5)">타입의 구조(청사진)</strong>만 정의한 것입니다. 실제 메모리를 차지하는 <strong style="color:var(--accent)">변수 선언</strong>은 별도로 해야 합니다.
+      </div>
+    </div>
+
+    <!-- 4가지 선언 패턴 -->
+    <h3 style="font-size:15px;font-weight:700;margin:20px 0 12px;color:var(--text)">구조체 타입 정의 + 변수 선언 4가지 패턴</h3>
+    <div class="tabs">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'sd1')">① 분리 선언</button>
+        <button class="tab-btn" onclick="switchTab(this,'sd2')">② 동시 선언</button>
+        <button class="tab-btn" onclick="switchTab(this,'sd3')">③ typedef 조합</button>
+        <button class="tab-btn" onclick="switchTab(this,'sd4')">④ 익명 구조체</button>
+      </div>
+      <div class="tab-panel active" id="sd1">
+        <div class="concept-card hl-green">
+          <h3 style="color:var(--accent2)"><span>①</span>타입 정의 → 변수 선언 (분리)</h3>
+          <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:10px 14px">
+<pre><span class="kw">struct</span> student { <span class="cm">/* 구조체 타입 정의 */</span>
+  <span class="ty">int</span> number; <span class="ty">char</span> name[<span class="nb">10</span>]; <span class="ty">double</span> grade;
+};
+<span class="kw">struct</span> student <span class="nm">s1</span>, <span class="nm">s2</span>; <span class="cm">/* 변수 선언 */</span></pre>
+          </div></div>
+          <p style="font-size:12px;color:var(--muted);margin-top:6px">가장 일반적인 방법. 타입 재사용이 쉬움.</p>
+        </div>
+      </div>
+      <div class="tab-panel" id="sd2">
+        <div class="concept-card hl-amber">
+          <h3><span>②</span>타입 정의 + 변수 선언 동시에</h3>
+          <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:10px 14px">
+<pre><span class="kw">struct</span> student {
+  <span class="ty">int</span> number; <span class="ty">char</span> name[<span class="nb">10</span>]; <span class="ty">double</span> grade;
+} <span class="nm">s1</span>, <span class="nm">s2</span>; <span class="cm">/* 정의와 동시에 변수 선언 */</span></pre>
+          </div></div>
+          <p style="font-size:12px;color:var(--muted);margin-top:6px">타입 정의와 변수 선언을 한 번에.</p>
+        </div>
+      </div>
+      <div class="tab-panel" id="sd3">
+        <div class="concept-card hl-cyan">
+          <h3 style="color:var(--accent5)"><span>③</span>typedef로 새 타입 이름 부여 (권장)</h3>
+          <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:10px 14px">
+<pre><span class="cm">/* 방법 A: 별도 typedef */</span>
+<span class="kw">struct</span> student { <span class="ty">int</span> number; <span class="ty">char</span> name[<span class="nb">10</span>]; <span class="ty">double</span> grade; };
+<span class="kw">typedef</span> <span class="kw">struct</span> student Student;
+Student <span class="nm">s1</span>, <span class="nm">s2</span>;
+
+<span class="cm">/* 방법 B: 한 번에 (태그 이름 생략 가능) */</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+  <span class="ty">int</span> number; <span class="ty">char</span> name[<span class="nb">10</span>]; <span class="ty">double</span> grade;
+} Student;
+Student <span class="nm">s1</span>, <span class="nm">s2</span>; <span class="cm">// struct 키워드 불필요!</span></pre>
+          </div></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="sd4">
+        <div class="concept-card hl-red">
+          <h3 style="color:var(--accent3)"><span>④</span>익명(태그 없는) 구조체</h3>
+          <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:10px 14px">
+<pre><span class="kw">struct</span> { <span class="cm">/* 태그 이름 없음 */</span>
+  <span class="ty">int</span> number; <span class="ty">char</span> name[<span class="nb">10</span>]; <span class="ty">double</span> grade;
+} <span class="nm">s1</span>, <span class="nm">s2</span>;
+<span class="cm">// ⚠️ 나중에 추가 변수 선언 불가!
+//    이름이 없으므로 타입을 다시 참조할 방법이 없음</span></pre>
+          </div></div>
+          <p style="font-size:12px;color:var(--accent3);margin-top:6px">추가 변수 선언이 불가하므로 사용 범위가 제한됨.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 4: 선언 & 초기화 ── -->
+  <section class="section" id="init">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>구조체 변수 선언 &amp; 초기화</h2>
+    </div>
+
+    <div class="concept-card hl-amber">
+      <h3><span>🔧</span>초기화 방법</h3>
+      <p>중괄호 <code style="color:var(--accent5)">{}</code>로 감싸고, 각 멤버 초기값을 <strong style="color:var(--accent)">정의된 순서대로</strong> 쉼표로 구분합니다.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">구조체 초기화 예시</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="cm">/* 기본 초기화 */</span>
+<span class="kw">struct</span> card { <span class="ty">int</span> pips; <span class="ty">char</span> suit; };
+<span class="kw">struct</span> card <span class="nm">c</span> = {<span class="nb">13</span>, <span class="st">'h'</span>};   <span class="cm">// king of hearts</span>
+
+<span class="cm">/* 선언과 동시에 초기화 */</span>
+<span class="kw">struct</span> home_address {
+  <span class="ty">char</span> *street;
+  <span class="ty">char</span> *city_and_state;
+  <span class="ty">long</span>  zip_code;
+} address = { <span class="st">"87 West Street"</span>, <span class="st">"Aspen, Colorado"</span>, <span class="nb">80526</span> };
+
+<span class="cm">/* {0}으로 전체 0 초기화 */</span>
+<span class="kw">struct</span> home_address prev = {<span class="nb">0</span>};
+
+<span class="cm">/* 구조체 배열 + 2D 초기화 */</span>
+<span class="kw">typedef</span> <span class="kw">struct</span> { <span class="ty">double</span> real; <span class="ty">double</span> imag; } Complex;
+Complex <span class="nm">a</span>[<span class="nb">3</span>][<span class="nb">3</span>] = {
+  {{<span class="nb">1.0</span>, -<span class="nb">0.1</span>}, {<span class="nb">2.0</span>, <span class="nb">0.2</span>}, {<span class="nb">3.0</span>, <span class="nb">0.3</span>}},
+  {{<span class="nb">4.0</span>, -<span class="nb">0.4</span>}, {<span class="nb">5.0</span>, <span class="nb">0.5</span>}, {<span class="nb">6.0</span>, <span class="nb">0.6</span>}},
+  <span class="cm">// a[2][0..2] → 자동으로 0</span>
+};</pre>
+      </div>
+    </div>
+
+    <!-- 인터랙티브 구조체 빌더 -->
+    <div class="demo-box">
+      <div class="demo-title">인터랙티브 Student 구조체 빌더</div>
+      <div class="demo-controls">
+        <label>number:</label>
+        <input type="number" class="demo-input" id="st-num" value="20241001" style="width:110px">
+        <label>name:</label>
+        <input type="text" class="demo-input" id="st-name" value="Kim" style="width:90px" maxlength="9">
+        <label>grade:</label>
+        <input type="number" class="demo-input" id="st-grade" value="4.2" step="0.1" min="0" max="4.5" style="width:70px">
+        <button class="demo-btn" onclick="buildStudent()">▶ 빌드</button>
+        <button class="demo-btn secondary" onclick="resetStudent()">↺</button>
+      </div>
+      <div id="student-vis"></div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: 멤버 접근 ── -->
+  <section class="section" id="member">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>멤버 접근 연산자 ( . ) 와 ( -&gt; )</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card hl-amber">
+        <h3><span>🔵</span><code>.</code> — 직접 접근 (구조체 변수)</h3>
+        <p style="font-size:13px">구조체 <strong style="color:var(--accent)">변수</strong>를 통해 멤버에 직접 접근합니다.</p>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="kw">struct</span> card <span class="nm">c1</span>;
+<span class="nm">c1</span>.pips = <span class="nb">3</span>;     <span class="cm">// 쓰기</span>
+<span class="nm">c1</span>.suit = <span class="st">'s'</span>;
+<span class="ty">int</span> <span class="nm">x</span> = <span class="nm">c1</span>.pips; <span class="cm">// 읽기</span></pre>
+        </div></div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px">사용법: <code style="color:var(--accent)">구조체변수명.멤버변수명</code></div>
+      </div>
+      <div class="concept-card hl-orange">
+        <h3 style="color:var(--accent6)"><span>🟠</span><code>-&gt;</code> — 간접 접근 (포인터)</h3>
+        <p style="font-size:13px">구조체를 가리키는 <strong style="color:var(--accent6)">포인터</strong>를 통해 멤버에 접근합니다.</p>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="kw">struct</span> card <span class="nm">c1</span>;
+<span class="kw">struct</span> card *<span class="nm">pcard</span> = &<span class="nm">c1</span>;
+<span class="nm">pcard</span>-><span class="nm">pips</span> = <span class="nb">1</span>;    <span class="cm">// ✅</span>
+(*<span class="nm">pcard</span>).<span class="nm">pips</span> = <span class="nb">2</span>; <span class="cm">// ✅ 동일</span>
+*<span class="nm">pcard</span>.<span class="nm">pips</span> = <span class="nb">3</span>;   <span class="cm">// ❌ 에러!</span></pre>
+        </div></div>
+        <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px">사용법: <code style="color:var(--accent6)">포인터변수->멤버변수명</code></div>
+      </div>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <strong><code>*pcard.pips</code>는 컴파일 에러!</strong>
+        <code>.</code>과 <code>-></code>는 <strong style="color:var(--accent5)">최고 우선순위</strong>(좌→우 결합)이므로, <code>*pcard.pips</code>는 <code>*(pcard.pips)</code>로 해석됩니다. pcard는 포인터이지 구조체가 아니므로 <code>.</code>을 사용할 수 없습니다.<br>
+        → 포인터에 <code>.</code>을 쓰려면 반드시 괄호: <code>(*pcard).pips</code>
+      </div>
+    </div>
+
+    <!-- 연산자 표현식 표 -->
+    <div class="concept-card">
+      <h3><span>📊</span>멤버 접근 표현식 예시 테이블</h3>
+      <p style="font-size:12px;color:var(--muted)">struct student s1; struct student *p = &amp;s1; — s1.last_name="Kim", s1.student_id=910017, s1.grade='A'</p>
+      <table class="data-table" style="margin-top:8px">
+        <thead><tr><th>수식</th><th>동일 표현</th><th>값</th></tr></thead>
+        <tbody>
+          <tr><td><code>s1.grade</code></td><td><code>p->grade</code></td><td><code>'A'</code></td></tr>
+          <tr><td><code>s1.last_name</code></td><td><code>p->last_name</code></td><td><code>"Kim"</code></td></tr>
+          <tr><td><code>(*p).student_id</code></td><td><code>p->student_id</code></td><td><code>910017</code></td></tr>
+          <tr><td><code>*p->last_name + 1</code></td><td><code>(*(p->last_name)) + 1</code></td><td><code>'L'</code> ('K'+1)</td></tr>
+          <tr><td><code>*(p->last_name + 2)</code></td><td><code>(p->last_name)[2]</code></td><td><code>'m'</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 인터랙티브 연산자 퀴즈 -->
+    <div class="demo-box">
+      <div class="demo-title">. vs -> 연산자 선택 트레이너</div>
+      <div id="op-quiz-question" style="font-family:'JetBrains Mono',monospace;font-size:13px;padding:10px;background:#010409;border:1px solid var(--border);border-radius:6px;margin-bottom:12px"></div>
+      <div style="display:flex;gap:8px">
+        <button class="demo-btn" onclick="answerOpQuiz('dot')">. (점 연산자)</button>
+        <button class="demo-btn" style="background:var(--accent6);color:var(--bg)" onclick="answerOpQuiz('arrow')">-> (화살표 연산자)</button>
+        <button class="demo-btn secondary" onclick="nextOpQuiz()">다음 →</button>
+      </div>
+      <div id="op-quiz-feedback" style="font-family:'Space Mono',monospace;font-size:12px;margin-top:8px;min-height:20px"></div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 6: 허용 연산자 ── -->
+  <section class="section" id="ops">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>구조체 변수에 허용되는 연산</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card hl-green">
+        <h3 style="color:var(--accent2)"><span>✅</span>가능한 연산</h3>
+        <ul>
+          <li><strong style="color:var(--accent5)">=</strong> 대입 연산자 (같은 타입 간 멤버 전체 복사)</li>
+          <li><strong style="color:var(--accent5)">&amp;</strong> 주소 연산자</li>
+          <li><strong style="color:var(--accent5)">*</strong> 역참조 연산자</li>
+          <li><strong style="color:var(--accent5)">sizeof</strong> 크기 연산자</li>
+          <li>멤버 변수 간 산술/관계/등가/논리 연산</li>
+        </ul>
+      </div>
+      <div class="concept-card hl-red">
+        <h3 style="color:var(--accent3)"><span>❌</span>불가능한 연산</h3>
+        <ul>
+          <li><strong style="color:var(--accent3)">==</strong> 구조체 변수 직접 비교 불가</li>
+          <li><strong style="color:var(--accent3)">+, -, *, /</strong> 구조체 변수 간 직접 산술 불가</li>
+        </ul>
+        <p style="font-size:12px;color:var(--muted);margin-top:8px">→ 멤버 변수 각각에 적용해야 합니다.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">Point 구조체 연산 예시</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="kw">typedef</span> <span class="kw">struct</span> { <span class="ty">int</span> x; <span class="ty">int</span> y; } Point;
+
+Point <span class="nm">p1</span> = {<span class="nb">10</span>, <span class="nb">20</span>};
+Point <span class="nm">p2</span> = {<span class="nb">30</span>, <span class="nb">40</span>};
+Point <span class="nm">p3</span>;
+
+<span class="cm">/* ✅ 대입 — 멤버 전체 복사 */</span>
+<span class="nm">p2</span> = <span class="nm">p1</span>; <span class="cm">// p2.x=10, p2.y=20</span>
+
+<span class="cm">/* ❌ 직접 비교 불가 → 멤버별로 */</span>
+<span class="kw">if</span> (<span class="nm">p1</span> == <span class="nm">p2</span>) ...   <span class="cm">// ❌</span>
+<span class="kw">if</span> ((<span class="nm">p1</span>.x==<span class="nm">p2</span>.x) && (<span class="nm">p1</span>.y==<span class="nm">p2</span>.y)) ... <span class="cm">// ✅</span>
+
+<span class="cm">/* ❌ 직접 산술 불가 → 멤버별로 */</span>
+<span class="nm">p3</span> = <span class="nm">p2</span> - <span class="nm">p1</span>;        <span class="cm">// ❌</span>
+<span class="nm">p3</span>.x = <span class="nm">p2</span>.x - <span class="nm">p1</span>.x;  <span class="cm">// ✅</span>
+<span class="nm">p3</span>.y = <span class="nm">p2</span>.y - <span class="nm">p1</span>.y;  <span class="cm">// ✅</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 7: 구조체 배열 ── -->
+  <section class="section" id="array">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>구조체 배열</h2>
+    </div>
+
+    <div class="concept-card hl-amber">
+      <h3><span>📚</span>구조체 배열</h3>
+      <p>구조체 타입의 배열을 선언하면 각 원소가 구조체 변수입니다. <strong style="color:var(--accent5)">student[i].name</strong>처럼 인덱스와 멤버 접근 연산자를 함께 사용합니다.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">구조체 배열 — 학생 정보 입력</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="pp">#define</span> <span class="nm">CLASS_SIZE</span> <span class="nb">3</span>
+
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+  <span class="ty">char</span> name[<span class="nb">20</span>];
+  <span class="ty">int</span>  id;
+  <span class="ty">char</span> grade;
+} Student_info;
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>)
+{
+  <span class="ty">int</span> <span class="nm">i</span>;
+  Student_info <span class="nm">student</span>[<span class="nm">CLASS_SIZE</span>] = { <span class="nb">0</span> }; <span class="cm">// 전체 0 초기화</span>
+
+  <span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt; <span class="nm">CLASS_SIZE</span>; <span class="nm">i</span>++) {
+    <span class="fn">printf</span>(<span class="st">"Input student %d info: "</span>, <span class="nm">i</span>);
+    <span class="cm">// student[i].name → 배열 + 구조체 멤버</span>
+    <span class="fn">scanf</span>(<span class="st">"%s %d %c"</span>,
+      <span class="nm">student</span>[<span class="nm">i</span>].name,
+      &<span class="nm">student</span>[<span class="nm">i</span>].id,
+      &<span class="nm">student</span>[<span class="nm">i</span>].grade);
+  }
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+      </div>
+    </div>
+
+    <!-- 구조체 배열 메모리 시각화 -->
+    <div class="concept-card">
+      <h3><span>🗃️</span>구조체 배열 메모리 레이아웃 — <code style="color:var(--accent5)">Student_info student[3]</code></h3>
+      <div class="mem-layout">
+        <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:6px">각 원소가 구조체 하나 (name[20]=20B + id=4B + grade=1B + padding=3B = 28B)</div>
+        <div style="display:flex;gap:2px;overflow-x:auto">
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div style="display:flex;gap:0">
+              <div class="mem-cell-struct t-char" style="width:120px;font-size:10px">student[0].name</div>
+              <div class="mem-cell-struct t-int" style="width:56px;font-size:10px">id</div>
+              <div class="mem-cell-struct t-char" style="width:30px;font-size:10px">g</div>
+              <div class="mem-cell-struct t-pad" style="width:26px;font-size:9px">pad</div>
+            </div>
+            <div style="display:flex;gap:0">
+              <div class="mem-cell-struct t-char" style="width:120px;font-size:10px">student[1].name</div>
+              <div class="mem-cell-struct t-int" style="width:56px;font-size:10px">id</div>
+              <div class="mem-cell-struct t-char" style="width:30px;font-size:10px">g</div>
+              <div class="mem-cell-struct t-pad" style="width:26px;font-size:9px">pad</div>
+            </div>
+            <div style="display:flex;gap:0">
+              <div class="mem-cell-struct t-char" style="width:120px;font-size:10px">student[2].name</div>
+              <div class="mem-cell-struct t-int" style="width:56px;font-size:10px">id</div>
+              <div class="mem-cell-struct t-char" style="width:30px;font-size:10px">g</div>
+              <div class="mem-cell-struct t-pad" style="width:26px;font-size:9px">pad</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:6px">※ 실제 크기는 컴파일러 정렬(padding) 정책에 따라 다를 수 있음</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 8: 중첩 구조체 ── -->
+  <section class="section" id="nested">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <h2>중첩 구조체 (Nested Structure)</h2>
+    </div>
+
+    <div class="concept-card hl-blue">
+      <h3 style="color:#79c0ff"><span>🔗</span>구조체 안에 구조체</h3>
+      <p style="font-size:13px">구조체의 멤버 변수로 또 다른 구조체 타입을 사용할 수 있습니다. <strong style="color:var(--accent)">반드시 안쪽 구조체 타입이 먼저 선언</strong>되어야 합니다.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">Employee 중첩 구조체 예시</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="kw">struct</span> dept {
+  <span class="ty">int</span>   dept_no;
+  <span class="ty">char</span> *dept_name;
+};
+
+<span class="kw">typedef</span> <span class="kw">struct</span> {
+  <span class="ty">char</span>            name[<span class="nb">20</span>];
+  <span class="ty">int</span>             employee_id;
+  <span class="kw">struct</span> dept     department;   <span class="cm">// 구조체 멤버!</span>
+  <span class="kw">struct</span> home_addr *addr;       <span class="cm">// 포인터 멤버 (불완전 타입 OK)</span>
+} Employee_data;
+
+Employee_data <span class="nm">e</span>;
+
+<span class="cm">/* 중첩 멤버 접근: . 두 번 사용 */</span>
+<span class="nm">e</span>.department.dept_no   = <span class="nb">1002</span>;   <span class="cm">// ①e의 department, ②dept_no</span>
+<span class="nm">e</span>.department.dept_name = <span class="st">"CS"</span>;</pre>
+      </div>
+    </div>
+
+    <!-- 구조체 계층 시각화 -->
+    <div class="mem-layout">
+      <div style="font-size:10px;color:var(--accent);font-family:'Space Mono',monospace;margin-bottom:8px">Employee_data e 구조체 메모리</div>
+      <div style="display:flex;gap:2px;overflow-x:auto;align-items:stretch">
+        <div class="mem-cell-struct t-char" style="width:100px;font-size:10px">name[20]</div>
+        <div class="mem-cell-struct t-int" style="width:50px;font-size:9px">employee_id</div>
+        <div style="display:flex;flex-direction:column;gap:0;border:2px solid rgba(227,179,65,.4);border-radius:4px;overflow:hidden">
+          <div style="font-size:8px;color:var(--accent);font-family:'Space Mono',monospace;padding:2px 4px;background:rgba(227,179,65,.1)">struct dept</div>
+          <div style="display:flex;gap:0">
+            <div class="mem-cell-struct t-int" style="width:50px;font-size:9px">dept_no</div>
+            <div class="mem-cell-struct t-ptr" style="width:60px;font-size:9px">dept_name*</div>
+          </div>
+        </div>
+        <div class="mem-cell-struct t-ptr" style="width:54px;font-size:9px">addr*</div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-top:6px">
+        접근: <code style="color:var(--accent)">e.department.dept_no</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 9: 구조체와 함수 ── -->
+  <section class="section" id="func">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <h2>구조체와 함수</h2>
+    </div>
+
+    <div class="concept-card hl-amber">
+      <h3><span>📞</span>구조체를 함수 인자로 전달</h3>
+      <p>구조체 변수를 함수 인자로 전달하면 <strong style="color:var(--accent)">Call-by-Value</strong> — 전체 구조체의 <strong style="color:var(--accent5)">지역 사본</strong>이 생성됩니다. 멤버에 배열이 있으면 그 배열도 복사됩니다.</p>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>구조체가 크면 복사 오버헤드 발생!</strong>
+        멤버가 많거나 크기가 큰 배열 멤버가 있을 때, 매번 복사하는 것은 매우 비효율적입니다.<br>
+        → <strong style="color:var(--accent2)">프로그래밍 팁: 구조체 포인터(주소)를 전달하는 것이 바람직합니다 (Call-by-Reference)!</strong>
+      </div>
+    </div>
+
+    <!-- 값 전달 vs 포인터 전달 비교 -->
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent3)"><span>📋</span>값으로 전달 (비효율)</h3>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:10px 12px">
+<pre><span class="cm">/* 구조체 통째로 복사 */</span>
+Employee_data <span class="fn">update</span>(Employee_data <span class="nm">e</span>)
+{
+  <span class="ty">int</span> <span class="nm">n</span>;
+  <span class="fn">scanf</span>(<span class="st">"%d"</span>, &<span class="nm">n</span>);
+  <span class="nm">e</span>.department.dept_no = <span class="nm">n</span>;
+  <span class="kw">return</span> <span class="nm">e</span>; <span class="cm">// 다시 복사해서 반환</span>
+}
+<span class="cm">// 호출</span>
+Employee_data <span class="nm">e</span>;
+<span class="nm">e</span> = <span class="fn">update</span>(<span class="nm">e</span>); <span class="cm">// 복사 2번!</span></pre>
+        </div></div>
+      </div>
+      <div class="concept-card hl-green">
+        <h3 style="color:var(--accent2)"><span>✅</span>포인터로 전달 (효율, 권장)</h3>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:10px 12px">
+<pre><span class="cm">/* 포인터만 전달 — 복사 없음! */</span>
+<span class="ty">void</span> <span class="fn">update</span>(Employee_data *<span class="nm">pe</span>)
+{
+  <span class="ty">int</span> <span class="nm">n</span>;
+  <span class="fn">scanf</span>(<span class="st">"%d"</span>, &<span class="nm">n</span>);
+  <span class="nm">pe</span>->department.dept_no = <span class="nm">n</span>; <span class="cm">// -> 사용</span>
+  <span class="kw">return</span>;
+}
+<span class="cm">// 호출</span>
+Employee_data <span class="nm">e</span>;
+<span class="fn">update</span>(&<span class="nm">e</span>); <span class="cm">// 주소만 전달!</span></pre>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">🔒</span>
+      <div class="callout-body">
+        <strong>읽기 전용 구조체는 const 포인터 사용 (Secure Coding)</strong>
+        구조체의 내용을 읽기만 할 경우, 매개변수에 <code style="color:var(--accent2)">const</code> 키워드를 사용하세요:<br>
+        <code>void display(const Employee_data *pe)</code> — 실수로 내용을 수정하는 것을 컴파일러가 방지합니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PART 2 ══ -->
+  <div class="part-divider">
+    <div class="part-divider-line"></div>
+    <div class="part-divider-label">Part 2 — 공용체 (Union) &amp; 열거형 (Enum)</div>
+    <div class="part-divider-line"></div>
+  </div>
+
+  <!-- ── SECTION 10: Union ── -->
+  <section class="section" id="union">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>공용체 (Union)</h2>
+    </div>
+
+    <div class="concept-card hl-orange">
+      <h3 style="color:var(--accent6)"><span>🔀</span>공용체란?</h3>
+      <p>구조체와 비슷한 선언 형식이지만, 모든 멤버 변수가 <strong style="color:var(--accent6)">동일한 메모리 공간을 공유</strong>합니다.</p>
+      <ul>
+        <li>한 순간에는 <strong style="color:var(--accent3)">하나의 멤버로만</strong> 유효한 값을 가짐</li>
+        <li>메모리 크기 = <strong style="color:var(--accent5)">가장 큰 멤버의 크기</strong></li>
+        <li>같은 메모리 위치를 다르게 해석할 때 유용</li>
+        <li><strong style="color:var(--accent3)">올바른 해석은 프로그래머의 책임!</strong></li>
+      </ul>
+    </div>
+
+    <!-- struct vs union 메모리 비교 -->
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:#79c0ff"><span>📦</span>struct (독립 공간)</h3>
+        <div class="mem-layout">
+          <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:6px">최소 12~16 Bytes</div>
+          <div style="display:flex;gap:0">
+            <div class="mem-cell-struct t-int" style="width:56px;font-size:10px">int i<br>4B</div>
+            <div class="mem-cell-struct t-double" style="width:96px;font-size:10px">double d<br>8B</div>
+          </div>
+        </div>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="kw">struct</span> int_or_float {
+  <span class="ty">int</span>    i;
+  <span class="ty">double</span> d;
+}; <span class="cm">// 12~16 bytes</span></pre>
+        </div></div>
+      </div>
+      <div class="concept-card hl-orange">
+        <h3 style="color:var(--accent6)"><span>🔀</span>union (공유 공간)</h3>
+        <div class="mem-layout">
+          <div style="font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:6px">8 Bytes (double 크기)</div>
+          <div style="position:relative;width:96px;height:40px">
+            <div class="mem-cell-struct t-union" style="width:96px;height:40px;position:absolute;top:0;left:0;font-size:10px">i / d 공유</div>
+          </div>
+        </div>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="kw">union</span> int_or_double {
+  <span class="ty">int</span>    i;
+  <span class="ty">double</span> d;
+}; <span class="cm">// 8 bytes만!</span></pre>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- union 동작 예시 -->
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">union 동작 예시 — 같은 공간 다르게 해석</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="kw">union</span> int_or_double { <span class="ty">int</span> <span class="nm">i</span>; <span class="ty">double</span> <span class="nm">d</span>; };
+<span class="kw">union</span> int_or_double <span class="nm">u</span>;
+
+<span class="nm">u</span>.i = <span class="nb">4444</span>;
+<span class="fn">printf</span>(<span class="st">"i: %d  d: %e\n"</span>, <span class="nm">u</span>.i, <span class="nm">u</span>.d);
+<span class="cm">// i: 4444  d: 2.1956e-320  ← d는 의미 없음!</span>
+
+<span class="nm">u</span>.d = <span class="nb">4444.0</span>;
+<span class="fn">printf</span>(<span class="st">"i: %d  d: %e\n"</span>, <span class="nm">u</span>.i, <span class="nm">u</span>.d);
+<span class="cm">// i: 0  d: 4.4440e+03  ← i는 의미 없음!</span>
+<span class="cm">// 마지막에 저장한 멤버만 올바름!</span></pre>
+      </div>
+    </div>
+    <div class="output-box">i:       4444  d:  2.1956277301e-320<br>i:          0  d:  4.4440000000e+03</div>
+
+    <div class="callout error">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <strong>union 초기화 주의!</strong>
+        <code>union id var = {"Tom", 1};</code>처럼 멤버 개수보다 많은 초기값을 주면 컴파일 경고가 발생합니다. union은 첫 번째 멤버 하나만 초기화할 수 있습니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 11: Enum ── -->
+  <section class="section" id="enum">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <h2>열거형 (Enumeration Type)</h2>
+    </div>
+
+    <div class="concept-card hl-purple">
+      <h3 style="color:var(--accent4)"><span>🎨</span>열거형이란?</h3>
+      <p><strong style="color:var(--accent4)">정수형 상수에 의미 있는 이름</strong>을 붙여 집합으로 정의하는 타입입니다. 코드 가독성과 유지보수성을 높입니다.</p>
+      <ul>
+        <li>기본값: 첫 열거자는 <strong style="color:var(--accent5)">0</strong>부터 시작, 이후 1씩 증가</li>
+        <li>특정 열거자에 다른 시작값 지정 가능</li>
+        <li><strong style="color:var(--accent3)">정수형 상수만</strong> 할당 가능 (문자열, 실수 불가)</li>
+      </ul>
+    </div>
+
+    <!-- enum 시각화 -->
+    <div class="demo-box">
+      <div class="demo-title">열거형 상수값 탐색기</div>
+      <div class="demo-controls">
+        <select id="enum-select" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 10px;border-radius:4px" onchange="showEnum()">
+          <option value="0">enum day {Sun,Mon,Tue,Wed,Thu,Fri,Sat}</option>
+          <option value="1">enum suit {clubs=1, diamonds, hearts, spades}</option>
+          <option value="2">enum fruit {apple=7, pear, orange=3, lemon}</option>
+          <option value="3">enum numbers {Minus1=-1, Zero, One, Two}</option>
+          <option value="4">enum colors {white, red=3, blue, green, black=9}</option>
+        </select>
+      </div>
+      <div id="enum-chips" class="enum-row"></div>
+      <div id="enum-info" style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 12px;background:#010409;border:1px solid var(--border);border-radius:4px;margin-top:8px;min-height:32px;line-height:1.8"></div>
+    </div>
+
+    <!-- 선언 방법 -->
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">열거형 선언과 변수 사용</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="cm">/* 열거형 타입 정의 */</span>
+<span class="kw">enum</span> day { Sun, Mon, Tue, Wed, Thu, Fri, Sat };
+
+<span class="cm">/* 변수 선언 */</span>
+<span class="kw">enum</span> day <span class="nm">d1</span>, <span class="nm">d2</span>;
+<span class="nm">d1</span> = Fri;
+
+<span class="cm">/* typedef와 결합 (권장) */</span>
+<span class="kw">typedef</span> <span class="kw">enum</span> day Day;
+Day <span class="nm">today</span> = Mon;
+
+<span class="cm">/* 또는 한 번에 */</span>
+<span class="kw">typedef</span> <span class="kw">enum</span> { Sun, Mon, Tue, Wed, Thu, Fri, Sat } day;
+
+<span class="cm">/* 비교 연산 가능 */</span>
+<span class="kw">if</span> (<span class="nm">d1</span> == <span class="nm">d2</span>) { <span class="cm">/* do something */</span> }</pre>
+      </div>
+    </div>
+
+    <!-- 실용 예시: next_day -->
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">열거형 활용 — find_next_day()</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="kw">typedef</span> <span class="kw">enum</span> { sun, mon, tue, wed, thu, fri, sat } day;
+
+day <span class="fn">find_next_day</span>(day <span class="nm">d</span>) {
+  day <span class="nm">next</span>;
+  <span class="kw">switch</span>(<span class="nm">d</span>) {
+    <span class="kw">case</span> sun: <span class="nm">next</span> = mon; <span class="kw">break</span>;
+    <span class="kw">case</span> mon: <span class="nm">next</span> = tue; <span class="kw">break</span>;
+    <span class="kw">case</span> tue: <span class="nm">next</span> = wed; <span class="kw">break</span>;
+    <span class="kw">case</span> wed: <span class="nm">next</span> = thu; <span class="kw">break</span>;
+    <span class="kw">case</span> thu: <span class="nm">next</span> = fri; <span class="kw">break</span>;
+    <span class="kw">case</span> fri: <span class="nm">next</span> = sat; <span class="kw">break</span>;
+    <span class="kw">case</span> sat: <span class="nm">next</span> = sun; <span class="kw">break</span>;
+  }
+  <span class="kw">return</span> <span class="nm">next</span>;
+}
+
+<span class="cm">/* 문자열 배열과 조합 */</span>
+<span class="ty">char</span> *Days[] = {<span class="st">"Sunday"</span>,<span class="st">"Monday"</span>,<span class="st">"Tuesday"</span>,
+               <span class="st">"Wednesday"</span>,<span class="st">"Thursday"</span>,<span class="st">"Friday"</span>,<span class="st">"Saturday"</span>};
+
+day <span class="nm">d1</span> = Wed;
+<span class="fn">printf</span>(<span class="st">"%d means %s\n"</span>, <span class="nm">d1</span>, Days[<span class="nm">d1</span>]); <span class="cm">// 3 means Wednesday</span></pre>
+      </div>
+    </div>
+    <div class="output-box">3 means Wednesday</div>
+
+    <!-- 주의사항 -->
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>열거형 상수로 정수형만 가능!</strong>
+        문자열이나 실수를 열거형 상수로 사용하면 컴파일 에러가 발생합니다:<br>
+        <code style="color:var(--accent3)">enum lastname {"Kim","Lee"};</code> → ❌<br>
+        <code style="color:var(--accent3)">enum realnumbers {pi=3.14};</code> → ❌
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 12: 퀴즈 ── -->
+  <section class="section" id="quiz">
+    <div class="quiz-section">
+      <div class="quiz-header">
+        <h2>🎯 퀴즈</h2>
+        <p>구조체 / 공용체 / 열거형 개념을 확인해봅시다!</p>
+      </div>
+
+      <!-- Q1: OX 구조체 -->
+      <div class="quiz-card" id="qcard1">
+        <div class="q-num">QUIZ 01 / 06</div>
+        <div class="q-text">다음 중 <strong style="color:var(--accent3)">거짓(False)</strong>인 것을 고르시오.</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">A</span> (a) 구조체 타입을 선언하면 자동으로 변수가 생성된다. — 거짓</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">B</span> (b) 구조체는 == 연산자를 사용하여 바로 비교할 수 있다. — 거짓</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">C</span> (c) 구조체 변수를 함수 인자로 사용하면 원본이 전달된다. — 거짓</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'correct')"><span class="opt-label">D</span> (d) 구조체 변수는 = 연산자로 바로 다른 구조체 변수에 대입될 수 있다. — 참</div>
+        </div>
+        <div class="quiz-feedback" id="qf1">
+          ✅ <strong>정답: D — (d)만 참</strong><br>
+          (a) <strong>거짓</strong>: 구조체 타입 선언은 청사진만 제공. 변수는 별도 선언 필요.<br>
+          (b) <strong>거짓</strong>: 구조체 변수에 == 연산자 직접 사용 불가. 멤버별 비교 필요.<br>
+          (c) <strong>거짓</strong>: Call-by-Value → 복사본(지역 사본)이 전달됨. 원본 변경 안 됨.<br>
+          (d) <strong>참</strong>: 동일한 구조체 타입 변수 간 = 연산자 사용 가능 (멤버 전체 복사).
+        </div>
+      </div>
+
+      <!-- Q2: 구조체 변수 멤버 접근 -->
+      <div class="quiz-card" id="qcard2">
+        <div class="q-num">QUIZ 02 / 06</div>
+        <div class="q-text"><code>struct Employee e;</code>로 선언된 구조체 변수 e의 <code>salary</code> 필드를 올바르게 참조한 것은?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">A</span> <code>e->salary</code></div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">B</span> <code>(*e).salary</code></div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'correct')"><span class="opt-label">C</span> <code>e.salary</code></div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">D</span> <code>(*e)->salary</code></div>
+        </div>
+        <div class="quiz-feedback" id="qf2">
+          ✅ <strong>정답: C — <code>e.salary</code></strong><br>
+          e는 구조체 <strong>변수</strong>이므로 점(.) 연산자를 사용합니다.<br>
+          A: <code>e->salary</code>는 포인터에 사용. e는 포인터가 아님. ❌<br>
+          B: <code>(*e).salary</code>는 포인터 e를 역참조. e는 일반 변수. ❌<br>
+          D: 문법적으로 오류. ❌
+        </div>
+      </div>
+
+      <!-- Q3: 포인터 멤버 접근 -->
+      <div class="quiz-card" id="qcard3">
+        <div class="q-num">QUIZ 03 / 06</div>
+        <div class="q-text"><code>struct Employee *pe = &amp;e;</code>로 선언된 포인터 pe를 이용해 <code>salary</code>를 올바르게 참조한 것을 <strong>모두</strong> 고르시오.</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">A</span> ①만 가능: pe->salary</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'correct')"><span class="opt-label">B</span> ①과 ④: pe->salary, (*pe).salary</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">C</span> ①, ②, ④ 모두 가능</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">D</span> ①, ③, ④ 가능</div>
+        </div>
+        <div class="quiz-feedback" id="qf3">
+          ✅ <strong>정답: B — ①과 ④</strong><br>
+          ① <code>pe->salary</code> ✅ — 포인터 → 멤버 접근 (화살표 연산자)<br>
+          ② <code>pe.salary</code> ❌ — pe는 포인터이므로 점 연산자 사용 불가<br>
+          ③ <code>*pe.salary</code> ❌ — <code>*(pe.salary)</code>로 해석됨. pe는 포인터라 pe.salary 자체가 오류<br>
+          ④ <code>(*pe).salary</code> ✅ — 포인터 역참조 후 점 연산자 (①과 동일 의미)
+        </div>
+      </div>
+
+      <!-- Q4: union 크기 -->
+      <div class="quiz-card" id="qcard4">
+        <div class="q-num">QUIZ 04 / 06</div>
+        <div class="q-text">다음 <code>union</code>의 크기는? (int=4B, double=8B)</div>
+        <div class="code-block" style="margin-bottom:14px"><div class="code-body" style="padding:8px 14px">
+<pre><span class="kw">union</span> mixed { <span class="ty">int</span> i; <span class="ty">double</span> d; <span class="ty">char</span> c; };</pre>
+        </div></div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">A</span> 13 Bytes (4+8+1)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'correct')"><span class="opt-label">B</span> 8 Bytes (가장 큰 멤버 double)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">C</span> 4 Bytes (가장 작은 멤버 기준)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">D</span> 1 Byte</div>
+        </div>
+        <div class="quiz-feedback" id="qf4">
+          ✅ <strong>정답: B — 8 Bytes</strong><br>
+          union의 크기 = <strong>멤버 중 가장 큰 것의 크기</strong>.<br>
+          int(4B), double(8B), char(1B) → 가장 큰 <strong>double = 8 Bytes</strong>.<br>
+          struct였다면 최소 4+8+1+패딩 = 16 Bytes가 필요했을 것입니다.
+        </div>
+      </div>
+
+      <!-- Q5: enum 값 -->
+      <div class="quiz-card" id="qcard5">
+        <div class="q-num">QUIZ 05 / 06</div>
+        <div class="q-text"><code>enum colors {white, red=3, blue, green, black=9};</code> 에서 <code>green</code>의 값은?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">A</span> 3</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">B</span> 4</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'correct')"><span class="opt-label">C</span> 5</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">D</span> 9</div>
+        </div>
+        <div class="quiz-feedback" id="qf5">
+          ✅ <strong>정답: C — 5</strong><br>
+          <code>white=0</code> (기본), <code>red=3</code> (명시), <code>blue=4</code> (red+1), <code>green=5</code> (blue+1), <code>black=9</code> (명시)<br>
+          즉: white=0, red=3, blue=4, <strong style="color:var(--accent)">green=5</strong>, black=9
+        </div>
+      </div>
+
+      <!-- Q6: union 경고 -->
+      <div class="quiz-card" id="qcard6">
+        <div class="q-num">QUIZ 06 / 06</div>
+        <div class="q-text">다음 코드를 컴파일할 때 <strong style="color:var(--accent3)">경고가 발생하는 이유</strong>는?</div>
+        <div class="code-block" style="margin-bottom:14px"><div class="code-body" style="padding:8px 14px">
+<pre><span class="kw">union</span> id { <span class="ty">char</span> name[<span class="nb">4</span>]; <span class="ty">long</span> number; }
+           <span class="nm">var</span> = {<span class="st">"Tom"</span>, <span class="nb">1</span>};</pre>
+        </div></div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">A</span> "Tom"은 char 배열로 초기화할 수 없어서</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'correct')"><span class="opt-label">B</span> union은 첫 번째 멤버 하나만 초기화할 수 있는데 초기값이 2개여서</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">C</span> long 타입에 정수 1을 초기화할 수 없어서</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">D</span> union 변수는 초기화를 할 수 없어서</div>
+        </div>
+        <div class="quiz-feedback" id="qf6">
+          ✅ <strong>정답: B</strong><br>
+          <code>union</code>은 모든 멤버가 메모리를 공유하므로 <strong>처음 선언된 멤버 하나만 초기화</strong>할 수 있습니다.<br>
+          <code>{"Tom", 1}</code>처럼 두 개의 초기값을 제공하면 컴파일러가 두 번째 값(1)이 어떤 멤버에 해당하는지 알 수 없어 <strong style="color:var(--accent3)">경고</strong>를 발생시킵니다.<br>
+          올바른 초기화: <code>var = {"Tom"}</code> 또는 <code>var.number = 1</code>
+        </div>
+      </div>
+
+      <div style="text-align:center">
+        <button class="btn-primary" onclick="showScore()">결과 확인</button>
+      </div>
+      <div class="quiz-score" id="quiz-score">
+        <div class="score-num" id="score-display">0/6</div>
+        <div class="score-label" id="score-msg">결과를 확인하세요!</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ── TABS ──
+function switchTab(btn, panelId) {
+  const tabs = btn.closest('.tabs');
+  tabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  tabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ── COPY ──
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ 복사됨'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── STUDENT BUILDER ──
+function buildStudent() {
+  const num   = document.getElementById('st-num').value || '20241001';
+  const name  = document.getElementById('st-name').value || 'Kim';
+  const grade = parseFloat(document.getElementById('st-grade').value) || 4.2;
+  const vis   = document.getElementById('student-vis');
+
+  const members = [
+    { type: 'int',    name: 'number', val: num,   size: 4,  cls: 't-int' },
+    { type: 'char[10]', name: 'name', val: name,  size: 10, cls: 't-char' },
+    { type: 'double', name: 'grade',  val: grade, size: 8,  cls: 't-double' },
+  ];
+
+  vis.innerHTML = `
+    <div class="struct-box">
+      <div class="struct-header">Student 구조체 — 총 ${4+10+8+2}+ bytes (패딩 포함)</div>
+      <div class="struct-members">
+        ${members.map(m => `
+          <div class="struct-member">
+            <span class="m-type">${m.type}</span>
+            <span class="m-name">${m.name}</span>
+            <span style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:12px;flex:1">${m.val}</span>
+            <div class="m-bar" style="background:rgba(227,179,65,${0.1+m.size*0.02});width:${m.size*8}px;max-width:80px"></div>
+            <span class="m-size">${m.size} B</span>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px;background:#010409;border:1px solid var(--border);border-radius:4px;margin-top:6px;color:var(--accent2)">
+      Student s = {${num}, "${name}", ${grade}};
+    </div>`;
+}
+function resetStudent() {
+  document.getElementById('st-num').value = '20241001';
+  document.getElementById('st-name').value = 'Kim';
+  document.getElementById('st-grade').value = '4.2';
+  buildStudent();
+}
+buildStudent();
+
+// ── . vs -> QUIZ ──
+const opQuestions = [
+  { code: 'struct card c1;\nc1.___pips = 3;', var: 'c1', isPtr: false, ans: 'dot' },
+  { code: 'struct card *p = &c1;\np.___pips = 3;', var: 'p', isPtr: true, ans: 'arrow' },
+  { code: 'Employee_data e;\ne.___department.dept_no = 1;', var: 'e', isPtr: false, ans: 'dot' },
+  { code: 'Employee_data *pe = &e;\npe.___salary = 5000;', var: 'pe', isPtr: true, ans: 'arrow' },
+  { code: 'Student_info s[3];\ns[0].___id = 100;', var: 's[0]', isPtr: false, ans: 'dot' },
+];
+let opIdx = 0;
+function nextOpQuiz() {
+  opIdx = (opIdx + 1) % opQuestions.length;
+  showOpQuiz();
+  document.getElementById('op-quiz-feedback').textContent = '';
+}
+function showOpQuiz() {
+  const q = opQuestions[opIdx];
+  document.getElementById('op-quiz-question').innerHTML =
+    `<span style="color:var(--muted);font-size:10px;font-family:'Space Mono',monospace">문제 ${opIdx+1}/${opQuestions.length}: ${q.var}은 ${q.isPtr ? '포인터' : '일반 변수'}</span><br>` +
+    q.code.replace('___', '<span style="color:var(--accent3);background:rgba(247,129,102,.2);padding:0 4px;border-radius:2px">???</span>').replace(/\n/g, '<br>');
+}
+function answerOpQuiz(ans) {
+  const q = opQuestions[opIdx];
+  const fb = document.getElementById('op-quiz-feedback');
+  if (ans === q.ans) {
+    fb.textContent = '✅ 정답! ' + (ans === 'dot' ? '"." 사용 — 일반 구조체 변수' : '"→" 사용 — 포인터 변수');
+    fb.style.color = 'var(--accent2)';
+  } else {
+    fb.textContent = '❌ 틀렸습니다. ' + (q.isPtr ? '포인터 변수는 "->" 사용!' : '일반 변수는 "." 사용!');
+    fb.style.color = 'var(--accent3)';
+  }
+}
+showOpQuiz();
+
+// ── ENUM VISUALIZER ──
+const enumData = [
+  { name: 'day', items: [{n:'Sun',v:0},{n:'Mon',v:1},{n:'Tue',v:2},{n:'Wed',v:3},{n:'Thu',v:4},{n:'Fri',v:5},{n:'Sat',v:6}] },
+  { name: 'suit', items: [{n:'clubs',v:1},{n:'diamonds',v:2},{n:'hearts',v:3},{n:'spades',v:4}] },
+  { name: 'fruit', items: [{n:'apple',v:7},{n:'pear',v:8},{n:'orange',v:3},{n:'lemon',v:4}] },
+  { name: 'numbers', items: [{n:'Minus1',v:-1},{n:'Zero',v:0},{n:'One',v:1},{n:'Two',v:2}] },
+  { name: 'colors', items: [{n:'white',v:0},{n:'red',v:3},{n:'blue',v:4},{n:'green',v:5},{n:'black',v:9}] },
+];
+const chipColors = [
+  'rgba(227,179,65,.15)','rgba(63,185,80,.15)','rgba(210,168,255,.15)',
+  'rgba(86,207,225,.15)','rgba(255,166,87,.15)','rgba(247,129,102,.15)',
+  'rgba(88,166,255,.15)',
+];
+const chipBorders = [
+  'rgba(227,179,65,.4)','rgba(63,185,80,.4)','rgba(210,168,255,.4)',
+  'rgba(86,207,225,.4)','rgba(255,166,87,.4)','rgba(247,129,102,.4)',
+  'rgba(88,166,255,.4)',
+];
+function showEnum() {
+  const idx = parseInt(document.getElementById('enum-select').value);
+  const d = enumData[idx];
+  const chips = document.getElementById('enum-chips');
+  const info  = document.getElementById('enum-info');
+  chips.innerHTML = d.items.map((it, i) =>
+    `<div class="enum-chip" style="background:${chipColors[i%7]};border-color:${chipBorders[i%7]};color:var(--text)"
+       onclick="showEnumDetail(${idx},${i})">${it.n}</div>`
+  ).join('');
+  info.innerHTML = d.items.map(it =>
+    `<span style="color:var(--muted)">${it.n} = </span><span style="color:var(--accent)">${it.v}</span>  `
+  ).join('');
+}
+function showEnumDetail(eIdx, iIdx) {
+  const it = enumData[eIdx].items[iIdx];
+  const info = document.getElementById('enum-info');
+  info.innerHTML = `<span style="color:var(--accent5)">선택: </span><span style="color:var(--accent)">${it.n}</span><span style="color:var(--muted)"> = </span><span style="color:var(--accent2)">${it.v}</span>  ` +
+    `<span style="color:var(--muted);font-size:10px">(enum ${enumData[eIdx].name})</span>`;
+}
+showEnum();
+
+// ── QUIZ ──
+const answers = {};
+function checkQuiz(opt, qNum, result) {
+  const card = document.getElementById('qcard' + qNum);
+  const fb   = document.getElementById('qf' + qNum);
+  if (card.dataset.answered) return;
+  card.dataset.answered = 'true';
+  answers[qNum] = result;
+  card.querySelectorAll('.quiz-opt').forEach(o => o.style.pointerEvents = 'none');
+  opt.classList.add(result);
+  if (result === 'wrong') {
+    card.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct');
+    });
+  }
+  fb.className = 'quiz-feedback show ' + result;
+}
+function showScore() {
+  const correct = Object.values(answers).filter(v => v === 'correct').length;
+  document.getElementById('score-display').textContent = correct + '/6';
+  const pct = correct / 6;
+  document.getElementById('score-msg').textContent =
+    pct === 1  ? '🎉 완벽합니다! 구조체 마스터!' :
+    pct >= .8  ? '👍 훌륭해요! 거의 다 맞혔습니다!' :
+    pct >= .6  ? '🙂 잘 했어요! 틀린 부분을 복습해봐요.' :
+                 '📚 구조체 개념을 다시 한 번 살펴봐요!';
+  document.getElementById('quiz-score').classList.add('show');
+}
+
+// ── ACTIVE NAV ──
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      navItems.forEach(n => n.classList.toggle('active', n.getAttribute('href') === '#' + e.target.id));
+  });
+}, { threshold: 0.25 });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

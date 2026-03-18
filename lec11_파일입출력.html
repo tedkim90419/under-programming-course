@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 11 — 파일 입출력 | C 프로그래밍</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0d1117;
+  --bg2:    #161b22;
+  --bg3:    #21262d;
+  --border: #30363d;
+  --text:   #e6edf3;
+  --muted:  #8b949e;
+  --accent:  #4ade80;   /* lime-green — lec11 */
+  --accent2: #60a5fa;
+  --accent3: #f87171;
+  --accent4: #c084fc;
+  --accent5: #fb923c;
+  --accent6: #34d399;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:15px;line-height:1.7}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:0;left:0;width:240px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;z-index:100;padding:0 0 40px}
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.sidebar-logo .course{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.sidebar-logo .title{font-size:13px;font-weight:700;color:var(--accent);margin-top:4px}
+.sidebar-logo .lec-num{display:inline-block;background:var(--accent);color:var(--bg);font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:8px}
+.nav-section{padding:12px 0 4px}
+.nav-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:0 20px 6px}
+.nav-item{display:block;padding:7px 20px;color:var(--muted);text-decoration:none;font-size:12px;border-left:2px solid transparent;transition:all .15s}
+.nav-item:hover,.nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(74,222,128,.08)}
+.nav-item .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:currentColor;margin-right:8px;vertical-align:middle}
+
+/* ── MAIN ── */
+.main{margin-left:240px;padding:40px 48px 80px;max-width:960px}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#0d1f15 100%);border:1px solid var(--border);border-radius:12px;padding:40px 48px;margin-bottom:48px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(74,222,128,.13) 0%,transparent 70%)}
+.hero-tag{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);padding:3px 12px;border-radius:20px;display:inline-block;margin-bottom:16px}
+.hero h1{font-size:32px;font-weight:700;line-height:1.2;margin-bottom:8px}
+.hero h1 span{color:var(--accent)}
+.hero-sub{font-size:16px;color:var(--muted);margin-bottom:24px}
+.hero-pills{display:flex;flex-wrap:wrap;gap:8px}
+.hero-pill{font-size:12px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:20px;font-family:'Space Mono',monospace}
+
+/* ── SECTION ── */
+.section{margin-bottom:56px;scroll-margin-top:24px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.section-num{font-family:'Space Mono',monospace;font-size:11px;color:var(--bg);background:var(--accent);padding:2px 10px;border-radius:4px;font-weight:700}
+.section h2{font-size:20px;font-weight:700}
+
+/* ── CONCEPT CARD ── */
+.concept-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px}
+.concept-card.hl-green {border-color:rgba(74,222,128,.4); background:linear-gradient(135deg,var(--bg2),rgba(74,222,128,.04))}
+.concept-card.hl-blue  {border-color:rgba(96,165,250,.4); background:linear-gradient(135deg,var(--bg2),rgba(96,165,250,.04))}
+.concept-card.hl-purple{border-color:rgba(192,132,252,.4);background:linear-gradient(135deg,var(--bg2),rgba(192,132,252,.04))}
+.concept-card.hl-orange{border-color:rgba(251,146,60,.4); background:linear-gradient(135deg,var(--bg2),rgba(251,146,60,.04))}
+.concept-card.hl-red   {border-color:rgba(248,113,113,.4);background:linear-gradient(135deg,var(--bg2),rgba(248,113,113,.04))}
+.concept-card.hl-teal  {border-color:rgba(52,211,153,.4); background:linear-gradient(135deg,var(--bg2),rgba(52,211,153,.04))}
+.concept-card h3{font-size:15px;font-weight:700;margin-bottom:12px;color:var(--accent);display:flex;align-items:center;gap:8px}
+.concept-card p{color:#c9d1d9;font-size:14px;margin-bottom:10px}
+.concept-card ul{list-style:none;margin-top:8px}
+.concept-card ul li{color:#c9d1d9;font-size:14px;padding:4px 0 4px 20px;position:relative}
+.concept-card ul li::before{content:'▸';position:absolute;left:0;color:var(--accent)}
+
+/* ── CODE BLOCK ── */
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0}
+.code-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;justify-content:space-between}
+.code-filename{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
+.code-lang{font-family:'Space Mono',monospace;font-size:10px;color:var(--bg);background:var(--accent);padding:2px 8px;border-radius:3px}
+.copy-btn{background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;cursor:pointer;transition:all .15s}
+.copy-btn:hover{color:var(--accent);border-color:var(--accent)}
+.copy-btn.copied{color:var(--accent6);border-color:var(--accent6)}
+.code-body{padding:20px;overflow-x:auto}
+.code-body pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;margin:0}
+.kw{color:#ff7b72}.ty{color:#79c0ff}.cm{color:#8b949e;font-style:italic}
+.nm{color:#ffa657}.st{color:#a5d6ff}.fn{color:#d2a8ff}
+.op{color:#e6edf3}.nb{color:#79c0ff}.pp{color:#ff7b72}
+
+/* ── CALLOUT ── */
+.callout{border-radius:8px;padding:14px 18px;margin:16px 0;font-size:13px;display:flex;gap:12px}
+.callout.tip   {background:rgba(74,222,128,.08); border:1px solid rgba(74,222,128,.25)}
+.callout.warn  {background:rgba(251,146,60,.08); border:1px solid rgba(251,146,60,.3)}
+.callout.info  {background:rgba(96,165,250,.08); border:1px solid rgba(96,165,250,.25)}
+.callout.error {background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.3)}
+.callout.purple{background:rgba(192,132,252,.08);border:1px solid rgba(192,132,252,.3)}
+.callout-icon{font-size:18px;flex-shrink:0}
+.callout-body{color:#c9d1d9;line-height:1.6}
+.callout-body strong{display:block;margin-bottom:4px}
+
+/* ── OUTPUT ── */
+.output-box{background:#010409;border:1px solid var(--accent);border-radius:6px;padding:10px 16px;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent)}
+.output-box::before{content:'$ ';color:var(--muted)}
+
+/* ── CARD GRID ── */
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── DATA TABLE ── */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0}
+.data-table thead tr{background:var(--bg3)}
+.data-table th{text-align:left;padding:10px 14px;color:var(--muted);font-weight:700;font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase;border-bottom:2px solid var(--border)}
+.data-table td{padding:9px 14px;border-bottom:1px solid var(--border);vertical-align:top;font-size:13px;line-height:1.5}
+.data-table tbody tr:hover{background:rgba(255,255,255,.02)}
+
+/* ── STREAM VISUAL ── */
+.stream-vis{display:flex;align-items:center;gap:0;margin:16px 0;overflow-x:auto;padding:16px;background:#010409;border:1px solid var(--border);border-radius:10px}
+.stream-node{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 16px;text-align:center;min-width:100px;flex-shrink:0}
+.stream-node .sn-icon{font-size:24px;margin-bottom:4px}
+.stream-node .sn-label{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.stream-node .sn-name{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;margin-top:2px}
+.stream-arrow{display:flex;flex-direction:column;align-items:center;padding:0 8px;flex-shrink:0}
+.stream-arrow .sa-line{font-size:20px;color:var(--muted);line-height:1}
+.stream-arrow .sa-label{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent);margin-top:2px;white-space:nowrap}
+.stream-buf{background:rgba(74,222,128,.08);border:1px solid rgba(74,222,128,.3);border-radius:6px;padding:8px 12px;min-width:130px;flex-shrink:0}
+.stream-buf .sb-title{font-family:'Space Mono',monospace;font-size:9px;color:var(--accent);text-transform:uppercase;margin-bottom:4px}
+.stream-buf .sb-cells{display:flex;gap:2px}
+.stream-buf .sb-cell{width:22px;height:22px;border:1px solid rgba(74,222,128,.4);border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--accent)}
+.stream-buf .sb-cell.empty{background:var(--bg3);color:var(--muted)}
+
+/* ── FILE POSITION VISUALIZER ── */
+.fp-vis{background:#010409;border:1px solid var(--border);border-radius:8px;padding:16px;margin:12px 0;overflow-x:auto}
+.fp-title{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:8px}
+.fp-row{display:flex;gap:0;align-items:center;margin-bottom:4px}
+.fp-byte{width:36px;height:36px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;flex-shrink:0;transition:all .25s}
+.fp-byte.read  {background:rgba(74,222,128,.18);border-color:rgba(74,222,128,.5);color:var(--accent)}
+.fp-byte.cursor{background:rgba(251,146,60,.3); border-color:rgba(251,146,60,.7);color:var(--accent5);box-shadow:0 0 0 2px rgba(251,146,60,.4)}
+.fp-byte.unread{background:var(--bg2);color:var(--muted)}
+.fp-byte.eof   {background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.4);color:var(--accent3);font-size:9px}
+.fp-idx{width:36px;text-align:center;font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;flex-shrink:0;padding-bottom:1px}
+
+/* ── DEMO BOX ── */
+.demo-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin:16px 0}
+.demo-title{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.demo-title::before{content:'▶';font-size:10px}
+.demo-controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.demo-controls label{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)}
+.demo-btn{background:var(--accent);color:var(--bg);border:none;padding:6px 16px;border-radius:5px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s}
+.demo-btn:hover{opacity:.85}
+.demo-btn.secondary{background:var(--bg3);color:var(--muted);border:1px solid var(--border)}
+.demo-btn.warn{background:var(--accent5);color:var(--bg)}
+.demo-input{background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;padding:4px 10px;border-radius:4px}
+
+/* ── TABS ── */
+.tabs{margin:16px 0}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tab-btn{padding:8px 18px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-size:13px;border-bottom:2px solid transparent;transition:all .2s;position:relative;bottom:-1px}
+.tab-btn:hover{color:var(--text)}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-panel{display:none;padding:20px 0}
+.tab-panel.active{display:block}
+
+/* ── QUIZ ── */
+.quiz-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:32px;margin-top:32px}
+.quiz-header{text-align:center;margin-bottom:32px}
+.quiz-header h2{font-size:22px;margin-bottom:8px}
+.quiz-header p{color:var(--muted);font-size:14px}
+.quiz-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:20px;margin-bottom:20px}
+.quiz-card .q-num{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:8px}
+.quiz-card .q-text{font-size:14px;font-weight:700;margin-bottom:14px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s;display:flex;align-items:flex-start;gap:10px;text-align:left}
+.quiz-opt:hover{border-color:var(--accent);background:rgba(74,222,128,.05)}
+.quiz-opt.correct{border-color:var(--accent6);background:rgba(52,211,153,.1);color:var(--accent6)}
+.quiz-opt.wrong  {border-color:var(--accent3);background:rgba(248,113,113,.1);color:var(--accent3)}
+.quiz-opt .opt-label{font-family:'Space Mono',monospace;font-size:11px;width:22px;height:22px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.quiz-feedback{margin-top:10px;font-size:13px;padding:10px 14px;border-radius:6px;display:none;line-height:1.6}
+.quiz-feedback.show{display:block}
+.quiz-feedback.correct{background:rgba(52,211,153,.1);color:var(--accent6);border:1px solid rgba(52,211,153,.3)}
+.quiz-feedback.wrong  {background:rgba(248,113,113,.1);color:var(--accent3);border:1px solid rgba(248,113,113,.3)}
+.quiz-score{text-align:center;padding:24px;background:var(--bg3);border-radius:8px;margin-top:20px;display:none}
+.quiz-score.show{display:block}
+.score-num{font-family:'Space Mono',monospace;font-size:48px;font-weight:700;color:var(--accent);line-height:1}
+.score-label{color:var(--muted);font-size:14px;margin-top:8px}
+.btn-primary{background:var(--accent);color:var(--bg);border:none;padding:10px 24px;border-radius:6px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;margin-top:16px}
+.btn-primary:hover{opacity:.85}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+@media(max-width:800px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:20px 20px 60px}
+  .card-grid,.card-grid-3{grid-template-columns:1fr}
+  .hero{padding:24px}
+}
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="course">C 프로그래밍 및 실습</div>
+    <div class="title">파일 입출력</div>
+    <div class="lec-num">Lecture 11</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">목차</div>
+    <a class="nav-item active" href="#stream"><span class="dot"></span>Stream 개념</a>
+    <a class="nav-item" href="#filetype"><span class="dot"></span>파일의 개념과 종류</a>
+    <a class="nav-item" href="#fopen"><span class="dot"></span>fopen / fclose</a>
+    <a class="nav-item" href="#char-io"><span class="dot"></span>문자 단위 입출력</a>
+    <a class="nav-item" href="#line-io"><span class="dot"></span>라인 단위 입출력</a>
+    <a class="nav-item" href="#binary-io"><span class="dot"></span>이진 파일 입출력</a>
+    <a class="nav-item" href="#fmt-io"><span class="dot"></span>형식 입출력 (fprintf/fscanf)</a>
+    <a class="nav-item" href="#summary"><span class="dot"></span>함수 요약표</a>
+    <a class="nav-item" href="#misc"><span class="dot"></span>기타 유틸리티 함수</a>
+    <a class="nav-item" href="#quiz"><span class="dot"></span>퀴즈 🎯</a>
+  </div>
+</nav>
+
+<main class="main">
+
+  <div class="hero">
+    <div class="hero-tag">Lecture 11</div>
+    <h1>File I/O<br><span>파일 입출력</span></h1>
+    <p class="hero-sub">프로그래밍방법론및실습 — 서울시립대학교 기계정보공학과</p>
+    <div class="hero-pills">
+      <span class="hero-pill">Stream</span>
+      <span class="hero-pill">fopen / fclose</span>
+      <span class="hero-pill">fgetc / fputc</span>
+      <span class="hero-pill">fgets / fputs</span>
+      <span class="hero-pill">fread / fwrite</span>
+      <span class="hero-pill">fprintf / fscanf</span>
+      <span class="hero-pill">fseek / ftell</span>
+    </div>
+  </div>
+
+  <!-- ── SECTION 1: Stream ── -->
+  <section class="section" id="stream">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>Stream 개념</h2>
+    </div>
+
+    <div class="concept-card hl-green">
+      <h3><span>🌊</span>Stream이란?</h3>
+      <p>모든 입출력을 <strong style="color:var(--accent)">일련의 바이트 흐름</strong>으로 생각하고 처리하는 추상적 개념입니다. 입출력 장치의 물리적 차이를 감춰 주어 일관된 API로 다양한 장치를 다룰 수 있게 합니다.</p>
+      <ul>
+        <li>키보드, 디스플레이, 파일, 다른 프로그램 — 모두 스트림으로 통일</li>
+        <li><strong style="color:var(--accent5)">입출력 버퍼링</strong>: 외부 장치 속도와 CPU 속도 차이를 메모리 버퍼로 완충</li>
+      </ul>
+    </div>
+
+    <!-- 스트림 흐름도 -->
+    <div class="stream-vis">
+      <div class="stream-node">
+        <div class="sn-icon">⌨️</div>
+        <div class="sn-label">Input</div>
+        <div class="sn-name" style="color:var(--accent2)">Keyboard</div>
+      </div>
+      <div class="stream-arrow">
+        <div class="sa-line">→</div>
+        <div class="sa-label">stdin</div>
+      </div>
+      <div class="stream-buf">
+        <div class="sb-title">Input Buffer</div>
+        <div class="sb-cells">
+          <div class="sb-cell">h</div><div class="sb-cell">i</div>
+          <div class="sb-cell empty">_</div><div class="sb-cell empty">_</div>
+          <div class="sb-cell empty">_</div>
+        </div>
+      </div>
+      <div class="stream-arrow">
+        <div class="sa-line">→</div>
+        <div class="sa-label">read</div>
+      </div>
+      <div class="stream-node" style="border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.06)">
+        <div class="sn-icon">⚙️</div>
+        <div class="sn-label">Program</div>
+        <div class="sn-name" style="color:var(--accent)">C Program</div>
+      </div>
+      <div class="stream-arrow">
+        <div class="sa-line">→</div>
+        <div class="sa-label">write</div>
+      </div>
+      <div class="stream-buf">
+        <div class="sb-title">Output Buffer</div>
+        <div class="sb-cells">
+          <div class="sb-cell">H</div><div class="sb-cell">I</div>
+          <div class="sb-cell empty">_</div><div class="sb-cell empty">_</div>
+          <div class="sb-cell empty">_</div>
+        </div>
+      </div>
+      <div class="stream-arrow">
+        <div class="sa-line">→</div>
+        <div class="sa-label">stdout</div>
+      </div>
+      <div class="stream-node">
+        <div class="sn-icon">🖥️</div>
+        <div class="sn-label">Output</div>
+        <div class="sn-name" style="color:var(--accent5)">Display</div>
+      </div>
+    </div>
+
+    <!-- 표준 스트림 3가지 -->
+    <h3 style="font-size:15px;font-weight:700;margin:20px 0 12px;color:var(--text)">표준 입출력 스트림 (자동 생성)</h3>
+    <div class="card-grid-3">
+      <div class="concept-card hl-blue" style="padding:16px;text-align:center">
+        <div style="font-size:28px;margin-bottom:6px">⌨️</div>
+        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2)">stdin</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">standard input<br>Keyboard</div>
+      </div>
+      <div class="concept-card hl-green" style="padding:16px;text-align:center">
+        <div style="font-size:28px;margin-bottom:6px">🖥️</div>
+        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--accent)">stdout</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">standard output<br>Display</div>
+      </div>
+      <div class="concept-card hl-red" style="padding:16px;text-align:center">
+        <div style="font-size:28px;margin-bottom:6px">⚠️</div>
+        <div style="font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--accent3)">stderr</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">standard error<br>Display</div>
+      </div>
+    </div>
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">프로그램 <strong>시작 시 자동 생성</strong>되고, <strong>종료 시 자동 소멸</strong>합니다. <code>printf()</code> = <code>fprintf(stdout, ...)</code>, <code>scanf()</code> = <code>fscanf(stdin, ...)</code>와 동일합니다.</div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: 파일의 개념과 종류 ── -->
+  <section class="section" id="filetype">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>파일의 개념과 종류</h2>
+    </div>
+
+    <div class="concept-card hl-green">
+      <h3><span>📁</span>파일(File)이란?</h3>
+      <p>하드디스크 파일 시스템에 저장된 <strong style="color:var(--accent)">일련의 바이트 스트림</strong>입니다.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card hl-blue">
+        <h3 style="color:var(--accent2)"><span>📄</span>텍스트 파일 (Text File)</h3>
+        <ul>
+          <li>사람이 읽을 수 있는 <strong style="color:var(--accent2)">ASCII 코드</strong> 형태</li>
+          <li>텍스트 에디터로 열람 가능</li>
+          <li>라인 단위로 구분</li>
+          <li>줄 끝 표현: Linux <code>\n</code> / Windows <code>\r\n</code></li>
+        </ul>
+        <div style="margin-top:8px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)">예: C 소스코드, CSV, HTML, JSON…</div>
+      </div>
+      <div class="concept-card hl-purple">
+        <h3 style="color:var(--accent4)"><span>🔢</span>이진 파일 (Binary File)</h3>
+        <ul>
+          <li>특정 이진 코드 형태로 <strong style="color:var(--accent4)">인코딩</strong>된 파일</li>
+          <li>텍스트 에디터로 읽으면 깨져 보임</li>
+          <li>직접 실행하거나 전용 프로그램 필요</li>
+        </ul>
+        <div style="margin-top:8px;font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)">예: 실행 파일(.exe), 이미지(.png/.jpg), 오디오/비디오</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>HWP, PPT, Word 문서는 텍스트 파일이 아닙니다!</strong>
+        텍스트처럼 보이지만 실제로는 이진 파일입니다. 텍스트 에디터로 열면 알아볼 수 없는 코드가 나옵니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: fopen / fclose ── -->
+  <section class="section" id="fopen">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>파일 처리의 시작과 끝: fopen() / fclose()</h2>
+    </div>
+
+    <div class="concept-card hl-green">
+      <h3><span>🔑</span>파일 입출력 3단계</h3>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px">
+        <div style="background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.4);border-radius:6px;padding:8px 16px;font-family:'Space Mono',monospace;font-size:12px;color:var(--accent)">① fopen()</div>
+        <div style="font-size:20px;color:var(--muted)">→</div>
+        <div style="background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.4);border-radius:6px;padding:8px 16px;font-family:'Space Mono',monospace;font-size:12px;color:var(--accent2)">② 읽기/쓰기</div>
+        <div style="font-size:20px;color:var(--muted)">→</div>
+        <div style="background:rgba(251,146,60,.12);border:1px solid rgba(251,146,60,.4);border-radius:6px;padding:8px 16px;font-family:'Space Mono',monospace;font-size:12px;color:var(--accent5)">③ fclose()</div>
+      </div>
+    </div>
+
+    <!-- fopen 상세 -->
+    <h3 style="font-size:15px;font-weight:700;margin:20px 0 12px;color:var(--text)">fopen() — 파일 열기</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">fopen 프로토타입</span><span class="code-lang">C</span></div>
+      <div class="code-body">
+<pre><span class="cm">/* 헤더: stdio.h */</span>
+<span class="nm">FILE</span> * <span class="fn">fopen</span>(<span class="kw">const</span> <span class="ty">char</span> *<span class="nm">pathname</span>, <span class="kw">const</span> <span class="ty">char</span> *<span class="nm">mode</span>);
+<span class="cm">//          ↑ 파일 경로              ↑ 모드 문자열
+// 성공: FILE 구조체 포인터 반환
+// 실패: NULL 반환 (반드시 체크!)</span></pre>
+      </div>
+    </div>
+
+    <!-- 모드 인터랙티브 탐색기 -->
+    <div class="demo-box">
+      <div class="demo-title">fopen() 모드 탐색기 — 클릭해서 동작을 확인하세요</div>
+      <div id="mode-chips" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
+      <div id="mode-info" style="font-family:'JetBrains Mono',monospace;font-size:13px;padding:12px;background:#010409;border:1px solid var(--border);border-radius:6px;min-height:60px;line-height:1.8">
+        <span style="color:var(--muted)">▶ 모드를 클릭해 동작을 확인하세요</span>
+      </div>
+    </div>
+
+    <!-- fclose -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">fclose() — 파일 닫기</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">fclose 프로토타입</span><span class="code-lang">C</span></div>
+      <div class="code-body">
+<pre><span class="ty">int</span> <span class="fn">fclose</span>(<span class="nm">FILE</span> *<span class="nm">fp</span>);
+<span class="cm">// 성공: 0 반환 / 실패: EOF(-1) 반환
+// 버퍼에 남은 데이터를 파일에 flush 후 닫음</span></pre>
+      </div>
+    </div>
+
+    <!-- 전체 패턴 코드 -->
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">파일 I/O 기본 패턴</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;stdlib.h&gt;</span>   <span class="cm">// exit()</span>
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>)
+{
+  <span class="nm">FILE</span> *<span class="nm">ifp</span>, *<span class="nm">ofp</span>;
+
+  <span class="cm">/* ① 파일 열기 */</span>
+  <span class="nm">ifp</span> = <span class="fn">fopen</span>(<span class="st">"./my_file"</span>, <span class="st">"r"</span>);   <span class="cm">// 읽기 모드</span>
+  <span class="kw">if</span> (<span class="nm">ifp</span> == <span class="nb">NULL</span>) {
+    <span class="fn">fprintf</span>(<span class="nm">stderr</span>, <span class="st">"File open error\n"</span>);
+    <span class="fn">exit</span>(<span class="nb">1</span>);
+  }
+  <span class="nm">ofp</span> = <span class="fn">fopen</span>(<span class="st">"./outfile"</span>, <span class="st">"w"</span>);  <span class="cm">// 쓰기 모드</span>
+  <span class="kw">if</span> (<span class="nm">ofp</span> == <span class="nb">NULL</span>) {
+    <span class="fn">fprintf</span>(<span class="nm">stderr</span>, <span class="st">"File open error\n"</span>);
+    <span class="fn">exit</span>(<span class="nb">1</span>);
+  }
+
+  <span class="cm">/* ② 파일 읽기/쓰기 */</span>
+  <span class="cm">// ... (fgetc, fgets, fscanf 등)</span>
+
+  <span class="cm">/* ③ 파일 닫기 */</span>
+  <span class="fn">fclose</span>(<span class="nm">ifp</span>);
+  <span class="fn">fclose</span>(<span class="nm">ofp</span>);
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+      </div>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <strong>fopen() 반환값 NULL 체크는 필수!</strong>
+        잘못된 경로, 접근 권한 문제, 디스크 공간 부족 등으로 fopen()이 실패하면 <code>NULL</code>을 반환합니다. NULL 체크 없이 파일 연산을 수행하면 <strong style="color:var(--accent3)">프로그램 크래시</strong>가 발생합니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 4: 문자 단위 I/O ── -->
+  <section class="section" id="char-io">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>문자 단위 입출력 — fgetc / fputc</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card hl-green">
+        <h3><span>📥</span>fgetc() — 문자 읽기</h3>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="ty">int</span> <span class="fn">fgetc</span>(<span class="nm">FILE</span> *<span class="nm">fp</span>);
+<span class="cm">// fp 파일에서 문자 하나를 읽어 반환
+// 파일 끝(EOF)이면 EOF(-1) 반환
+// 버퍼에서 한 글자씩 읽어 옴</span></pre>
+        </div></div>
+      </div>
+      <div class="concept-card hl-teal">
+        <h3 style="color:var(--accent6)"><span>📤</span>fputc() — 문자 쓰기</h3>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="ty">int</span> <span class="fn">fputc</span>(<span class="ty">int</span> <span class="nm">c</span>, <span class="nm">FILE</span> *<span class="nm">fp</span>);
+<span class="cm">// fp 파일에 문자 c 하나를 씀
+// 일단 스트림 버퍼에 저장 후
+// 조건 충족 시 실제 파일에 씀</span></pre>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- 버퍼링 개념 -->
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>입출력 버퍼링 동작</strong>
+        <strong>읽기</strong>: 파일에서 버퍼 크기만큼 한 번에 읽어 두고, fgetc() 호출마다 버퍼에서 한 글자씩 꺼냄 (파일 접근 횟수 최소화).<br>
+        <strong>쓰기</strong>: fputc()는 버퍼에 먼저 쌓고, 버퍼가 꽉 차거나 <code>fclose()</code>/<code>fflush()</code>/<code>'\n'</code> 출력 시 실제 파일에 씀.
+      </div>
+    </div>
+
+    <!-- 예제 코드 -->
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">fgetc로 파일 전체 읽기</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="nm">FILE</span> *<span class="nm">fp</span>;
+<span class="ty">int</span>   <span class="nm">ch</span>;
+
+<span class="kw">if</span> ((<span class="nm">fp</span> = <span class="fn">fopen</span>(<span class="st">"a.txt"</span>, <span class="st">"r"</span>)) == <span class="nb">NULL</span>) {
+  <span class="fn">fprintf</span>(<span class="nm">stderr</span>, <span class="st">"File open error\n"</span>);
+  <span class="fn">exit</span>(<span class="nb">1</span>);
+}
+<span class="kw">while</span> ((<span class="nm">ch</span> = <span class="fn">fgetc</span>(<span class="nm">fp</span>)) != <span class="nm">EOF</span>)  <span class="cm">// EOF까지 한 글자씩</span>
+  <span class="fn">putchar</span>(<span class="nm">ch</span>);                    <span class="cm">// 화면에 출력</span>
+<span class="fn">fclose</span>(<span class="nm">fp</span>);</pre>
+      </div>
+    </div>
+
+    <!-- 인터랙티브 fgetc 시뮬레이터 -->
+    <div class="demo-box">
+      <div class="demo-title">fgetc() 파일 읽기 시뮬레이터</div>
+      <div class="demo-controls">
+        <label>파일 내용:</label>
+        <input type="text" class="demo-input" id="fgetc-content" value="apple" maxlength="10" style="width:120px">
+        <button class="demo-btn" onclick="fgetcStep()">fgetc() 한 번 ▶</button>
+        <button class="demo-btn secondary" onclick="fgetcReset()">↺ 초기화</button>
+      </div>
+      <div id="fgetc-vis" class="fp-vis">
+        <div class="fp-title">파일 스트림 (file position indicator →)</div>
+        <div id="fgetc-bytes-row" class="fp-row"></div>
+        <div id="fgetc-idx-row" class="fp-row" style="margin-top:2px"></div>
+      </div>
+      <div id="fgetc-result" style="font-family:'JetBrains Mono',monospace;font-size:13px;padding:8px 12px;background:#010409;border:1px solid var(--border);border-radius:4px;margin-top:8px;min-height:32px">
+        <span style="color:var(--muted)">▶ fgetc()를 호출해 한 글자씩 읽어보세요</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: 라인 단위 I/O ── -->
+  <section class="section" id="line-io">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>라인 단위 입출력 — fgets / fputs</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card hl-green">
+        <h3><span>📥</span>fgets() — 줄 읽기</h3>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="ty">char</span> *<span class="fn">fgets</span>(<span class="ty">char</span> *<span class="nm">buf</span>, <span class="ty">int</span> <span class="nm">n</span>, <span class="nm">FILE</span> *<span class="nm">fp</span>);
+<span class="cm">// 최대 n-1개 문자를 읽어 buf에 저장
+// 끝에 자동으로 '\0' 추가
+// '\n' 문자도 buf에 포함됨
+// EOF를 만나면 NULL 반환</span></pre>
+        </div></div>
+      </div>
+      <div class="concept-card hl-teal">
+        <h3 style="color:var(--accent6)"><span>📤</span>fputs() — 줄 쓰기</h3>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="ty">int</span> <span class="fn">fputs</span>(<span class="kw">const</span> <span class="ty">char</span> *<span class="nm">buf</span>, <span class="nm">FILE</span> *<span class="nm">fp</span>);
+<span class="cm">// buf의 문자열을 파일에 씀
+// '\0'은 파일에 쓰지 않음
+// 성공: 출력 문자 수 / 실패: EOF</span></pre>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- fgets 동작 시각화 -->
+    <div class="concept-card">
+      <h3><span>🔍</span>fgets() 동작 — c.txt 파일에서 3줄 읽기</h3>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px">
+        <div style="flex:0 0 auto">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px">c.txt 파일</div>
+          <div style="background:#010409;border:1px solid var(--border);border-radius:6px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent2)">
+            We're \n<br>proud of\n<br>UOS MIE \n
+          </div>
+        </div>
+        <div style="font-size:20px;color:var(--muted);align-self:center">→</div>
+        <div style="flex:1;min-width:200px">
+          <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px">fgets(str, 80, fp) 3회 호출</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <div style="background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.3);border-radius:4px;padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:12px">str ← <span style="color:var(--accent)">"We're \n\0"</span></div>
+            <div style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.3);border-radius:4px;padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:12px">str ← <span style="color:var(--accent2)">"proud of\n\0"</span></div>
+            <div style="background:rgba(192,132,252,.1);border:1px solid rgba(192,132,252,.3);border-radius:4px;padding:6px 10px;font-family:'JetBrains Mono',monospace;font-size:12px">str ← <span style="color:var(--accent4)">"UOS MIE \n\0"</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 파일 복사 예제 -->
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">fgets + fputs 파일 복사</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="nm">FILE</span> *<span class="nm">ifp</span>, *<span class="nm">ofp</span>;
+<span class="ty">char</span>  <span class="nm">buf</span>[<span class="nb">256</span>];
+
+<span class="nm">ifp</span> = <span class="fn">fopen</span>(<span class="st">"src.txt"</span>,  <span class="st">"r"</span>);
+<span class="nm">ofp</span> = <span class="fn">fopen</span>(<span class="st">"dest.txt"</span>, <span class="st">"w"</span>);
+<span class="cm">/* NULL 체크 생략 (실제로는 필수!) */</span>
+
+<span class="cm">/* fgets로 한 줄씩 읽어 fputs로 씀 */</span>
+<span class="kw">while</span> (<span class="fn">fgets</span>(<span class="nm">buf</span>, <span class="kw">sizeof</span>(<span class="nm">buf</span>), <span class="nm">ifp</span>) != <span class="nb">NULL</span>)
+  <span class="fn">fputs</span>(<span class="nm">buf</span>, <span class="nm">ofp</span>);
+
+<span class="fn">fclose</span>(<span class="nm">ifp</span>);
+<span class="fn">fclose</span>(<span class="nm">ofp</span>);</pre>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>fgets()는 '\n'을 buf에 포함!</strong>
+        fgets로 읽은 줄에는 줄바꿈 문자 <code>'\n'</code>이 그대로 포함됩니다. 필요 시 <code>buf[strlen(buf)-1] = '\0'</code>으로 제거하세요.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 6: 이진 파일 I/O ── -->
+  <section class="section" id="binary-io">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>이진 파일 입출력 — fread / fwrite</h2>
+    </div>
+
+    <div class="concept-card hl-purple">
+      <h3 style="color:var(--accent4)"><span>🔢</span>fread / fwrite — 블록 단위 입출력</h3>
+      <p>구조체, 배열 등 <strong style="color:var(--accent4)">다양한 형식으로 구조화된 데이터</strong>를 이진 파일에 읽고 쓸 때 사용합니다.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">fread / fwrite 프로토타입</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="cm">/* 읽기: fp 파일에서 count개 × size바이트 데이터를 ptr에 저장 */</span>
+<span class="ty">size_t</span> <span class="fn">fread</span>(<span class="ty">void</span> *<span class="nm">ptr</span>, <span class="ty">size_t</span> <span class="nm">size</span>, <span class="ty">size_t</span> <span class="nm">count</span>, <span class="nm">FILE</span> *<span class="nm">fp</span>);
+
+<span class="cm">/* 쓰기: ptr에서 count개 × size바이트 데이터를 fp 파일에 씀 */</span>
+<span class="ty">size_t</span> <span class="fn">fwrite</span>(<span class="kw">const</span> <span class="ty">void</span> *<span class="nm">ptr</span>, <span class="ty">size_t</span> <span class="nm">size</span>, <span class="ty">size_t</span> <span class="nm">count</span>, <span class="nm">FILE</span> *<span class="nm">fp</span>);
+<span class="cm">// 반환값: 실제로 읽거나 쓴 데이터 개수 (바이트 아님!)
+// EOF/에러 시: count보다 작은 값 반환 → feof()로 확인 필요</span></pre>
+      </div>
+    </div>
+
+    <!-- fread/fwrite 사용 예시 -->
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">구조체 배열 이진 파일 저장/읽기</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="kw">typedef</span> <span class="kw">struct</span> { <span class="ty">int</span> id; <span class="ty">char</span> name[<span class="nb">20</span>]; <span class="ty">double</span> score; } Student;
+
+<span class="cm">/* 쓰기 */</span>
+Student <span class="nm">students</span>[<span class="nb">3</span>] = {{<span class="nb">1</span>,<span class="st">"Kim"</span>,<span class="nb">95.5</span>},{<span class="nb">2</span>,<span class="st">"Lee"</span>,<span class="nb">87.0</span>},{<span class="nb">3</span>,<span class="st">"Park"</span>,<span class="nb">91.3</span>}};
+<span class="nm">FILE</span> *<span class="nm">fp</span> = <span class="fn">fopen</span>(<span class="st">"students.bin"</span>, <span class="st">"wb"</span>);
+<span class="fn">fwrite</span>(<span class="nm">students</span>, <span class="kw">sizeof</span>(Student), <span class="nb">3</span>, <span class="nm">fp</span>);
+<span class="cm">// sizeof(Student)바이트씩 3개 씀</span>
+<span class="fn">fclose</span>(<span class="nm">fp</span>);
+
+<span class="cm">/* 읽기 */</span>
+Student <span class="nm">buf</span>[<span class="nb">3</span>];
+<span class="nm">fp</span> = <span class="fn">fopen</span>(<span class="st">"students.bin"</span>, <span class="st">"rb"</span>);
+<span class="ty">size_t</span> <span class="nm">n</span> = <span class="fn">fread</span>(<span class="nm">buf</span>, <span class="kw">sizeof</span>(Student), <span class="nb">3</span>, <span class="nm">fp</span>);
+<span class="fn">printf</span>(<span class="st">"읽은 개수: %zu\n"</span>, <span class="nm">n</span>);  <span class="cm">// 3</span>
+<span class="fn">fclose</span>(<span class="nm">fp</span>);</pre>
+      </div>
+    </div>
+
+    <!-- fread 파라미터 시각화 -->
+    <div class="concept-card">
+      <h3><span>📊</span>fread/fwrite 파라미터 의미</h3>
+      <div style="background:#010409;border:1px solid var(--border);border-radius:6px;padding:14px;margin-top:10px;font-family:'JetBrains Mono',monospace">
+        <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;font-size:13px">
+          <span style="color:#d2a8ff">fread</span><span style="color:var(--text)">(</span>
+          <span style="color:var(--accent);border-bottom:2px solid rgba(74,222,128,.5);padding-bottom:1px">students</span><span style="color:var(--muted)">,</span>
+          <span style="color:var(--accent5);border-bottom:2px solid rgba(251,146,60,.5);padding-bottom:1px">sizeof(Student)</span><span style="color:var(--muted)">,</span>
+          <span style="color:var(--accent2);border-bottom:2px solid rgba(96,165,250,.5);padding-bottom:1px">3</span><span style="color:var(--muted)">,</span>
+          <span style="color:var(--accent4);border-bottom:2px solid rgba(192,132,252,.5);padding-bottom:1px">fp</span><span style="color:var(--text)">);</span>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;font-size:11px">
+          <span style="color:var(--accent);min-width:100px">↑ ptr: 저장 버퍼</span>
+          <span style="color:var(--accent5);min-width:130px">↑ size: 원소 크기</span>
+          <span style="color:var(--accent2);min-width:100px">↑ count: 개수</span>
+          <span style="color:var(--accent4)">↑ fp: 파일</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 7: fprintf / fscanf ── -->
+  <section class="section" id="fmt-io">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>형식 입출력 — fprintf / fscanf</h2>
+    </div>
+
+    <div class="concept-card hl-green">
+      <h3><span>📝</span>fprintf / fscanf — 파일 버전의 printf / scanf</h3>
+      <p>printf/scanf와 동일한 기능이지만 <strong style="color:var(--accent)">입출력 대상이 파일</strong>입니다.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">fprintf / fscanf 프로토타입</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="ty">int</span> <span class="fn">fprintf</span>(<span class="nm">FILE</span> *<span class="nm">fp</span>, <span class="kw">const</span> <span class="ty">char</span> *<span class="nm">format</span>, …);
+<span class="ty">int</span> <span class="fn">fscanf</span> (<span class="nm">FILE</span> *<span class="nm">fp</span>, <span class="kw">const</span> <span class="ty">char</span> *<span class="nm">format</span>, ...);
+
+<span class="cm">/* 표준 입출력과 동일 */</span>
+<span class="fn">fprintf</span>(<span class="nm">stdout</span>, ...)  == <span class="fn">printf</span>(...)
+<span class="fn">fscanf</span>(<span class="nm">stdin</span>,  ...)  == <span class="fn">scanf</span>(...)
+
+<span class="cm">/* 에러 출력에는 stderr 사용 */</span>
+<span class="fn">fprintf</span>(<span class="nm">stderr</span>, <span class="st">"Error: %s\n"</span>, <span class="nm">msg</span>);</pre>
+      </div>
+    </div>
+
+    <!-- 사용 예시 -->
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">텍스트 파일에 데이터 쓰고 읽기</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="cm">/* 쓰기 */</span>
+<span class="nm">FILE</span> *<span class="nm">fp</span> = <span class="fn">fopen</span>(<span class="st">"data.txt"</span>, <span class="st">"w"</span>);
+<span class="fn">fprintf</span>(<span class="nm">fp</span>, <span class="st">"%d %s %.2f\n"</span>, <span class="nb">1</span>, <span class="st">"Kim"</span>, <span class="nb">95.5</span>);
+<span class="fn">fprintf</span>(<span class="nm">fp</span>, <span class="st">"%d %s %.2f\n"</span>, <span class="nb">2</span>, <span class="st">"Lee"</span>, <span class="nb">87.0</span>);
+<span class="fn">fclose</span>(<span class="nm">fp</span>);
+<span class="cm">// data.txt: "1 Kim 95.50\n2 Lee 87.00\n"</span>
+
+<span class="cm">/* 읽기 */</span>
+<span class="ty">int</span> <span class="nm">id</span>; <span class="ty">char</span> <span class="nm">name</span>[<span class="nb">20</span>]; <span class="ty">double</span> <span class="nm">score</span>;
+<span class="nm">fp</span> = <span class="fn">fopen</span>(<span class="st">"data.txt"</span>, <span class="st">"r"</span>);
+<span class="kw">while</span> (<span class="fn">fscanf</span>(<span class="nm">fp</span>, <span class="st">"%d %s %lf"</span>, &<span class="nm">id</span>, <span class="nm">name</span>, &<span class="nm">score</span>) != <span class="nm">EOF</span>) {
+  <span class="fn">printf</span>(<span class="st">"id=%d name=%s score=%.1f\n"</span>, <span class="nm">id</span>, <span class="nm">name</span>, <span class="nm">score</span>);
+}
+<span class="fn">fclose</span>(<span class="nm">fp</span>);</pre>
+      </div>
+    </div>
+    <div class="output-box">id=1 name=Kim score=95.5<br>id=2 name=Lee score=87.0</div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>fscanf() 반환값 EOF 체크!</strong>
+        <code>fscanf()</code>가 <code>EOF(-1)</code>을 반환하면 대부분 파일의 끝까지 읽었음을 의미합니다. 반환값을 확인해 루프를 종료해야 합니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 8: 함수 요약표 ── -->
+  <section class="section" id="summary">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <h2>파일 입출력 함수 요약 (stdio.h)</h2>
+    </div>
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>종류</th>
+          <th>함수</th>
+          <th>동작 설명</th>
+          <th>EOF/에러 반환</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="background:rgba(74,222,128,.04)">
+          <td rowspan="4" style="color:var(--accent);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;vertical-align:middle">Text<br>File</td>
+          <td><code>fgetc(fp)</code></td>
+          <td>fp에서 문자 하나를 읽어 반환</td>
+          <td>EOF(-1)</td>
+        </tr>
+        <tr style="background:rgba(74,222,128,.04)">
+          <td><code>fputc(c, fp)</code></td>
+          <td>fp에 문자 c 하나를 씀</td>
+          <td>EOF(-1)</td>
+        </tr>
+        <tr style="background:rgba(74,222,128,.04)">
+          <td><code>fgets(buf, n, fp)</code></td>
+          <td>fp에서 최대 n-1개 문자를 읽어 buf에 저장 (라인 단위)</td>
+          <td>NULL</td>
+        </tr>
+        <tr style="background:rgba(74,222,128,.04)">
+          <td><code>fputs(buf, fp)</code></td>
+          <td>buf의 문자열을 fp에 씀</td>
+          <td>EOF(-1)</td>
+        </tr>
+        <tr>
+          <td colspan="4" style="font-size:12px;color:var(--muted);font-style:italic;padding:6px 14px">※ fprintf(), fscanf() 도 텍스트 파일 대상 (형식화된 구조 데이터에 편리)</td>
+        </tr>
+        <tr style="background:rgba(192,132,252,.04)">
+          <td rowspan="2" style="color:var(--accent4);font-family:'Space Mono',monospace;font-size:11px;font-weight:700;vertical-align:middle">Binary<br>File</td>
+          <td><code>fread(ptr, size, count, fp)</code></td>
+          <td>fp에서 count개 × size바이트를 읽어 ptr에 저장</td>
+          <td>count보다 작은 값</td>
+        </tr>
+        <tr style="background:rgba(192,132,252,.04)">
+          <td><code>fwrite(ptr, size, count, fp)</code></td>
+          <td>ptr에서 count개 × size바이트를 fp에 씀</td>
+          <td>count보다 작은 값</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <span class="callout-icon">📌</span>
+      <div class="callout-body">
+        각 파일 스트림은 <strong style="color:var(--accent)">file position indicator</strong>(현재 읽기/쓰기 위치)를 유지합니다. 입출력 함수를 호출할 때마다 읽거나 쓴 바이트만큼 자동으로 이동합니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 9: 기타 유틸리티 함수 ── -->
+  <section class="section" id="misc">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <h2>기타 파일 처리 함수 (stdio.h)</h2>
+    </div>
+
+    <!-- fseek 인터랙티브 -->
+    <div class="demo-box">
+      <div class="demo-title">fseek() — file position indicator 이동 시뮬레이터</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-family:'Space Mono',monospace">파일 내용: "Hello, World!" (13 bytes)</div>
+      <div class="demo-controls">
+        <label>origin:</label>
+        <select id="seek-origin" style="background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:12px;padding:4px 8px;border-radius:4px">
+          <option value="0">SEEK_SET (파일 시작)</option>
+          <option value="1">SEEK_CUR (현재 위치)</option>
+          <option value="2">SEEK_END (파일 끝)</option>
+        </select>
+        <label>offset:</label>
+        <input type="number" class="demo-input" id="seek-offset" value="0" min="-13" max="13" style="width:70px">
+        <button class="demo-btn" onclick="runFseek()">fseek()</button>
+        <button class="demo-btn secondary" onclick="resetFseek()">↺ rewind</button>
+      </div>
+      <div id="fseek-vis" class="fp-vis">
+        <div class="fp-title" id="fseek-title">file position: 0</div>
+        <div id="fseek-bytes-row" class="fp-row"></div>
+        <div id="fseek-idx-row" class="fp-row" style="margin-top:2px"></div>
+      </div>
+      <div id="fseek-result" style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px;background:#010409;border:1px solid var(--border);border-radius:4px;margin-top:8px;min-height:28px">
+        <span style="color:var(--muted)">▶ fseek()를 실행해보세요</span>
+      </div>
+    </div>
+
+    <!-- 함수 요약 테이블 -->
+    <table class="data-table">
+      <thead>
+        <tr><th>함수</th><th>프로토타입</th><th>동작</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code style="color:var(--accent)">fseek</code></td>
+          <td><code style="font-size:11px">int fseek(FILE *fp, long offset, int origin)</code></td>
+          <td>file position indicator를 origin 기준으로 offset 바이트 이동<br><small style="color:var(--muted)">origin: SEEK_SET(0)=시작, SEEK_CUR(1)=현재, SEEK_END(2)=끝</small></td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent2)">ftell</code></td>
+          <td><code style="font-size:11px">long ftell(FILE *fp)</code></td>
+          <td>현재 file position indicator 값 반환 (실패 시 -1)</td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent4)">rewind</code></td>
+          <td><code style="font-size:11px">void rewind(FILE *fp)</code></td>
+          <td>file position을 파일 맨 앞으로 이동<br><small style="color:var(--muted)">= fseek(fp, 0L, SEEK_SET)</small></td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent5)">feof</code></td>
+          <td><code style="font-size:11px">int feof(FILE *fp)</code></td>
+          <td>현재 position이 파일 끝인지 검사 (끝이면 0이 아닌 값)</td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent6)">fflush</code></td>
+          <td><code style="font-size:11px">int fflush(FILE *fp)</code></td>
+          <td>출력 버퍼 내용을 즉시 파일에 씀 (0: 성공, EOF: 실패)</td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent3)">remove</code></td>
+          <td><code style="font-size:11px">int remove(const char *pathname)</code></td>
+          <td>파일 삭제</td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--muted)">tmpfile</code></td>
+          <td><code style="font-size:11px">FILE *tmpfile(void)</code></td>
+          <td>임시 이진 파일 생성·오픈 (프로그램 종료 시 자동 삭제)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- fseek offset 방향 시각화 -->
+    <div class="concept-card">
+      <h3><span>🧭</span>fseek offset 방향</h3>
+      <div style="background:#010409;border:1px solid var(--border);border-radius:6px;padding:14px;margin-top:10px;overflow-x:auto">
+        <div style="display:flex;align-items:center;gap:0;min-width:400px;font-family:'JetBrains Mono',monospace">
+          <div style="font-size:11px;color:var(--accent3);writing-mode:vertical-lr;transform:rotate(180deg);margin-right:8px">SEEK_SET</div>
+          <div style="flex:1;position:relative;height:36px">
+            <div style="position:absolute;top:50%;left:0;right:0;height:2px;background:var(--border);transform:translateY(-50%)"></div>
+            <div style="position:absolute;top:0;left:0;font-size:9px;color:var(--accent);font-family:'Space Mono',monospace">파일 시작(0)</div>
+            <div style="position:absolute;top:0;left:50%;font-size:9px;color:var(--accent4);font-family:'Space Mono',monospace;transform:translateX(-50%)">현재 위치</div>
+            <div style="position:absolute;top:0;right:0;font-size:9px;color:var(--accent5);font-family:'Space Mono',monospace">파일 끝</div>
+            <!-- arrows -->
+            <div style="position:absolute;top:50%;left:50%;font-size:14px;color:var(--accent3);transform:translateY(-50%) translateX(-30px)">←</div>
+            <div style="position:absolute;top:50%;left:50%;font-size:14px;color:var(--accent2);transform:translateY(-50%) translateX(10px)">→</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;font-family:'Space Mono',monospace">
+          <span style="color:var(--accent3)">offset &lt; 0 → 앞으로</span>
+          <span style="color:var(--accent2)">offset &gt; 0 → 뒤로</span>
+          <span style="color:var(--muted)">offset = 0 → 그대로</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 10: 퀴즈 ── -->
+  <section class="section" id="quiz">
+    <div class="quiz-section">
+      <div class="quiz-header">
+        <h2>🎯 퀴즈</h2>
+        <p>파일 입출력 개념을 확인해봅시다. 클릭하여 정답을 확인하세요!</p>
+      </div>
+
+      <!-- Q1: fopen 모드 -->
+      <div class="quiz-card" id="qcard1">
+        <div class="q-num">QUIZ 01 / 06</div>
+        <div class="q-text">기존 파일이 존재할 때 <code>fopen("data.txt", "w")</code>를 호출하면?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">A</span> NULL을 반환하며 실패한다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'correct')"><span class="opt-label">B</span> 기존 내용이 삭제되고 새 파일로 열린다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">C</span> 기존 내용 뒤에 이어서 쓸 수 있도록 열린다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">D</span> 읽기 전용으로 열린다.</div>
+        </div>
+        <div class="quiz-feedback" id="qf1">
+          ✅ <strong>정답: B</strong><br>
+          <code>"w"</code> 모드는 파일이 이미 존재하면 기존 내용을 <strong>모두 삭제(덮어쓰기)</strong>하고 처음부터 씁니다.<br>
+          파일이 없으면 새로 생성합니다. 기존 내용을 보존하려면 <code>"a"</code>(append) 모드를 사용하세요.
+        </div>
+      </div>
+
+      <!-- Q2: fgetc vs fgets -->
+      <div class="quiz-card" id="qcard2">
+        <div class="q-num">QUIZ 02 / 06</div>
+        <div class="q-text">다음 중 파일에서 데이터를 읽을 때 <strong style="color:var(--accent3)">틀린</strong> 설명은?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">A</span> fgetc()는 파일 끝을 만나면 EOF(-1)를 반환한다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">B</span> fgets()는 읽은 줄에 '\n' 문자를 포함시킨다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'correct')"><span class="opt-label">C</span> fgets()는 파일 끝을 만나면 EOF(-1)를 반환한다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">D</span> fscanf()가 EOF를 반환하면 파일을 다 읽은 것이다.</div>
+        </div>
+        <div class="quiz-feedback" id="qf2">
+          ✅ <strong>정답: C</strong><br>
+          <code>fgets()</code>는 파일 끝을 만나면 <strong><code>NULL</code>을 반환</strong>합니다 (EOF가 아닙니다!).<br>
+          <code>fgetc()</code>는 EOF(-1)를 반환하고, <code>fgets()</code>는 NULL을 반환한다는 차이를 기억하세요.
+        </div>
+      </div>
+
+      <!-- Q3: fread 파라미터 -->
+      <div class="quiz-card" id="qcard3">
+        <div class="q-num">QUIZ 03 / 06</div>
+        <div class="q-text"><code>fread(buf, sizeof(Student), 5, fp)</code>가 <strong>3</strong>을 반환했다면 의미는?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">A</span> 3 바이트를 읽었다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'correct')"><span class="opt-label">B</span> Student 구조체를 3개 읽었다. (파일에 5개가 없었음)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">C</span> 오류가 발생했다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">D</span> 파일이 정상적으로 3개 남아 있다는 뜻이다.</div>
+        </div>
+        <div class="quiz-feedback" id="qf3">
+          ✅ <strong>정답: B</strong><br>
+          <code>fread()</code>의 반환값은 <strong>실제로 읽은 데이터 개수</strong>(바이트가 아닌 항목 수)입니다.<br>
+          요청한 5개보다 작은 3이 반환됐으므로, 파일에서 <strong>Student 구조체를 3개만</strong> 읽었습니다. 파일 끝(EOF)이나 에러가 발생한 것입니다. 정확한 확인은 <code>feof()</code>로 합니다.
+        </div>
+      </div>
+
+      <!-- Q4: fseek -->
+      <div class="quiz-card" id="qcard4">
+        <div class="q-num">QUIZ 04 / 06</div>
+        <div class="q-text">파일 크기가 100바이트인 파일에서 <code>fseek(fp, -10, SEEK_END)</code> 후 <code>ftell(fp)</code>의 반환값은?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">A</span> -10</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'correct')"><span class="opt-label">B</span> 90</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">C</span> 100</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">D</span> 10</div>
+        </div>
+        <div class="quiz-feedback" id="qf4">
+          ✅ <strong>정답: B — 90</strong><br>
+          <code>SEEK_END</code>는 파일 끝(위치 100)을 기준으로 합니다.<br>
+          offset이 -10이므로: 100 + (-10) = <strong>90</strong>번째 바이트 위치로 이동합니다.<br>
+          <code>ftell()</code>은 현재 file position indicator 값(90)을 반환합니다.
+        </div>
+      </div>
+
+      <!-- Q5: 텍스트 vs 바이너리 -->
+      <div class="quiz-card" id="qcard5">
+        <div class="q-num">QUIZ 05 / 06</div>
+        <div class="q-text">구조체 배열을 파일에 저장하고 다시 읽을 때 가장 적합한 함수 조합은?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">A</span> fgets / fputs ("r", "w" 모드)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">B</span> fscanf / fprintf ("r", "w" 모드)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'correct')"><span class="opt-label">C</span> fread / fwrite ("rb", "wb" 모드)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">D</span> fgetc / fputc ("r", "w" 모드)</div>
+        </div>
+        <div class="quiz-feedback" id="qf5">
+          ✅ <strong>정답: C — fread / fwrite</strong><br>
+          구조체 배열처럼 <strong>정해진 크기의 이진 데이터</strong>를 그대로 저장/복원할 때는 <code>fread()</code>/<code>fwrite()</code>가 가장 적합합니다.<br>
+          이진 모드(<code>"rb"</code>, <code>"wb"</code>)로 열어야 OS별 줄바꿈 변환 없이 정확하게 처리됩니다.
+        </div>
+      </div>
+
+      <!-- Q6: 스트림 / 버퍼링 -->
+      <div class="quiz-card" id="qcard6">
+        <div class="q-num">QUIZ 06 / 06</div>
+        <div class="q-text">fputc()로 문자를 출력했는데 파일에 즉시 반영되지 않는 이유는?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">A</span> fputc()에 버그가 있어서</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">B</span> fopen()을 잘못 호출했기 때문에</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'correct')"><span class="opt-label">C</span> 출력 스트림 버퍼에 먼저 저장되기 때문에</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">D</span> fclose()를 이미 호출했기 때문에</div>
+        </div>
+        <div class="quiz-feedback" id="qf6">
+          ✅ <strong>정답: C</strong><br>
+          C의 I/O는 <strong>버퍼링(buffering)</strong>을 사용합니다. fputc()는 문자를 직접 파일에 쓰지 않고 먼저 <strong>출력 스트림 버퍼</strong>에 저장합니다.<br>
+          버퍼가 꽉 차거나, <code>fclose()</code>/<code>fflush()</code> 호출 또는 <code>'\n'</code> 출력 시에 실제 파일에 씌어집니다. 즉시 반영하려면 <code>fflush(fp)</code>를 호출하세요.
+        </div>
+      </div>
+
+      <div style="text-align:center">
+        <button class="btn-primary" onclick="showScore()">결과 확인</button>
+      </div>
+      <div class="quiz-score" id="quiz-score">
+        <div class="score-num" id="score-display">0/6</div>
+        <div class="score-label" id="score-msg">결과를 확인하세요!</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ── COPY ──
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ 복사됨'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── TAB SWITCHER ──
+function switchTab(btn, panelId) {
+  const tabs = btn.closest('.tabs');
+  tabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  tabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ── FOPEN MODE EXPLORER ──
+const modes = [
+  { mode: '"r"',  color: 'rgba(96,165,250,.3)',  text: '#60a5fa',
+    desc: '읽기(read) 모드\n파일이 있으면: 열기 성공 ✅\n파일이 없으면: 열기 실패 (NULL 반환) ❌\n파일 내용: 변경 없음' },
+  { mode: '"w"',  color: 'rgba(251,146,60,.3)',   text: '#fb923c',
+    desc: '쓰기(write) 모드\n파일이 있으면: 기존 내용 삭제 후 덮어씀 ⚠️\n파일이 없으면: 새 파일 생성 ✅' },
+  { mode: '"a"',  color: 'rgba(74,222,128,.3)',   text: '#4ade80',
+    desc: '덧붙이기(append) 모드\n파일이 있으면: 기존 내용 뒤에 이어서 씀 ✅\n파일이 없으면: 새 파일 생성 ✅' },
+  { mode: '"rb"', color: 'rgba(96,165,250,.3)',   text: '#60a5fa',
+    desc: '이진 읽기 모드\n"r"과 동일하지만 이진(binary) 파일로 처리\nOS별 줄바꿈 변환 없음' },
+  { mode: '"wb"', color: 'rgba(251,146,60,.3)',   text: '#fb923c',
+    desc: '이진 쓰기 모드\n"w"와 동일하지만 이진(binary) 파일로 처리' },
+  { mode: '"ab"', color: 'rgba(74,222,128,.3)',   text: '#4ade80',
+    desc: '이진 덧붙이기 모드\n"a"와 동일하지만 이진(binary) 파일로 처리' },
+  { mode: '"r+"', color: 'rgba(192,132,252,.3)',  text: '#c084fc',
+    desc: '읽기↔쓰기 전환 모드\n파일이 있어야 함. 모드 전환 시 fseek() 등 필요' },
+  { mode: '"w+"', color: 'rgba(192,132,252,.3)',  text: '#c084fc',
+    desc: '쓰기↔읽기 전환 모드\n기존 내용 삭제 후 읽기/쓰기 가능' },
+  { mode: '"a+"', color: 'rgba(192,132,252,.3)',  text: '#c084fc',
+    desc: '덧붙이기↔읽기 전환 모드\n기존 내용 보존, 덧붙이기/읽기 가능' },
+];
+const modeChipsEl = document.getElementById('mode-chips');
+const modeInfoEl  = document.getElementById('mode-info');
+modes.forEach(m => {
+  const chip = document.createElement('div');
+  chip.style.cssText = `background:${m.color};border:1px solid ${m.text};border-radius:6px;padding:5px 14px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:${m.text};cursor:pointer;transition:all .15s`;
+  chip.textContent = m.mode;
+  chip.addEventListener('click', () => {
+    modeInfoEl.innerHTML = m.mode + ':<br>' + m.desc.replace(/\n/g, '<br>');
+    modeInfoEl.style.color = m.text;
+  });
+  modeChipsEl.appendChild(chip);
+});
+
+// ── FGETC SIMULATOR ──
+let fgetcPos = 0;
+let fgetcContent = '';
+function fgetcBuild() {
+  fgetcContent = document.getElementById('fgetc-content').value || 'apple';
+  fgetcPos = 0;
+  renderFgetc();
+}
+function renderFgetc() {
+  const bytes = document.getElementById('fgetc-bytes-row');
+  const idxs  = document.getElementById('fgetc-idx-row');
+  const content = fgetcContent;
+  bytes.innerHTML = idxs.innerHTML = '';
+  for (let i = 0; i <= content.length; i++) {
+    const isEof = i === content.length;
+    const cell = document.createElement('div');
+    cell.className = 'fp-byte ' + (isEof ? 'eof' : i < fgetcPos ? 'read' : i === fgetcPos ? 'cursor' : 'unread');
+    cell.textContent = isEof ? 'EOF' : content[i];
+    bytes.appendChild(cell);
+    const idx = document.createElement('div');
+    idx.className = 'fp-idx';
+    idx.textContent = isEof ? 'EOF' : i;
+    idxs.appendChild(idx);
+  }
+}
+function fgetcStep() {
+  fgetcContent = document.getElementById('fgetc-content').value || 'apple';
+  const res = document.getElementById('fgetc-result');
+  if (fgetcPos >= fgetcContent.length) {
+    res.innerHTML = '<span style="color:var(--accent3)">ch = fgetc(fp) → EOF (-1) — 파일 끝!</span>';
+    return;
+  }
+  const ch = fgetcContent[fgetcPos];
+  res.innerHTML = `<span style="color:var(--muted)">ch = fgetc(fp) → </span><span style="color:var(--accent)">'${ch}'</span>  <span style="color:var(--muted)">(ASCII ${ch.charCodeAt(0)}), position: ${fgetcPos} → ${fgetcPos+1}</span>`;
+  fgetcPos++;
+  renderFgetc();
+}
+function fgetcReset() {
+  fgetcPos = 0;
+  renderFgetc();
+  document.getElementById('fgetc-result').innerHTML = '<span style="color:var(--muted)">▶ fgetc()를 호출해 한 글자씩 읽어보세요</span>';
+}
+fgetcBuild();
+
+// ── FSEEK SIMULATOR ──
+const FSEEK_CONTENT = 'Hello, World!';
+let fseekPos = 0;
+function renderFseek() {
+  const bytes = document.getElementById('fseek-bytes-row');
+  const idxs  = document.getElementById('fseek-idx-row');
+  const title = document.getElementById('fseek-title');
+  bytes.innerHTML = idxs.innerHTML = '';
+  for (let i = 0; i <= FSEEK_CONTENT.length; i++) {
+    const isEof = i === FSEEK_CONTENT.length;
+    const cell = document.createElement('div');
+    cell.className = 'fp-byte ' + (isEof ? 'eof' : i === fseekPos ? 'cursor' : 'unread');
+    cell.textContent = isEof ? 'EOF' : FSEEK_CONTENT[i];
+    bytes.appendChild(cell);
+    const idx = document.createElement('div');
+    idx.className = 'fp-idx';
+    idx.textContent = isEof ? '' : i;
+    idxs.appendChild(idx);
+  }
+  title.textContent = `file position indicator: ${fseekPos}  (파일 크기: ${FSEEK_CONTENT.length} bytes)`;
+}
+function runFseek() {
+  const origin = parseInt(document.getElementById('seek-origin').value);
+  const offset = parseInt(document.getElementById('seek-offset').value) || 0;
+  const fileSize = FSEEK_CONTENT.length;
+  let base = origin === 0 ? 0 : origin === 1 ? fseekPos : fileSize;
+  let newPos = base + offset;
+  newPos = Math.max(0, Math.min(newPos, fileSize));
+  const res = document.getElementById('fseek-result');
+  const originName = ['SEEK_SET', 'SEEK_CUR', 'SEEK_END'][origin];
+  res.innerHTML = `<span style="color:var(--muted)">fseek(fp, ${offset}, ${originName});</span>  <span style="color:var(--muted)">→ 기준위치(${base}) + offset(${offset}) = </span><span style="color:var(--accent)">${newPos}</span>  <span style="color:var(--muted)">| ftell(fp) = </span><span style="color:var(--accent2)">${newPos}</span>`;
+  fseekPos = newPos;
+  renderFseek();
+}
+function resetFseek() {
+  fseekPos = 0; renderFseek();
+  document.getElementById('fseek-result').innerHTML = '<span style="color:var(--muted)">▶ fseek()를 실행해보세요</span>';
+}
+renderFseek();
+
+// ── QUIZ ──
+const answers = {};
+function checkQuiz(opt, qNum, result) {
+  const card = document.getElementById('qcard' + qNum);
+  const fb   = document.getElementById('qf' + qNum);
+  if (card.dataset.answered) return;
+  card.dataset.answered = 'true';
+  answers[qNum] = result;
+  card.querySelectorAll('.quiz-opt').forEach(o => o.style.pointerEvents = 'none');
+  opt.classList.add(result);
+  if (result === 'wrong') {
+    card.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct');
+    });
+  }
+  fb.className = 'quiz-feedback show ' + result;
+}
+function showScore() {
+  const correct = Object.values(answers).filter(v => v === 'correct').length;
+  document.getElementById('score-display').textContent = correct + '/6';
+  const pct = correct / 6;
+  document.getElementById('score-msg').textContent =
+    pct === 1  ? '🎉 완벽합니다! 파일 I/O 마스터!' :
+    pct >= .8  ? '👍 훌륭해요! 거의 다 맞혔습니다!' :
+    pct >= .6  ? '🙂 잘 했어요! 틀린 부분을 복습해봐요.' :
+                 '📚 파일 입출력 개념을 다시 한 번 살펴봐요!';
+  document.getElementById('quiz-score').classList.add('show');
+}
+
+// ── ACTIVE NAV ──
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      navItems.forEach(n => n.classList.toggle('active', n.getAttribute('href') === '#' + e.target.id));
+  });
+}, { threshold: 0.25 });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

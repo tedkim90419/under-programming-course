@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 08 — 포인터 | C 프로그래밍</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0d1117;
+  --bg2:    #161b22;
+  --bg3:    #21262d;
+  --border: #30363d;
+  --text:   #e6edf3;
+  --muted:  #8b949e;
+  --accent:  #56cfe1;   /* cyan — lec08 */
+  --accent2: #3fb950;
+  --accent3: #f78166;
+  --accent4: #d2a8ff;
+  --accent5: #ffa657;
+  --yellow:  #e3b341;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; font-size: 15px; line-height: 1.7; }
+
+/* ── SIDEBAR ── */
+.sidebar { position: fixed; top: 0; left: 0; width: 240px; height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); overflow-y: auto; z-index: 100; padding: 0 0 40px; }
+.sidebar-logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+.sidebar-logo .course { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.sidebar-logo .title { font-size: 13px; font-weight: 700; color: var(--accent); margin-top: 4px; }
+.sidebar-logo .lec-num { display: inline-block; background: var(--accent); color: var(--bg); font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 8px; }
+.nav-section { padding: 12px 0 4px; }
+.nav-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 0 20px 6px; }
+.nav-part { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); padding: 10px 20px 4px; opacity: .7; }
+.nav-item { display: block; padding: 6px 20px; color: var(--muted); text-decoration: none; font-size: 12px; border-left: 2px solid transparent; transition: all .15s; }
+.nav-item:hover, .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(86,207,225,.08); }
+.nav-item .dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: currentColor; margin-right: 8px; vertical-align: middle; }
+
+/* ── MAIN ── */
+.main { margin-left: 240px; padding: 40px 48px 80px; max-width: 960px; }
+
+/* ── HERO ── */
+.hero { background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0a1e24 100%); border: 1px solid var(--border); border-radius: 12px; padding: 40px 48px; margin-bottom: 48px; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, rgba(86,207,225,.13) 0%, transparent 70%); }
+.hero-tag { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); background: rgba(86,207,225,.1); border: 1px solid rgba(86,207,225,.2); padding: 3px 12px; border-radius: 20px; display: inline-block; margin-bottom: 16px; }
+.hero h1 { font-size: 32px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+.hero h1 span { color: var(--accent); }
+.hero-sub { font-size: 16px; color: var(--muted); margin-bottom: 24px; }
+.hero-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero-pill { font-size: 12px; background: var(--bg3); border: 1px solid var(--border); color: var(--muted); padding: 4px 12px; border-radius: 20px; font-family: 'Space Mono', monospace; }
+
+/* ── PART DIVIDER ── */
+.part-divider { display: flex; align-items: center; gap: 16px; margin: 48px 0 32px; }
+.part-divider-line { flex: 1; height: 1px; background: var(--border); }
+.part-divider-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); background: rgba(86,207,225,.1); border: 1px solid rgba(86,207,225,.25); padding: 4px 14px; border-radius: 20px; white-space: nowrap; }
+
+/* ── SECTION ── */
+.section { margin-bottom: 56px; scroll-margin-top: 24px; }
+.section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.section-num { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--bg); background: var(--accent); padding: 2px 10px; border-radius: 4px; font-weight: 700; }
+.section h2 { font-size: 20px; font-weight: 700; }
+
+/* ── CONCEPT CARD ── */
+.concept-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 16px; }
+.concept-card.hl-cyan   { border-color: rgba(86,207,225,.4);  background: linear-gradient(135deg, var(--bg2), rgba(86,207,225,.04)); }
+.concept-card.hl-green  { border-color: rgba(63,185,80,.4);   background: linear-gradient(135deg, var(--bg2), rgba(63,185,80,.04)); }
+.concept-card.hl-blue   { border-color: rgba(88,166,255,.4);  background: linear-gradient(135deg, var(--bg2), rgba(88,166,255,.04)); }
+.concept-card.hl-purple { border-color: rgba(210,168,255,.4); background: linear-gradient(135deg, var(--bg2), rgba(210,168,255,.04)); }
+.concept-card.hl-orange { border-color: rgba(255,166,87,.4);  background: linear-gradient(135deg, var(--bg2), rgba(255,166,87,.04)); }
+.concept-card.hl-red    { border-color: rgba(247,129,102,.4); background: linear-gradient(135deg, var(--bg2), rgba(247,129,102,.04)); }
+.concept-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+.concept-card p { color: #c9d1d9; font-size: 14px; margin-bottom: 10px; }
+.concept-card ul { list-style: none; margin-top: 8px; }
+.concept-card ul li { color: #c9d1d9; font-size: 14px; padding: 4px 0 4px 20px; position: relative; }
+.concept-card ul li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); }
+
+/* ── CODE BLOCK ── */
+.code-block { background: #010409; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 16px 0; }
+.code-header { background: var(--bg3); border-bottom: 1px solid var(--border); padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; }
+.code-filename { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); }
+.code-lang { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--bg); background: var(--accent); padding: 2px 8px; border-radius: 3px; }
+.copy-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--muted); font-family: 'Space Mono', monospace; font-size: 10px; padding: 3px 10px; border-radius: 4px; cursor: pointer; transition: all .15s; }
+.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+.copy-btn.copied { color: var(--accent2); border-color: var(--accent2); }
+.code-body { padding: 20px; overflow-x: auto; }
+.code-body pre { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; margin: 0; }
+.kw{color:#ff7b72} .ty{color:#79c0ff} .cm{color:#8b949e;font-style:italic}
+.nm{color:#ffa657} .st{color:#a5d6ff} .fn{color:#d2a8ff}
+.op{color:#e6edf3} .nb{color:#79c0ff} .pp{color:#ff7b72}
+
+/* ── CALLOUT ── */
+.callout { border-radius: 8px; padding: 14px 18px; margin: 16px 0; font-size: 13px; display: flex; gap: 12px; }
+.callout.tip    { background: rgba(63,185,80,.08);   border: 1px solid rgba(63,185,80,.25); }
+.callout.warn   { background: rgba(255,166,87,.08);  border: 1px solid rgba(255,166,87,.3); }
+.callout.info   { background: rgba(86,207,225,.08);  border: 1px solid rgba(86,207,225,.25); }
+.callout.error  { background: rgba(247,129,102,.08); border: 1px solid rgba(247,129,102,.3); }
+.callout.purple { background: rgba(210,168,255,.08); border: 1px solid rgba(210,168,255,.3); }
+.callout-icon { font-size: 18px; flex-shrink: 0; }
+.callout-body { color: #c9d1d9; line-height: 1.6; }
+.callout-body strong { display: block; margin-bottom: 4px; }
+
+/* ── OUTPUT ── */
+.output-box { background: #010409; border: 1px solid var(--accent); border-radius: 6px; padding: 10px 16px; margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); }
+.output-box::before { content: '$ '; color: var(--muted); }
+
+/* ── CARD GRID ── */
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* ── DATA TABLE ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+.data-table thead tr { background: var(--bg3); }
+.data-table th { text-align: left; padding: 10px 14px; color: var(--muted); font-weight: 700; font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
+.data-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 13px; }
+.data-table tbody tr:hover { background: rgba(255,255,255,.02); }
+
+/* ── MEMORY VISUALIZER ── */
+.mem-wrap { background: #010409; border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; font-family: 'JetBrains Mono', monospace; }
+.mem-title { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); margin-bottom: 14px; }
+.mem-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.mem-addr { font-size: 10px; color: var(--muted); width: 48px; text-align: right; flex-shrink: 0; font-family: 'Space Mono', monospace; }
+.mem-cell { border: 1px solid var(--border); border-radius: 4px; width: 56px; height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; transition: all .3s; position: relative; flex-shrink: 0; }
+.mem-cell .cv  { font-weight: 700; font-size: 13px; }
+.mem-cell .ct  { font-size: 9px; color: var(--muted); font-family: 'Space Mono', monospace; }
+.mem-cell.var  { background: rgba(86,207,225,.12); border-color: rgba(86,207,225,.4); }
+.mem-cell.var .cv { color: var(--accent); }
+.mem-cell.ptr  { background: rgba(255,166,87,.12); border-color: rgba(255,166,87,.4); }
+.mem-cell.ptr .cv { color: var(--accent5); }
+.mem-cell.null { background: var(--bg2); }
+.mem-cell.null .cv { color: var(--muted); }
+.mem-cell.highlighted { background: rgba(247,129,102,.2); border-color: rgba(247,129,102,.6); }
+.mem-varname { font-size: 12px; color: var(--accent2); margin-left: 6px; }
+.ptr-arrow { font-size: 18px; color: var(--accent5); margin: 0 4px; }
+
+/* ── INTERACTIVE POINTER DEMO ── */
+.demo-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin: 16px 0; }
+.demo-title { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.demo-title::before { content: '▶'; font-size: 10px; }
+.demo-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+.demo-controls label { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); }
+.demo-btn { background: var(--accent); color: var(--bg); border: none; padding: 6px 16px; border-radius: 5px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer; transition: all .15s; }
+.demo-btn:hover { opacity: .85; }
+.demo-btn.secondary { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+.demo-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 4px 8px; border-radius: 4px; width: 70px; text-align: center; }
+
+/* ── PTR ARITHMETIC TABLE ── */
+.ptr-arith-row { display: flex; gap: 0; margin-bottom: 4px; }
+.ptr-arith-cell { border: 1px solid var(--border); min-width: 64px; height: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; transition: all .25s; }
+.ptr-arith-cell .addr { color: var(--muted); font-size: 8px; font-family: 'Space Mono', monospace; }
+.ptr-arith-cell .val { font-weight: 700; font-size: 12px; }
+.ptr-arith-cell.char-type { background: rgba(86,207,225,.1); border-color: rgba(86,207,225,.3); }
+.ptr-arith-cell.char-type .val { color: var(--accent); }
+.ptr-arith-cell.int-type  { background: rgba(255,166,87,.1);  border-color: rgba(255,166,87,.3); }
+.ptr-arith-cell.int-type .val  { color: var(--accent5); }
+.ptr-arith-cell.dbl-type  { background: rgba(210,168,255,.1); border-color: rgba(210,168,255,.3); }
+.ptr-arith-cell.dbl-type .val  { color: var(--accent4); }
+.ptr-arith-cell.active { transform: scale(1.05); box-shadow: 0 0 0 2px var(--accent); }
+
+/* ── HEAP VISUALIZER ── */
+.heap-wrap { background: #010409; border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+.heap-title { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent5); margin-bottom: 12px; }
+.heap-blocks { display: flex; gap: 4px; flex-wrap: wrap; min-height: 52px; align-items: center; }
+.heap-block { border-radius: 4px; height: 48px; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; transition: all .3s; border: 1px solid; flex-shrink: 0; }
+.heap-block.alloc { background: rgba(86,207,225,.15); border-color: rgba(86,207,225,.5); color: var(--accent); }
+.heap-block.free-block { background: rgba(63,185,80,.15); border-color: rgba(63,185,80,.5); color: var(--accent2); }
+.heap-block.leaked { background: rgba(247,129,102,.15); border-color: rgba(247,129,102,.5); color: var(--accent3); }
+.heap-block.dangling { background: rgba(255,166,87,.15); border-color: rgba(255,166,87,.5); color: var(--accent5); opacity: .6; }
+.heap-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+.heap-legend-item { display: flex; align-items: center; gap: 4px; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
+.heap-legend-dot { width: 10px; height: 10px; border-radius: 2px; border: 1px solid; flex-shrink: 0; }
+
+/* ── TABS ── */
+.tabs { margin: 16px 0; }
+.tab-bar { display: flex; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.tab-btn { padding: 8px 18px; background: none; border: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; border-bottom: 2px solid transparent; transition: all .2s; position: relative; bottom: -1px; }
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-panel { display: none; padding: 20px 0; }
+.tab-panel.active { display: block; }
+
+/* ── QUIZ ── */
+.quiz-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 32px; margin-top: 32px; }
+.quiz-header { text-align: center; margin-bottom: 32px; }
+.quiz-header h2 { font-size: 22px; margin-bottom: 8px; }
+.quiz-header p { color: var(--muted); font-size: 14px; }
+.quiz-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+.quiz-card .q-num { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent); margin-bottom: 8px; }
+.quiz-card .q-text { font-size: 14px; font-weight: 700; margin-bottom: 14px; line-height: 1.5; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 13px; transition: all .15s; display: flex; align-items: flex-start; gap: 10px; text-align: left; }
+.quiz-opt:hover { border-color: var(--accent); background: rgba(86,207,225,.05); }
+.quiz-opt.correct { border-color: var(--accent2); background: rgba(63,185,80,.1); color: var(--accent2); }
+.quiz-opt.wrong   { border-color: var(--accent3); background: rgba(247,129,102,.1); color: var(--accent3); }
+.quiz-opt .opt-label { font-family: 'Space Mono', monospace; font-size: 11px; width: 22px; height: 22px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.quiz-feedback { margin-top: 10px; font-size: 13px; padding: 10px 14px; border-radius: 6px; display: none; line-height: 1.6; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: rgba(63,185,80,.1); color: var(--accent2); border: 1px solid rgba(63,185,80,.3); }
+.quiz-feedback.wrong   { background: rgba(247,129,102,.1); color: var(--accent3); border: 1px solid rgba(247,129,102,.3); }
+.quiz-score { text-align: center; padding: 24px; background: var(--bg3); border-radius: 8px; margin-top: 20px; display: none; }
+.quiz-score.show { display: block; }
+.score-num { font-family: 'Space Mono', monospace; font-size: 48px; font-weight: 700; color: var(--accent); line-height: 1; }
+.score-label { color: var(--muted); font-size: 14px; margin-top: 8px; }
+.btn-primary { background: var(--accent); color: var(--bg); border: none; padding: 10px 24px; border-radius: 6px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .15s; margin-top: 16px; }
+.btn-primary:hover { opacity: .85; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 20px 20px 60px; }
+  .card-grid, .card-grid-3 { grid-template-columns: 1fr; }
+  .hero { padding: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="course">C 프로그래밍 및 실습</div>
+    <div class="title">포인터 / 동적 메모리</div>
+    <div class="lec-num">Lecture 08</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">목차</div>
+    <div class="nav-part">Part 1 — 포인터 기초</div>
+    <a class="nav-item active" href="#intro"><span class="dot"></span>변수와 메모리 주소</a>
+    <a class="nav-item" href="#declare"><span class="dot"></span>포인터 변수 선언</a>
+    <a class="nav-item" href="#operators"><span class="dot"></span>&amp; / * 연산자</a>
+    <a class="nav-item" href="#init"><span class="dot"></span>초기화 &amp; 주의사항</a>
+    <a class="nav-item" href="#arith"><span class="dot"></span>포인터 산술 연산</a>
+    <div class="nav-part">Part 2 — 포인터 응용</div>
+    <a class="nav-item" href="#array"><span class="dot"></span>포인터와 배열</a>
+    <a class="nav-item" href="#function"><span class="dot"></span>포인터와 함수</a>
+    <a class="nav-item" href="#advanced"><span class="dot"></span>고급 포인터</a>
+    <a class="nav-item" href="#const"><span class="dot"></span>const 키워드</a>
+    <div class="nav-part">Part 3 — 동적 메모리</div>
+    <a class="nav-item" href="#dynamic"><span class="dot"></span>동적 메모리 할당</a>
+    <a class="nav-item" href="#malloc"><span class="dot"></span>malloc / free</a>
+    <a class="nav-item" href="#quiz"><span class="dot"></span>퀴즈 🎯</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Lecture 08</div>
+    <h1>Pointers &amp; Dynamic Memory<br><span>포인터와 동적 메모리 관리</span></h1>
+    <p class="hero-sub">프로그래밍방법론및실습 — 서울시립대학교 기계정보공학과</p>
+    <div class="hero-pills">
+      <span class="hero-pill">&amp; Address-of</span>
+      <span class="hero-pill">* Dereference</span>
+      <span class="hero-pill">Pointer Arithmetic</span>
+      <span class="hero-pill">Call-by-Reference</span>
+      <span class="hero-pill">void * / double *</span>
+      <span class="hero-pill">malloc / free</span>
+      <span class="hero-pill">const</span>
+    </div>
+  </div>
+
+  <!-- ══ PART 1 ══ -->
+  <div class="part-divider">
+    <div class="part-divider-line"></div>
+    <div class="part-divider-label">Part 1 — 포인터 기초</div>
+    <div class="part-divider-line"></div>
+  </div>
+
+  <!-- ── SECTION 1: 변수와 메모리 주소 ── -->
+  <section class="section" id="intro">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>변수와 메모리 주소</h2>
+    </div>
+
+    <div class="concept-card hl-cyan">
+      <h3><span>🧠</span>변수는 메모리 위치다</h3>
+      <p>변수는 메모리 상의 특정 <strong style="color:var(--accent)">주소(address)</strong>로부터 일정한 크기를 차지하며 값이 저장됩니다.</p>
+      <ul>
+        <li>주소는 <strong style="color:var(--accent5)">바이트(byte) 단위</strong>로 1씩 증가</li>
+        <li>여러 바이트를 차지하는 변수의 주소 = <strong style="color:var(--accent5)">시작 주소</strong></li>
+        <li>컴파일러가 자료형에 따라 메모리 공간에 일정 길이의 바이트 할당</li>
+      </ul>
+    </div>
+
+    <!-- 메모리 레이아웃 시각화 -->
+    <div class="mem-wrap">
+      <div class="mem-title">▸ 변수 선언과 메모리 배치</div>
+      <div style="display:flex;gap:0;flex-wrap:nowrap;overflow-x:auto;margin-bottom:6px">
+        <div class="mem-cell var" style="width:64px"><span class="cv">10</span><span class="ct">int i</span></div>
+        <div class="mem-cell var" style="width:64px"><span class="cv">10</span><span class="ct"></span></div>
+        <div class="mem-cell var" style="width:64px"><span class="cv">10</span><span class="ct"></span></div>
+        <div class="mem-cell var" style="width:64px"><span class="cv">10</span><span class="ct"></span></div>
+        <div class="mem-cell ptr" style="width:64px"><span class="cv">0.1</span><span class="ct">float f</span></div>
+        <div class="mem-cell ptr" style="width:64px"><span class="cv">0.1</span><span class="ct"></span></div>
+        <div class="mem-cell ptr" style="width:64px"><span class="cv">0.1</span><span class="ct"></span></div>
+        <div class="mem-cell ptr" style="width:64px"><span class="cv">0.1</span><span class="ct"></span></div>
+        <div class="mem-cell" style="width:64px;background:rgba(63,185,80,.12);border-color:rgba(63,185,80,.4)"><span class="cv" style="color:var(--accent2)">'a'</span><span class="ct">char c</span></div>
+        <div class="mem-cell null" style="width:64px"><span class="cv">...</span></div>
+      </div>
+      <div style="display:flex;gap:0;flex-wrap:nowrap;overflow-x:auto">
+        <div style="width:64px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">100</div>
+        <div style="width:64px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">101</div>
+        <div style="width:64px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">102</div>
+        <div style="width:64px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">103</div>
+        <div style="width:64px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">104</div>
+        <div style="width:64px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">105</div>
+        <div style="width:64px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">106</div>
+        <div style="width:64px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">107</div>
+        <div style="width:64px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">108</div>
+        <div style="width:64px;text-align:center;font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)">109</div>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted);font-family:'Space Mono',monospace">
+        <span style="color:var(--accent)">int i=10</span>: 주소 100~103 (4B) &nbsp;|&nbsp;
+        <span style="color:var(--accent5)">float f=0.1</span>: 주소 104~107 (4B) &nbsp;|&nbsp;
+        <span style="color:var(--accent2)">char c='a'</span>: 주소 108 (1B)
+      </div>
+    </div>
+
+    <div class="concept-card hl-cyan">
+      <h3><span>📍</span>포인터(Pointer)란?</h3>
+      <p><strong style="color:var(--accent)">메모리 상의 주소를 저장하는 변수</strong>입니다. 변수 값 자체가 아닌 다른 변수의 주소를 저장하여, 간접적으로 변수 값에 접근합니다.</p>
+      <ul>
+        <li>대표적 활용: 함수 호출 시 데이터 복사 없이 주소 전달 (<strong style="color:var(--accent5)">Call-by-Reference</strong>)</li>
+        <li>동적으로 변하는 자료구조 표현 (linked list, tree …)</li>
+        <li>동적 메모리 할당 관리</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: 포인터 변수 선언 ── -->
+  <section class="section" id="declare">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>포인터 변수의 선언</h2>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">포인터 변수 선언 문법</span><span class="code-lang">C</span></div>
+      <div class="code-body">
+<pre><span class="ty">int</span>  * <span class="nm">p</span>;      <span class="cm">// int를 가리키는 포인터</span>
+<span class="cm">↑       ↑  ↑</span>
+<span class="cm">데이터  *  변수명</span>
+<span class="cm">타입   (포인터 표시)</span>
+
+<span class="ty">float</span>  *<span class="nm">pf</span>;   <span class="cm">// float를 가리키는 포인터</span>
+<span class="ty">char</span>   *<span class="nm">pc</span>;   <span class="cm">// char를 가리키는 포인터</span>
+<span class="ty">double</span> *<span class="nm">pd</span>;   <span class="cm">// double을 가리키는 포인터</span></pre>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3><span>❓</span>왜 타입이 필요한가?</h3>
+        <p style="font-size:13px">포인터가 가리키는 주소에서 <strong style="color:var(--accent5)">몇 바이트를 읽을지</strong> 알아야 합니다. <code>int*</code>는 4바이트, <code>double*</code>는 8바이트를 읽습니다. 타입 없이는 값을 올바르게 해석할 수 없습니다.</p>
+      </div>
+      <div class="concept-card">
+        <h3 style="color:var(--accent3)"><span>⚠️</span>여러 개 선언 시 주의!</h3>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:10px 14px">
+<pre><span class="cm">// p1, p2, p3 모두 포인터</span>
+<span class="ty">int</span> *<span class="nm">p1</span>, *<span class="nm">p2</span>, *<span class="nm">p3</span>;
+
+<span class="cm">// ⚠️ p1만 포인터! p2, p3는 int!</span>
+<span class="ty">int</span> *<span class="nm">p1</span>, <span class="nm">p2</span>, <span class="nm">p3</span>;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">📏</span>
+      <div class="callout-body">
+        <strong>포인터 변수의 크기</strong>
+        포인터 변수 자체의 크기는 가리키는 데이터 타입과 무관하게 <strong style="color:var(--accent)">32비트 시스템: 4 Bytes / 64비트 시스템: 8 Bytes</strong>입니다. <code>sizeof(int*) == sizeof(double*)</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: & / * 연산자 ── -->
+  <section class="section" id="operators">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>&amp; (Address-of) / * (Dereference) 연산자</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card hl-cyan">
+        <h3><span>📌</span>& — 주소 연산자 (Address-of)</h3>
+        <p style="font-size:13px">변수의 <strong style="color:var(--accent)">메모리 시작 주소</strong>를 반환합니다.</p>
+        <ul>
+          <li>피연산자는 <strong style="color:var(--accent5)">변수만</strong> 가능 (상수·수식 불가)</li>
+          <li><code>&amp;i</code> → i가 저장된 주소 (예: 100)</li>
+          <li>오른쪽에서 왼쪽 결합</li>
+        </ul>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:8px 12px">
+<pre><span class="ty">int</span>  <span class="nm">i</span>  = <span class="nb">10</span>;
+<span class="ty">int</span> *<span class="nm">pi</span> = &<span class="nm">i</span>;   <span class="cm">// pi = 100 (i의 주소)</span>
+<span class="cm">// p = &3;      ← ❌ 컴파일 에러</span>
+<span class="cm">// p = &(i+2);  ← ❌ 컴파일 에러</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="concept-card hl-orange">
+        <h3 style="color:var(--accent5)"><span>🔍</span>* — 간접 참조 연산자 (Dereference)</h3>
+        <p style="font-size:13px">포인터가 가리키는 주소의 <strong style="color:var(--accent5)">데이터 값</strong>에 접근합니다.</p>
+        <ul>
+          <li>피연산자는 <strong style="color:var(--accent5)">포인터 타입 변수</strong>만 가능</li>
+          <li><code>*pi</code> → pi가 가리키는 주소의 값 (10)</li>
+          <li>읽기(r-value)와 쓰기(l-value) 모두 가능</li>
+        </ul>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:8px 12px">
+<pre><span class="ty">int</span> *<span class="nm">pi</span> = &<span class="nm">i</span>;
+<span class="fn">printf</span>(<span class="st">"%d"</span>, *<span class="nm">pi</span>); <span class="cm">// 읽기: 10</span>
+*<span class="nm">pi</span> = <span class="nb">99</span>;          <span class="cm">// 쓰기: i = 99</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 인터랙티브 포인터 데모 -->
+    <div class="demo-box">
+      <div class="demo-title">인터랙티브 포인터 연산 시뮬레이터</div>
+      <div class="demo-controls">
+        <label>a 값:</label>
+        <input type="number" class="demo-input" id="ptr-a" value="1">
+        <label>b 값:</label>
+        <input type="number" class="demo-input" id="ptr-b" value="2">
+        <button class="demo-btn" onclick="runPtrDemo()">▶ 실행</button>
+        <button class="demo-btn secondary" onclick="resetPtrDemo()">↺ 초기화</button>
+      </div>
+      <!-- 메모리 시각화 영역 -->
+      <div id="ptr-mem-vis" style="background:#010409;border:1px solid var(--border);border-radius:6px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:12px;min-height:80px">
+        <span style="color:var(--muted)">▶ 실행 버튼을 눌러보세요</span>
+      </div>
+      <div id="ptr-steps" style="margin-top:12px"></div>
+    </div>
+
+    <!-- 연산자 활용 예시 테이블 -->
+    <div class="concept-card">
+      <h3><span>📊</span>포인터 연산 표현식 예시</h3>
+      <p style="font-size:12px;color:var(--muted)">int i=3, j=5, *p=&amp;i, *q=&amp;j, *r; double x;</p>
+      <table class="data-table" style="margin-top:8px">
+        <thead>
+          <tr><th>수식</th><th>동일 표현</th><th>값/결과</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>p == &amp;i</code></td><td><code>p == (&amp;i)</code></td><td><code>1</code> (참)</td></tr>
+          <tr><td><code>**&amp;p</code></td><td><code>*(*(&amp;p))</code></td><td><code>3</code></td></tr>
+          <tr><td><code>r = &amp;x</code></td><td><code>r = (&amp;x)</code></td><td>r에 x 주소 저장</td></tr>
+          <tr><td><code>7 * *p / *q + 7</code></td><td><code>((7 * (*p)) / (*q)) + 7</code></td><td><code>11</code></td></tr>
+          <tr><td><code>*(r=&amp;j) *= *p</code></td><td><code>r=&amp;j; *r=(*r)*(*p);</code> → <code>j=j*i</code></td><td>j = 15</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── SECTION 4: 초기화 & 주의사항 ── -->
+  <section class="section" id="init">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>포인터 초기화 &amp; 주의사항</h2>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <strong>초기화되지 않은 포인터는 극도로 위험!</strong>
+        포인터 변수를 초기화 없이 역참조(<code>*p</code>)하면 임의의 메모리 주소를 건드려 <strong style="color:var(--accent3)">프로그램 크래시, 데이터 손상</strong>이 발생합니다.
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">LAB: p9.c, p13.c — 포인터 초기화</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="ty">int</span> *<span class="nm">p</span>;       <span class="cm">// ❌ 초기화 안 됨 — p는 쓰레기 주소</span>
+*<span class="nm">p</span> = <span class="nb">100</span>;   <span class="cm">// 🚨 아주 위험한 코드! 임의 메모리에 씀</span>
+
+<span class="cm">// ✅ 올바른 초기화 방법들</span>
+<span class="ty">int</span> <span class="nm">i</span>;
+<span class="ty">int</span> *<span class="nm">p1</span> = &<span class="nm">i</span>;     <span class="cm">// 가장 일반적인 방법</span>
+<span class="ty">int</span> *<span class="nm">p2</span> = <span class="nb">NULL</span>;  <span class="cm">// NULL로 초기화 (사용 전 체크)</span>
+
+<span class="cm">// NULL 포인터 체크 패턴</span>
+<span class="kw">if</span> (<span class="nm">p2</span> == <span class="nb">NULL</span>)
+  <span class="fn">printf</span>(<span class="st">"NULL pointer error\n"</span>);
+
+<span class="cm">// ❌ 타입 불일치 — 위험!</span>
+<span class="ty">int</span>    <span class="nm">i</span>;
+<span class="ty">double</span> *<span class="nm">pd</span> = &<span class="nm">i</span>;  <span class="cm">// double*로 int를 가리킴</span>
+*<span class="nm">pd</span> = <span class="nb">36.5</span>;       <span class="cm">// 실제 메모리 8바이트를 쓰지만 i는 4바이트!</span></pre>
+      </div>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card hl-green">
+        <h3 style="color:var(--accent2)"><span>✅</span>NULL 포인터 패턴</h3>
+        <p style="font-size:13px">포인터를 바로 초기화할 대상이 없을 때는 <code style="color:var(--accent)">NULL</code>(0)로 초기화하고, 사용 전에 반드시 <code>NULL</code> 여부를 체크합니다.</p>
+      </div>
+      <div class="concept-card hl-red">
+        <h3 style="color:var(--accent3)"><span>❌</span>타입 불일치 위험</h3>
+        <p style="font-size:13px">포인터 변수의 자료형과 가리키는 변수의 자료형은 <strong style="color:var(--accent3)">반드시 일치</strong>시켜야 합니다. 불일치 시 잘못된 메모리 범위를 접근합니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: 포인터 산술 연산 ── -->
+  <section class="section" id="arith">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>포인터 산술 연산 &amp; 증감 연산자</h2>
+    </div>
+
+    <div class="concept-card hl-cyan">
+      <h3><span>➕</span>포인터에 허용되는 연산</h3>
+      <p>포인터 변수에는 <strong style="color:var(--accent)">증가(++), 감소(--), 덧셈(+), 뺄셈(-)</strong>만 허용됩니다.</p>
+      <ul>
+        <li>증가/감소 단위는 <strong style="color:var(--accent5)">가리키는 타입의 크기(sizeof)</strong>만큼 변함</li>
+        <li><code>pc++</code> → +1 byte / <code>pi++</code> → +4 bytes / <code>pd++</code> → +8 bytes</li>
+      </ul>
+    </div>
+
+    <!-- 인터랙티브 포인터 산술 시뮬레이터 -->
+    <div class="demo-box">
+      <div class="demo-title">포인터 산술 연산 시뮬레이터 (시작 주소: 10000)</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;font-family:'Space Mono',monospace">
+        각 포인터를 1 증가(++)했을 때의 주소 변화
+      </div>
+      <div style="overflow-x:auto">
+        <div style="display:flex;gap:0;min-width:400px;margin-bottom:4px">
+          <div style="width:80px;flex-shrink:0;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);display:flex;align-items:center">초기(10000)</div>
+          <div id="arith-before" style="display:flex;gap:2px"></div>
+        </div>
+        <div style="display:flex;gap:0;min-width:400px">
+          <div style="width:80px;flex-shrink:0;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);display:flex;align-items:center">++ 후</div>
+          <div id="arith-after" style="display:flex;gap:2px"></div>
+        </div>
+      </div>
+      <div class="demo-controls" style="margin-top:12px">
+        <button class="demo-btn" onclick="runArith()">▶ ++ 실행</button>
+        <button class="demo-btn secondary" onclick="resetArith()">↺ 초기화</button>
+      </div>
+      <div id="arith-result" style="font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:8px;line-height:1.8;padding:8px;background:#010409;border:1px solid var(--border);border-radius:4px;min-height:40px">
+        <span style="color:var(--muted)">▶ 실행을 눌러보세요</span>
+      </div>
+    </div>
+
+    <!-- 증감 연산자 우선순위 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">⚡ 간접 참조 연산자 + 증감 연산자 우선순위</h3>
+    <div class="callout info">
+      <span class="callout-icon">📋</span>
+      <div class="callout-body">
+        <strong>우선순위: 전위 ++/-- == &amp;(주소) == *(역참조) (모두 같은 우선순위, 오른→왼 결합)</strong>
+        따라서 <code>*p++</code>는 <code>*(p++)</code>이고 <code>*++p</code>는 <code>*(++p)</code>입니다.
+      </div>
+    </div>
+
+    <table class="data-table">
+      <thead><tr><th>수식</th><th>동일 표현</th><th>설명</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code style="color:var(--accent)">v = *p++</code></td>
+          <td><code>v=*p; p++;</code></td>
+          <td>p가 가리키는 값을 v에 대입 후, <strong>p(주소)</strong>를 증가</td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent5)">v = (*p)++</code></td>
+          <td><code>v=*p; *p=*p+1;</code></td>
+          <td>p가 가리키는 값을 v에 대입 후, <strong>*p(값)</strong>을 증가 (주소 변동 없음)</td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent4)">v = *++p</code></td>
+          <td><code>++p; v=*p;</code></td>
+          <td>p(주소)를 먼저 증가 후, 새 주소의 값을 v에 대입</td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent2)">v = ++*p</code></td>
+          <td><code>*p=*p+1; v=*p;</code></td>
+          <td>*p(값)를 먼저 증가 후 v에 대입 (주소 변동 없음)</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        증가/감소의 대상이 <strong style="color:var(--accent5)">주소(pointer 자체)</strong>인지, <strong style="color:var(--accent5)">주소에 저장된 값(*p)</strong>인지 항상 구분하세요!
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PART 2 ══ -->
+  <div class="part-divider">
+    <div class="part-divider-line"></div>
+    <div class="part-divider-label">Part 2 — 포인터 응용</div>
+    <div class="part-divider-line"></div>
+  </div>
+
+  <!-- ── SECTION 6: 포인터와 배열 ── -->
+  <section class="section" id="array">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>포인터와 배열의 관계</h2>
+    </div>
+
+    <div class="concept-card hl-cyan">
+      <h3><span>🔗</span>배열 이름 = 배열의 시작 주소!</h3>
+      <p>수식이나 함수 인자로 사용된 <strong style="color:var(--accent)">배열 이름은 포인터와 동등하게 처리</strong>됩니다.</p>
+      <ul>
+        <li>인덱스는 시작 주소로부터의 <strong style="color:var(--accent5)">오프셋(offset)</strong>으로 취급됨</li>
+        <li><strong style="color:var(--accent5)">차이점</strong>: 포인터 변수는 값 변경 가능 / 배열 이름은 상수 (변경 불가)</li>
+      </ul>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">배열-포인터 동등 표현</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="ty">int</span> *<span class="nm">p</span>, *<span class="nm">q</span>;
+<span class="ty">int</span>  <span class="nm">a</span>[<span class="nb">4</span>];
+
+<span class="nm">p</span> = <span class="nm">a</span>;       <span class="cm">/* p = &a[0]; 와 동일 */</span>
+<span class="nm">q</span> = <span class="nm">a</span> + <span class="nb">2</span>;   <span class="cm">/* q = &a[2]; 와 동일 */</span>
+<span class="nm">p</span> = <span class="nm">a</span> + <span class="nm">i</span>;   <span class="cm">// ✅ OK — 포인터는 변수</span>
+<span class="nm">a</span> = <span class="nm">q</span>;       <span class="cm">// ❌ Error — 배열 이름은 상수</span>
+
+<span class="cm">// 다음 네 가지는 모두 동일!</span>
+<span class="nm">a</span>[<span class="nm">i</span>]   <span class="cm">// 배열 인덱스</span>
+*(<span class="nm">a</span>+<span class="nm">i</span>) <span class="cm">// 포인터 + 오프셋</span>
+*(<span class="nm">p</span>+<span class="nm">i</span>) <span class="cm">// 포인터 변수</span>
+<span class="nm">p</span>[<span class="nm">i</span>]   <span class="cm">// 포인터에 [] 연산자</span>
+
+<span class="cm">// sizeof 차이 (a가 int[4]일 때)</span>
+<span class="kw">sizeof</span>(<span class="nm">a</span>)  <span class="cm">// 16 (배열 전체 크기)</span>
+<span class="kw">sizeof</span>(<span class="nm">p</span>)  <span class="cm">// 4 또는 8 (포인터 하나 크기)</span></pre>
+      </div>
+    </div>
+
+    <!-- 합 구하기 3가지 버전 -->
+    <div class="concept-card">
+      <h3><span>📊</span>배열 합 구하기 — 3가지 포인터 버전</h3>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-header"><span class="code-filename">LAB: p16.c</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+        <div class="code-body">
+<pre><span class="pp">#define</span> <span class="nm">N</span> <span class="nb">10</span>
+<span class="ty">int</span> *<span class="nm">p</span>, <span class="nm">a</span>[<span class="nm">N</span>], <span class="nm">sum</span> = <span class="nb">0</span>;
+
+<span class="cm">/* Version 1: 포인터 + 오프셋 */</span>
+<span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt; <span class="nm">N</span>; ++<span class="nm">i</span>)
+  <span class="nm">sum</span> += *(<span class="nm">a</span>+<span class="nm">i</span>); <span class="cm">// 또는 a[i]</span>
+
+<span class="cm">/* Version 2: 포인터 이동 (주소 비교) */</span>
+<span class="kw">for</span> (<span class="nm">p</span> = <span class="nm">a</span>; <span class="nm">p</span> &lt;= &<span class="nm">a</span>[<span class="nm">N</span>-<span class="nb">1</span>]; ++<span class="nm">p</span>)
+  <span class="nm">sum</span> += *<span class="nm">p</span>;
+
+<span class="cm">/* Version 3: 포인터를 배열처럼 */</span>
+<span class="kw">for</span> (<span class="nm">p</span> = <span class="nm">a</span>, <span class="nm">i</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt; <span class="nm">N</span>; ++<span class="nm">i</span>)
+  <span class="nm">sum</span> += <span class="nm">p</span>[<span class="nm">i</span>]; <span class="cm">// 또는 *(p+i)</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 7: 포인터와 함수 ── -->
+  <section class="section" id="function">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>포인터와 함수 (Call-by-Reference)</h2>
+    </div>
+
+    <div class="concept-card hl-cyan">
+      <h3><span>📞</span>Call-by-Reference 구현 방법</h3>
+      <ol style="margin-left:16px;color:#c9d1d9;font-size:14px;line-height:2">
+        <li>함수 매개변수를 <strong style="color:var(--accent)">포인터 타입</strong>으로 선언</li>
+        <li>호출 시 <strong style="color:var(--accent5)">&amp; 연산자</strong>로 변수 주소를 인자로 전달</li>
+        <li>함수 내부에서 <strong style="color:var(--accent5)">* 연산자</strong>로 역참조해서 원본 값 변경</li>
+      </ol>
+    </div>
+
+    <!-- swap 비교 데모 -->
+    <h3 style="font-size:15px;font-weight:700;margin:0 0 12px;color:var(--text)">Call-by-Value vs Call-by-Reference — swap 함수 비교</h3>
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent3)"><span>❌</span>Call-by-Value (원본 불변)</h3>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:10px 12px">
+<pre><span class="ty">void</span> <span class="fn">swap</span>(<span class="ty">int</span> <span class="nm">p</span>, <span class="ty">int</span> <span class="nm">q</span>) {
+  <span class="ty">int</span> <span class="nm">tmp</span> = <span class="nm">p</span>;
+  <span class="nm">p</span> = <span class="nm">q</span>; <span class="nm">q</span> = <span class="nm">tmp</span>;
+  <span class="cm">// p, q는 복사본</span>
+}
+<span class="ty">int</span> <span class="nm">i</span>=<span class="nb">3</span>, <span class="nm">j</span>=<span class="nb">5</span>;
+<span class="fn">swap</span>(<span class="nm">i</span>, <span class="nm">j</span>);
+<span class="fn">printf</span>(<span class="st">"%d %d"</span>, <span class="nm">i</span>, <span class="nm">j</span>);</pre>
+          </div>
+        </div>
+        <div class="output-box" style="border-color:var(--accent3);color:var(--accent3)">3 5  ← 원본 그대로!</div>
+      </div>
+      <div class="concept-card hl-green">
+        <h3 style="color:var(--accent2)"><span>✅</span>Call-by-Reference (원본 변경)</h3>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:10px 12px">
+<pre><span class="ty">void</span> <span class="fn">swap</span>(<span class="ty">int</span> *<span class="nm">p</span>, <span class="ty">int</span> *<span class="nm">q</span>) {
+  <span class="ty">int</span> <span class="nm">tmp</span> = *<span class="nm">p</span>;
+  *<span class="nm">p</span> = *<span class="nm">q</span>; *<span class="nm">q</span> = <span class="nm">tmp</span>;
+  <span class="cm">// *p, *q로 원본 직접 변경</span>
+}
+<span class="ty">int</span> <span class="nm">i</span>=<span class="nb">3</span>, <span class="nm">j</span>=<span class="nb">5</span>;
+<span class="fn">swap</span>(&<span class="nm">i</span>, &<span class="nm">j</span>);   <span class="cm">// 주소 전달</span>
+<span class="fn">printf</span>(<span class="st">"%d %d"</span>, <span class="nm">i</span>, <span class="nm">j</span>);</pre>
+          </div>
+        </div>
+        <div class="output-box">5 3  ← 교환 성공!</div>
+      </div>
+    </div>
+
+    <!-- 함수 매개변수로 배열 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">배열 매개변수 = 포인터</h3>
+    <div class="concept-card">
+      <h3><span>🔗</span>배열로 선언된 매개변수의 실체</h3>
+      <p style="font-size:13px">함수에 배열이 전달되면 실제로는 <strong style="color:var(--accent)">배열의 시작 주소(포인터)</strong>가 전달됩니다 (Call-by-Reference 효과). 배열 원소 자체는 복사되지 않습니다.</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-header"><span class="code-filename">LAB: p20.c</span><span class="code-lang">C</span></div>
+        <div class="code-body">
+<pre><span class="cm">// 두 선언은 완전히 동일!</span>
+<span class="ty">double</span> <span class="fn">sum</span>(<span class="ty">double</span> <span class="nm">a</span>[], <span class="ty">int</span> <span class="nm">n</span>)  <span class="cm">// 배열 표기</span>
+<span class="ty">double</span> <span class="fn">sum</span>(<span class="ty">double</span> *<span class="nm">a</span>, <span class="ty">int</span> <span class="nm">n</span>) <span class="cm">// 포인터 표기</span>
+<span class="cm">// 함수 내에서 배열 길이를 알 수 없음 → 별도 파라미터로!</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Return by parameter -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">Return by Parameter (다중 반환값)</h3>
+    <div class="concept-card hl-blue">
+      <h3 style="color:var(--accent2)"><span>📤</span>결과가 2개 이상일 때</h3>
+      <p style="font-size:13px">함수의 return은 값 하나만 반환 가능합니다. 여러 결과를 반환하려면 결과를 저장할 변수의 <strong style="color:var(--accent5)">주소를 매개변수로 전달</strong>합니다. <code>scanf()</code>가 대표적인 예입니다.</p>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-header"><span class="code-filename">LAB: p22.c — 합과 차를 동시에 반환</span><span class="code-lang">C</span></div>
+        <div class="code-body">
+<pre><span class="cm">// scanf: return = 읽은 개수, 실제 값은 포인터로 저장</span>
+<span class="ty">int</span> <span class="nm">i</span>, <span class="nm">j</span>, <span class="nm">count</span>;
+<span class="nm">count</span> = <span class="fn">scanf</span>(<span class="st">"%d %d"</span>, &<span class="nm">i</span>, &<span class="nm">j</span>);
+
+<span class="cm">// 합과 차를 동시에 반환하는 함수 설계</span>
+<span class="ty">void</span> <span class="fn">sum_and_diff</span>(<span class="ty">int</span> <span class="nm">a</span>, <span class="ty">int</span> <span class="nm">b</span>,
+                   <span class="ty">int</span> *<span class="nm">sum</span>, <span class="ty">int</span> *<span class="nm">diff</span>) {
+  *<span class="nm">sum</span>  = <span class="nm">a</span> + <span class="nm">b</span>;  <span class="cm">// 결과를 포인터로 저장</span>
+  *<span class="nm">diff</span> = <span class="nm">a</span> - <span class="nm">b</span>;
+}
+<span class="ty">int</span> <span class="nm">s</span>, <span class="nm">d</span>;
+<span class="fn">sum_and_diff</span>(<span class="nb">10</span>, <span class="nb">3</span>, &<span class="nm">s</span>, &<span class="nm">d</span>);
+<span class="cm">// s=13, d=7</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <strong>지역 변수 주소를 반환하면 안 된다!</strong>
+        함수가 반환한 후 지역 변수의 스택 공간은 즉시 해제됩니다. 지역 변수의 주소를 return하면 <strong style="color:var(--accent3)">dangling pointer</strong>가 되어 가비지 값 또는 런타임 에러가 발생합니다.
+        <div style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3)">int *add(int x,int y){int result=x+y; return &result;} // ❌ 위험!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 8: 고급 포인터 ── -->
+  <section class="section" id="advanced">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <h2>포인터 활용 [고급편]</h2>
+    </div>
+
+    <div class="tabs">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'adv1')">void 포인터</button>
+        <button class="tab-btn" onclick="switchTab(this,'adv2')">이중 포인터</button>
+        <button class="tab-btn" onclick="switchTab(this,'adv3')">포인터 배열</button>
+        <button class="tab-btn" onclick="switchTab(this,'adv4')">비정형 배열</button>
+        <button class="tab-btn" onclick="switchTab(this,'adv5')">main() 인자</button>
+        <button class="tab-btn" onclick="switchTab(this,'adv6')">2D & 포인터</button>
+      </div>
+
+      <div class="tab-panel active" id="adv1">
+        <div class="concept-card hl-cyan">
+          <h3><span>🌐</span>void 포인터 (Generic Pointer)</h3>
+          <p style="font-size:13px">특정 타입과 무관하게 <strong style="color:var(--accent)">어떤 주소든 저장</strong>할 수 있는 제네릭 포인터입니다.</p>
+          <ul>
+            <li><strong style="color:var(--accent2)">장점</strong>: 다양한 타입의 인자를 받는 함수 구현에 유용 (예: <code>malloc()</code>)</li>
+            <li><strong style="color:var(--accent3)">단점</strong>: 포인터 산술 연산 불가, 역참조 불가 (타입 캐스팅 필수)</li>
+          </ul>
+        </div>
+        <div class="code-block"><div class="code-header"><span class="code-filename">LAB: p24.c — void 포인터</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+          <div class="code-body"><pre><span class="ty">int</span>   <span class="nm">a</span> = <span class="nb">10</span>;
+<span class="ty">void</span> *<span class="nm">p</span>;
+<span class="nm">p</span> = &<span class="nm">a</span>;               <span class="cm">// OK: 어떤 주소든 저장 가능</span>
+<span class="fn">printf</span>(<span class="st">"%d\n"</span>, *<span class="nm">p</span>);        <span class="cm">// ❌ 컴파일 에러 — 타입 모름</span>
+<span class="fn">printf</span>(<span class="st">"%d\n"</span>, *(<span class="ty">int</span>*)<span class="nm">p</span>); <span class="cm">// ✅ 타입 캐스팅 후 역참조</span>
+<span class="nm">p</span>++;                       <span class="cm">// ⚠️ 산술 연산 불가 (컴파일러 경고)</span></pre></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="adv2">
+        <div class="concept-card hl-purple">
+          <h3 style="color:var(--accent4)"><span>🔗</span>이중 포인터 (Double Pointer)</h3>
+          <p style="font-size:13px">또 다른 <strong style="color:var(--accent4)">포인터 변수의 주소</strong>를 가리키는 포인터입니다. <code>int **ppi</code>.</p>
+        </div>
+        <div class="code-block"><div class="code-header"><span class="code-filename">LAB: p25.c — 이중 포인터</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+          <div class="code-body"><pre><span class="ty">int</span>   <span class="nm">i</span>   = <span class="nb">10</span>;       <span class="cm">// 주소: 1000</span>
+<span class="ty">int</span>  *<span class="nm">pi</span>  = &<span class="nm">i</span>;       <span class="cm">// pi = 1000, 주소: 1010</span>
+<span class="ty">int</span> **<span class="nm">ppi</span> = &<span class="nm">pi</span>;      <span class="cm">// ppi = 1010, 주소: 1020</span>
+
+*<span class="nm">pi</span>   = <span class="nb">20</span>; <span class="cm">// i = 20</span>
+**<span class="nm">ppi</span>  = <span class="nb">30</span>; <span class="cm">// *(*ppi) = *(pi) = i → i = 30</span>
+<span class="fn">printf</span>(<span class="st">"i=%d\n"</span>, <span class="nm">i</span>); <span class="cm">// 30</span>
+<span class="cm">// ppi → pi → i 순서로 역참조</span></pre></div>
+        </div>
+        <div class="mem-wrap" style="margin-top:8px">
+          <div class="mem-title">▸ 이중 포인터 메모리 구조</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div><div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-align:center;margin-bottom:2px">ppi (1020)</div><div class="mem-cell ptr" style="width:72px"><span class="cv">1010</span><span class="ct">int**</span></div></div>
+            <div style="font-size:20px;color:var(--muted)">→</div>
+            <div><div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-align:center;margin-bottom:2px">pi (1010)</div><div class="mem-cell ptr" style="width:72px;border-color:rgba(210,168,255,.4);background:rgba(210,168,255,.12)"><span class="cv" style="color:var(--accent4)">1000</span><span class="ct">int*</span></div></div>
+            <div style="font-size:20px;color:var(--muted)">→</div>
+            <div><div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-align:center;margin-bottom:2px">i (1000)</div><div class="mem-cell var" style="width:72px"><span class="cv">30</span><span class="ct">int</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="adv3">
+        <div class="concept-card hl-orange">
+          <h3 style="color:var(--accent5)"><span>📦</span>포인터 배열 (Array of Pointers)</h3>
+          <p style="font-size:13px">각 원소가 그 자체로 <strong style="color:var(--accent5)">개별적인 포인터 변수</strong>인 배열입니다.</p>
+        </div>
+        <div class="code-block"><div class="code-header"><span class="code-filename">LAB: arrayOfPtrs.c</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+          <div class="code-body"><pre><span class="ty">int</span>  <span class="nm">a</span>=<span class="nb">10</span>, <span class="nm">b</span>=<span class="nb">20</span>, <span class="nm">c</span>=<span class="nb">30</span>, <span class="nm">d</span>=<span class="nb">40</span>;
+<span class="ty">int</span> *<span class="nm">ap</span>[<span class="nb">4</span>] = { &<span class="nm">a</span>, &<span class="nm">b</span>, &<span class="nm">c</span>, &<span class="nm">d</span> };
+<span class="cm">// ap[0]=&a, ap[1]=&b, ap[2]=&c, ap[3]=&d</span>
+
+<span class="fn">printf</span>(<span class="st">"%d\n"</span>, *<span class="nm">ap</span>[<span class="nb">0</span>]); <span class="cm">// 10</span>
+<span class="fn">printf</span>(<span class="st">"%d\n"</span>, *<span class="nm">ap</span>[<span class="nb">2</span>]); <span class="cm">// 30</span></pre></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="adv4">
+        <div class="concept-card hl-cyan">
+          <h3><span>🧩</span>비정형 배열 (Ragged Arrays)</h3>
+          <p style="font-size:13px">다양한 크기의 배열을 가리키는 포인터들로 구성된 배열입니다. 각 행의 길이가 달라도 됩니다.</p>
+        </div>
+        <div class="code-block"><div class="code-header"><span class="code-filename">LAB: raggedArray.c</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+          <div class="code-body"><pre><span class="cm">// 문자열 포인터 배열 (다른 길이의 문자열)</span>
+<span class="ty">char</span> *<span class="nm">p</span>[<span class="nb">2</span>] = { <span class="st">"abc"</span>, <span class="st">"a is for apple"</span> };
+<span class="cm">// p[0] → "abc" (4바이트)</span>
+<span class="cm">// p[1] → "a is for apple" (15바이트)</span>
+
+<span class="cm">// 숫자형 비정형 배열 (-1로 행 끝 표시)</span>
+<span class="ty">int</span> <span class="nm">row_1</span>[] = { <span class="nb">1</span>,<span class="nb">2</span>,<span class="nb">3</span>,<span class="nb">4</span>,<span class="nb">5</span>,<span class="nb">-1</span> };
+<span class="ty">int</span> <span class="nm">row_2</span>[] = { <span class="nb">6</span>,<span class="nb">7</span>,<span class="nb">-1</span> };
+<span class="ty">int</span> <span class="nm">row_3</span>[] = { <span class="nb">8</span>,<span class="nb">9</span>,<span class="nb">-1</span> };
+<span class="ty">int</span> *<span class="nm">weights</span>[] = { <span class="nm">row_1</span>, <span class="nm">row_2</span>, <span class="nm">row_3</span> };</pre></div>
+        </div>
+        <div class="card-grid" style="margin-top:12px">
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px">
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--accent2);margin-bottom:6px">char a[2][15] (2D 배열)</div>
+            <div style="font-size:12px;color:var(--muted)">메모리: 30 bytes 고정<br>내용 변경 가능</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px">
+            <div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--accent);margin-bottom:6px">char *p[2] (포인터 배열)</div>
+            <div style="font-size:12px;color:var(--muted)">포인터 16B + 데이터 19B<br>문자열 상수 → 내용 변경 불가</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="adv5">
+        <div class="concept-card hl-blue">
+          <h3 style="color:var(--accent2)"><span>⌨️</span>main() 함수의 인자</h3>
+          <p style="font-size:13px">커맨드라인 인자를 받기 위해 main()에 두 매개변수를 선언합니다.</p>
+          <ul>
+            <li><code style="color:var(--accent5)">argc</code>: 커맨드라인 인자의 개수</li>
+            <li><code style="color:var(--accent5)">argv</code>: 각 인자를 가리키는 문자열 포인터 배열 (<code>char *argv[]</code> == <code>char **argv</code>)</li>
+          </ul>
+        </div>
+        <div class="code-block"><div class="code-header"><span class="code-filename">LAB: myEcho.c — 커맨드라인 인자</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+          <div class="code-body"><pre><span class="ty">void</span> <span class="fn">main</span>(<span class="ty">int</span> <span class="nm">argc</span>, <span class="ty">char</span> *<span class="nm">argv</span>[])
+{
+  <span class="ty">int</span> <span class="nm">i</span>;
+  <span class="fn">printf</span>(<span class="st">"argc = %d\n"</span>, <span class="nm">argc</span>);
+  <span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt; <span class="nm">argc</span>; ++<span class="nm">i</span>)
+    <span class="fn">printf</span>(<span class="st">"argv[%d] = %s\n"</span>, <span class="nm">i</span>, <span class="nm">argv</span>[<span class="nm">i</span>]);
+}
+<span class="cm">// 실행: ./myEcho a is for apple
+// argc=5, argv[0]="./myEcho", argv[1]="a", ...</span></pre></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="adv6">
+        <div class="concept-card hl-cyan">
+          <h3><span>📊</span>2차원 배열과 포인터</h3>
+          <p style="font-size:13px"><code>int a[3][5]</code>에서 <code>a[i]</code>는 i번째 행을 가리키는 포인터와 동일합니다 (<code>a[i] == *(a+i)</code>).</p>
+        </div>
+        <div class="code-block"><div class="code-header"><span class="code-filename">LAB: p31.c — 2D 배열 포인터 표현</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+          <div class="code-body"><pre><span class="ty">int</span> <span class="nm">a</span>[<span class="nb">3</span>][<span class="nb">5</span>];
+
+<span class="cm">/* a[i][j]의 다양한 표현 (모두 동일!) */</span>
+<span class="nm">a</span>[<span class="nm">i</span>][<span class="nm">j</span>]                <span class="cm">// 일반 표기</span>
+*(<span class="nm">a</span>[<span class="nm">i</span>] + <span class="nm">j</span>)           <span class="cm">// a[i]는 행 포인터</span>
+(*(<span class="nm">a</span>+<span class="nm">i</span>))[<span class="nm">j</span>]           <span class="cm">// *(a+i) = a[i]</span>
+*((*(<span class="nm">a</span>+<span class="nm">i</span>)) + <span class="nm">j</span>)        <span class="cm">// 완전 포인터 표현</span>
+
+<span class="cm">// 주소 관계: a, a[0], &a[0][0] 모두 같은 주소!</span>
+<span class="fn">printf</span>(<span class="st">"%p %p %p\n"</span>, <span class="nm">a</span>, <span class="nm">a</span>[<span class="nb">0</span>], &<span class="nm">a</span>[<span class="nb">0</span>][<span class="nb">0</span>]);
+
+<span class="cm">// sizeof 차이</span>
+<span class="kw">sizeof</span>(<span class="nm">a</span>)    <span class="cm">// 60 = 3×5×4</span>
+<span class="kw">sizeof</span>(<span class="nm">a</span>[<span class="nb">0</span>]) <span class="cm">// 20 = 5×4 (한 행)</span></pre></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 9: const 키워드 ── -->
+  <section class="section" id="const">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <h2>const 키워드와 포인터</h2>
+    </div>
+
+    <div class="concept-card hl-orange">
+      <h3 style="color:var(--accent5)"><span>🔒</span>const 키워드</h3>
+      <p>변수를 <strong style="color:var(--accent5)">읽기 전용</strong>으로 만듭니다. 포인터와 함께 쓸 때 <strong style="color:var(--accent3)">위치에 따라 의미가 완전히 다릅니다!</strong></p>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent)"><span>🔒</span><code>const char *p</code></h3>
+        <p style="font-size:13px"><strong style="color:var(--accent3)">p가 가리키는 값</strong>을 변경할 수 없음. p 자체(주소)는 변경 가능.</p>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="ty">const</span> <span class="ty">int</span> *<span class="nm">p</span> = &<span class="nm">a</span>;
+*<span class="nm">p</span> = <span class="nb">3</span>;   <span class="cm">// ❌ 에러: 값 변경 불가</span>
+<span class="nm">p</span>  = &<span class="nm">b</span>;  <span class="cm">// ✅ OK: 주소 변경 가능</span></pre>
+        </div></div>
+      </div>
+      <div class="concept-card">
+        <h3 style="color:var(--accent5)"><span>📌</span><code>char * const p</code></h3>
+        <p style="font-size:13px"><strong style="color:var(--accent3)">p 자체(주소)</strong>를 변경할 수 없음. p가 가리키는 값은 변경 가능.</p>
+        <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:8px 12px">
+<pre><span class="ty">int</span> * <span class="ty">const</span> <span class="nm">p</span> = &<span class="nm">a</span>;
+*<span class="nm">p</span> = <span class="nb">3</span>;   <span class="cm">// ✅ OK: 값 변경 가능</span>
+<span class="nm">p</span>  = &<span class="nm">b</span>;  <span class="cm">// ❌ 에러: 주소 변경 불가</span></pre>
+        </div></div>
+      </div>
+    </div>
+
+    <!-- const 조합 테이블 -->
+    <table class="data-table">
+      <thead><tr><th>선언</th><th>*p (값) 변경</th><th>p (주소) 변경</th><th>특징</th></tr></thead>
+      <tbody>
+        <tr><td><code>int *p</code></td><td style="color:var(--accent2)">✅ 가능</td><td style="color:var(--accent2)">✅ 가능</td><td>일반 포인터</td></tr>
+        <tr><td><code>const int *p</code></td><td style="color:var(--accent3)">❌ 불가</td><td style="color:var(--accent2)">✅ 가능</td><td>가리키는 값 보호</td></tr>
+        <tr><td><code>int * const p</code></td><td style="color:var(--accent2)">✅ 가능</td><td style="color:var(--accent3)">❌ 불가</td><td>포인터 자체 보호</td></tr>
+        <tr><td><code>const int * const p</code></td><td style="color:var(--accent3)">❌ 불가</td><td style="color:var(--accent3)">❌ 불가</td><td>둘 다 보호 (완전 읽기전용)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>읽는 법: const는 바로 오른쪽에 있는 것을 수식</strong>
+        <code>const int *p</code> → const가 <code>int</code> 앞 → "const int를 가리키는 포인터" → 값 변경 불가<br>
+        <code>int * const p</code> → const가 <code>p</code> 앞 → "const 포인터" → 주소 변경 불가
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PART 3 ══ -->
+  <div class="part-divider">
+    <div class="part-divider-line"></div>
+    <div class="part-divider-label">Part 3 — 동적 메모리 관리</div>
+    <div class="part-divider-line"></div>
+  </div>
+
+  <!-- ── SECTION 10: 동적 메모리 할당 개요 ── -->
+  <section class="section" id="dynamic">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>동적 메모리 할당 (Dynamic Memory Allocation)</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent3)"><span>🧱</span>정적 메모리 할당 (Static)</h3>
+        <ul>
+          <li>프로그램 시작 시 <strong>크기 고정</strong></li>
+          <li>예: <code>int arr[10];</code></li>
+          <li>실행 중 크기 변경 불가</li>
+          <li style="color:var(--accent3)">더 큰 입력 → 처리 불가</li>
+          <li style="color:var(--accent3)">더 작은 입력 → 공간 낭비</li>
+        </ul>
+      </div>
+      <div class="concept-card hl-green">
+        <h3 style="color:var(--accent2)"><span>🌊</span>동적 메모리 할당 (Dynamic)</h3>
+        <ul>
+          <li>실행 중 <strong style="color:var(--accent2)">필요한 시점에 필요한 만큼</strong> 할당</li>
+          <li><strong>Heap 영역</strong>에 할당</li>
+          <li>사용 후 반드시 시스템에 반납</li>
+          <li><code>malloc()</code>, <code>free()</code> 등 활용</li>
+          <li style="color:var(--accent3)">관리는 프로그래머 책임!</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 메모리 구조 시각화 -->
+    <div class="mem-wrap">
+      <div class="mem-title">▸ 프로세스 메모리 구조</div>
+      <div style="display:flex;flex-direction:column;gap:2px;max-width:300px">
+        <div style="background:rgba(247,129,102,.1);border:1px solid rgba(247,129,102,.3);border-radius:4px;padding:10px 16px;font-family:'Space Mono',monospace;font-size:12px;color:var(--accent3)">Stack (지역 변수)</div>
+        <div style="text-align:center;font-size:18px;color:var(--muted)">↕</div>
+        <div style="background:rgba(86,207,225,.15);border:2px solid rgba(86,207,225,.5);border-radius:4px;padding:10px 16px;font-family:'Space Mono',monospace;font-size:12px;color:var(--accent)">Heap ← 동적 메모리 할당 영역</div>
+        <div style="background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.3);border-radius:4px;padding:10px 16px;font-family:'Space Mono',monospace;font-size:12px;color:var(--accent2)">Data (전역 변수, 상수)</div>
+        <div style="background:rgba(255,166,87,.1);border:1px solid rgba(255,166,87,.3);border-radius:4px;padding:10px 16px;font-family:'Space Mono',monospace;font-size:12px;color:var(--accent5)">Text (프로그램 코드)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 11: malloc / free ── -->
+  <section class="section" id="malloc">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <h2>malloc / calloc / realloc / free</h2>
+    </div>
+
+    <!-- 함수 테이블 -->
+    <table class="data-table">
+      <thead><tr><th>함수</th><th>프로토타입</th><th>설명</th><th>사용 예</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code style="color:var(--accent)">malloc</code></td>
+          <td><code style="font-size:11px">void *malloc(size_t size)</code></td>
+          <td>size 바이트 할당, 초기화 없음, 실패 시 NULL 반환</td>
+          <td><code style="font-size:11px">p=(char*)malloc(100)</code></td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent2)">calloc</code></td>
+          <td><code style="font-size:11px">void *calloc(size_t n, size_t size)</code></td>
+          <td>n×size 바이트 할당, <strong>전부 0으로 초기화</strong></td>
+          <td><code style="font-size:11px">p=(int*)calloc(5,sizeof(int))</code></td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent5)">realloc</code></td>
+          <td><code style="font-size:11px">void *realloc(void *ptr, size_t size)</code></td>
+          <td>기존 동적 할당 영역 크기 변경, 기존 데이터 보존</td>
+          <td><code style="font-size:11px">p=(int*)realloc(p, 7*sizeof(int))</code></td>
+        </tr>
+        <tr>
+          <td><code style="color:var(--accent3)">free</code></td>
+          <td><code style="font-size:11px">void free(void *ptr)</code></td>
+          <td>동적 할당된 메모리 반환</td>
+          <td><code style="font-size:11px">free(p)</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <span class="callout-icon">📌</span>
+      <div class="callout-body"><strong>헤더: #include &lt;stdlib.h&gt;</strong></div>
+    </div>
+
+    <!-- 사용 예시 코드 -->
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">dynamic_mem.c — malloc + realloc 예시</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
+      <div class="code-body">
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;stdlib.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>)
+{
+  <span class="ty">int</span>  *<span class="nm">pi</span>;
+  <span class="nm">pi</span> = (<span class="ty">int</span>*)<span class="fn">malloc</span>(<span class="nb">5</span> * <span class="kw">sizeof</span>(<span class="ty">int</span>));
+
+  <span class="cm">/* ① 반드시 NULL 체크! */</span>
+  <span class="kw">if</span> (<span class="nm">pi</span> == <span class="nb">NULL</span>) {
+    <span class="fn">printf</span>(<span class="st">"메모리 할당 오류\n"</span>);
+    <span class="fn">exit</span>(<span class="nb">1</span>);
+  }
+
+  <span class="nm">pi</span>[<span class="nb">0</span>]=<span class="nb">1</span>; <span class="nm">pi</span>[<span class="nb">1</span>]=<span class="nb">2</span>; <span class="nm">pi</span>[<span class="nb">2</span>]=<span class="nb">3</span>; <span class="nm">pi</span>[<span class="nb">3</span>]=<span class="nb">4</span>; <span class="nm">pi</span>[<span class="nb">4</span>]=<span class="nb">5</span>;
+
+  <span class="cm">/* ② 사용 후 반드시 free */</span>
+  <span class="fn">free</span>(<span class="nm">pi</span>);
+  <span class="nm">pi</span> = <span class="nb">NULL</span>; <span class="cm">// dangling pointer 방지</span>
+  <span class="kw">return</span> <span class="nb">0</span>;
+}
+
+<span class="cm">/* realloc 예시: 2개 → 3개로 확장 */</span>
+<span class="ty">int</span> *<span class="nm">list</span> = (<span class="ty">int</span>*)<span class="fn">malloc</span>(<span class="kw">sizeof</span>(<span class="ty">int</span>) * <span class="nb">2</span>);
+<span class="nm">list</span>[<span class="nb">0</span>] = <span class="nb">10</span>; <span class="nm">list</span>[<span class="nb">1</span>] = <span class="nb">20</span>;
+
+<span class="ty">int</span> *<span class="nm">list_new</span> = (<span class="ty">int</span>*)<span class="fn">realloc</span>(<span class="nm">list</span>, <span class="kw">sizeof</span>(<span class="ty">int</span>) * <span class="nb">3</span>);
+<span class="nm">list_new</span>[<span class="nb">2</span>] = <span class="nb">30</span>;  <span class="cm">// 기존 데이터(10, 20) 보존!</span></pre>
+      </div>
+    </div>
+
+    <!-- 인터랙티브 Heap 시뮬레이터 -->
+    <div class="heap-wrap">
+      <div class="heap-title">▸ 인터랙티브 Heap 메모리 시뮬레이터</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <button class="demo-btn" onclick="heapMalloc()">malloc(5×int)</button>
+        <button class="demo-btn" style="background:var(--accent5);color:var(--bg)" onclick="heapRealloc()">realloc(+2)</button>
+        <button class="demo-btn" style="background:var(--accent2);color:var(--bg)" onclick="heapFree()">free()</button>
+        <button class="demo-btn secondary" onclick="heapReset()">↺ 초기화</button>
+      </div>
+      <div id="heap-blocks-wrap" class="heap-blocks">
+        <span style="color:var(--muted);font-size:12px;font-family:'Space Mono',monospace">Heap 비어있음</span>
+      </div>
+      <div id="heap-status" style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);margin-top:8px">상태: 초기화됨</div>
+      <div class="heap-legend">
+        <div class="heap-legend-item"><div class="heap-legend-dot" style="background:rgba(86,207,225,.15);border-color:rgba(86,207,225,.5)"></div>할당됨</div>
+        <div class="heap-legend-item"><div class="heap-legend-dot" style="background:rgba(63,185,80,.15);border-color:rgba(63,185,80,.5)"></div>free됨</div>
+        <div class="heap-legend-item"><div class="heap-legend-dot" style="background:rgba(247,129,102,.15);border-color:rgba(247,129,102,.5)"></div>메모리 누수</div>
+        <div class="heap-legend-item"><div class="heap-legend-dot" style="background:rgba(255,166,87,.15);border-color:rgba(255,166,87,.5)"></div>dangling ptr</div>
+      </div>
+    </div>
+
+    <!-- 주의사항 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">⚠️ 동적 메모리 사용 시 주의사항</h3>
+    <div class="card-grid-3">
+      <div class="concept-card hl-red" style="padding:16px">
+        <h3 style="color:var(--accent3);font-size:13px"><span>🚨</span>① 항상 NULL 체크</h3>
+        <p style="font-size:12px">malloc/calloc/realloc은 실패 시 <code>NULL</code> 반환. 반드시 확인 후 사용!</p>
+      </div>
+      <div class="concept-card hl-red" style="padding:16px">
+        <h3 style="color:var(--accent3);font-size:13px"><span>💧</span>② 메모리 누수 방지</h3>
+        <p style="font-size:12px">할당한 메모리는 반드시 <code>free()</code> 호출. 함수에서 포인터 잃으면 해제 불가 → Memory Leak!</p>
+      </div>
+      <div class="concept-card hl-red" style="padding:16px">
+        <h3 style="color:var(--accent3);font-size:13px"><span>👻</span>③ Dangling Pointer</h3>
+        <p style="font-size:12px">free() 후 해제된 메모리를 다시 참조하면 런타임 에러. free() 후 포인터를 <code>NULL</code>로!</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">코드 뽀개기 — 3가지 위험 패턴</span><span class="code-lang">C</span></div>
+      <div class="code-body">
+<pre><span class="cm">/* ❌ 패턴 1: dangling pointer */</span>
+<span class="ty">int</span> *<span class="nm">pi</span> = (<span class="ty">int</span>*)<span class="fn">malloc</span>(<span class="nb">5</span>*<span class="kw">sizeof</span>(<span class="ty">int</span>));
+<span class="fn">free</span>(<span class="nm">pi</span>);
+*<span class="nm">pi</span> = <span class="nb">10</span>;  <span class="cm">// 🚨 해제된 메모리 접근!</span>
+
+<span class="cm">/* ❌ 패턴 2: memory leak (sub 호출마다 200*4 = 800B 누수) */</span>
+<span class="ty">void</span> <span class="fn">sub</span>(<span class="ty">void</span>) {
+  <span class="ty">int</span> *<span class="nm">p1</span> = (<span class="ty">int</span>*)<span class="fn">malloc</span>(<span class="nb">100</span>*<span class="kw">sizeof</span>(<span class="ty">int</span>));
+  <span class="ty">int</span> *<span class="nm">p2</span> = (<span class="ty">int</span>*)<span class="fn">malloc</span>(<span class="nb">100</span>*<span class="kw">sizeof</span>(<span class="ty">int</span>));
+  <span class="kw">return</span>; <span class="cm">// free() 없이 반환 → 누수!</span>
+}
+
+<span class="cm">/* ❌ 패턴 3: NULL 미체크 */</span>
+<span class="ty">char</span> *<span class="nm">pc</span> = (<span class="ty">char</span>*)<span class="fn">malloc</span>(<span class="nb">1</span>);
+*<span class="nm">pc</span> = <span class="st">'a'</span>; <span class="cm">// malloc 실패 시 (pc==NULL) → 🚨 크래시!</span>
+
+<span class="cm">/* ✅ 올바른 패턴 */</span>
+<span class="ty">int</span> *<span class="nm">p</span> = (<span class="ty">int</span>*)<span class="fn">malloc</span>(<span class="nb">5</span>*<span class="kw">sizeof</span>(<span class="ty">int</span>));
+<span class="kw">if</span> (<span class="nm">p</span> == <span class="nb">NULL</span>) { <span class="fn">exit</span>(<span class="nb">1</span>); }
+<span class="cm">/* 사용... */</span>
+<span class="fn">free</span>(<span class="nm">p</span>); <span class="nm">p</span> = <span class="nb">NULL</span>; <span class="cm">// dangling ptr 방지</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 12: 퀴즈 ── -->
+  <section class="section" id="quiz">
+    <div class="quiz-section">
+      <div class="quiz-header">
+        <h2>🎯 퀴즈</h2>
+        <p>포인터 &amp; 동적 메모리 개념을 확인해봅시다. 클릭하여 정답을 확인하세요!</p>
+      </div>
+
+      <!-- Q1: 잘못된 선언/초기화 -->
+      <div class="quiz-card" id="qcard1">
+        <div class="q-num">QUIZ 01 / 06</div>
+        <div class="q-text">다음 중 포인터 변수의 선언 및 초기화가 <strong style="color:var(--accent3)">잘못된 것</strong>을 고르시오.</div>
+        <div class="code-block" style="margin-bottom:14px"><div class="code-body" style="padding:10px 14px"><pre>① <span class="ty">int</span>   <span class="nm">x</span>;   <span class="ty">int</span>   *<span class="nm">p1</span> = &<span class="nm">x</span>;
+② <span class="ty">short</span> <span class="nm">s</span>;   <span class="ty">long</span>  *<span class="nm">p2</span> = &<span class="nm">s</span>;
+③ <span class="ty">char</span>  <span class="nm">str</span>[<span class="nb">20</span>]; <span class="ty">char</span> *<span class="nm">p3</span> = <span class="nm">str</span>;
+④ <span class="ty">double</span> <span class="nm">d</span>;  <span class="ty">double</span> *<span class="nm">p4</span> = &<span class="nm">d</span>;
+⑤ <span class="ty">float</span>  <span class="nm">f</span>;   <span class="ty">float</span> *<span class="nm">p5</span> = <span class="nm">f</span>;</pre></div></div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">A</span> ①만 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'correct')"><span class="opt-label">B</span> ②와 ⑤가 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">C</span> ③과 ⑤가 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">D</span> ④와 ⑤가 잘못됨</div>
+        </div>
+        <div class="quiz-feedback" id="qf1">
+          ✅ <strong>정답: B — ②와 ⑤</strong><br>
+          <strong>② </strong><code>long *p2 = &amp;s</code>: short 변수 s의 주소를 long 포인터에 저장 → 타입 불일치. 컴파일 경고/에러.<br>
+          <strong>⑤ </strong><code>float *p5 = f</code>: f는 float 변수이지 주소가 아님. 포인터에는 주소(&amp;f)가 필요. 컴파일 에러.<br>
+          ①, ③, ④는 올바름. ③은 배열 이름이 시작 주소이므로 char*에 직접 대입 가능.
+        </div>
+      </div>
+
+      <!-- Q2: 포인터 값 출력 -->
+      <div class="quiz-card" id="qcard2">
+        <div class="q-num">QUIZ 02 / 06</div>
+        <div class="q-text"><code>short num=10; (주소 0x1230) / short *p=&amp;num; (주소 0x1240)</code> 일 때,<br><code>printf("%d", *p)</code>의 출력은?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">A</span> 0x1230</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'correct')"><span class="opt-label">B</span> 10</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">C</span> 0x1240</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">D</span> 4 또는 8</div>
+        </div>
+        <div class="quiz-feedback" id="qf2">
+          ✅ <strong>정답: B — 10</strong><br>
+          <code>*p</code>는 p가 가리키는 주소(0x1230)에 있는 값을 역참조합니다. 그 값은 <strong>num = 10</strong>입니다.<br>
+          <code>p</code>(주소 출력) = 0x1230 / <code>&amp;p</code>(포인터 변수의 주소) = 0x1240 / <code>sizeof(p)</code> = 2 또는 4 또는 8 (short* 크기) / <code>p+1</code> = 0x1232 (short는 2바이트)
+        </div>
+      </div>
+
+      <!-- Q3: *p++ vs (*p)++ -->
+      <div class="quiz-card" id="qcard3">
+        <div class="q-num">QUIZ 03 / 06</div>
+        <div class="q-text"><code>int a=5; int *p=&amp;a;</code> 일 때, <code>v = *p++</code> 실행 후 v와 a의 값은?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">A</span> v=6, a=6 (a가 증가)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'correct')"><span class="opt-label">B</span> v=5, a=5 (p 주소만 증가, a 불변)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">C</span> v=5, a=6 (a가 증가)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">D</span> v=6, a=5</div>
+        </div>
+        <div class="quiz-feedback" id="qf3">
+          ✅ <strong>정답: B — v=5, a=5</strong><br>
+          <code>*p++</code> = <code>*(p++)</code>: 후위 증가이므로 먼저 <code>*p</code>(=5)를 v에 대입한 후, p의 <strong>주소</strong>를 1 증가시킵니다.<br>
+          a의 값은 변하지 않고, p만 다음 int 주소를 가리키게 됩니다.<br>
+          만약 <code>v = (*p)++</code>이었다면: v=5, a=6 (a의 값이 증가).
+        </div>
+      </div>
+
+      <!-- Q4: 배열-포인터 동등 표현 -->
+      <div class="quiz-card" id="qcard4">
+        <div class="q-num">QUIZ 04 / 06</div>
+        <div class="q-text"><code>int x[10]; int *p=x;</code> 일 때, 의미가 <strong style="color:var(--accent3)">다른</strong> 것은?</div>
+        <div class="code-block" style="margin-bottom:14px"><div class="code-body" style="padding:8px 14px"><pre>① *(x+i)   ② x[i]   ③ p+i   ④ p[i]</pre></div></div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'correct')"><span class="opt-label">A</span> ③ p+i</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">B</span> ① *(x+i)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">C</span> ② x[i]</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">D</span> 모두 동일</div>
+        </div>
+        <div class="quiz-feedback" id="qf4">
+          ✅ <strong>정답: A — ③ p+i</strong><br>
+          ①<code>*(x+i)</code>, ②<code>x[i]</code>, ④<code>p[i]</code>는 모두 i번째 원소의 <strong>값</strong>을 나타냅니다.<br>
+          ③<code>p+i</code>는 i번째 원소의 <strong>주소</strong>를 나타냅니다. 값이 아닙니다!<br>
+          값을 원한다면 <code>*(p+i)</code>로 역참조해야 합니다.
+        </div>
+      </div>
+
+      <!-- Q5: 컴파일 에러 -->
+      <div class="quiz-card" id="qcard5">
+        <div class="q-num">QUIZ 05 / 06</div>
+        <div class="q-text"><code>int x[10], y[10]; int *p=x;</code> 일 때, <strong style="color:var(--accent3)">컴파일 에러</strong>가 발생하는 것은?</div>
+        <div class="code-block" style="margin-bottom:14px"><div class="code-body" style="padding:8px 14px"><pre>① p++;   ② x = y;   ③ p = y;   ④ p = x + 3;</pre></div></div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">A</span> ①</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'correct')"><span class="opt-label">B</span> ②</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">C</span> ③</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">D</span> ④</div>
+        </div>
+        <div class="quiz-feedback" id="qf5">
+          ✅ <strong>정답: B — ②</strong><br>
+          <code>x = y</code>: 배열 이름 x는 <strong>주소 상수</strong>이므로 새로운 값을 대입할 수 없습니다 → 컴파일 에러!<br>
+          ① <code>p++</code>: 포인터 변수는 증가 가능. OK.<br>
+          ③ <code>p = y</code>: 포인터 변수에 다른 배열의 시작 주소 대입. OK.<br>
+          ④ <code>p = x+3</code>: 포인터 변수에 주소 연산 결과 대입. OK.
+        </div>
+      </div>
+
+      <!-- Q6: const 포인터 -->
+      <div class="quiz-card" id="qcard6">
+        <div class="q-num">QUIZ 06 / 06</div>
+        <div class="q-text"><code>const int a=7; const int *p=&amp;a;</code> 일 때, 다음 중 <strong style="color:var(--accent)">올바른 코드</strong>는?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">A</span> <code>*p = 3;</code></div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'correct')"><span class="opt-label">B</span> <code>int b=4; p = &amp;b;</code></div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">C</span> <code>(*p)++;</code></div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">D</span> 모두 올바르지 않음</div>
+        </div>
+        <div class="quiz-feedback" id="qf6">
+          ✅ <strong>정답: B — <code>p = &amp;b;</code></strong><br>
+          <code>const int *p</code>: <strong>p가 가리키는 값(*p)은 변경 불가</strong>, p 자체(주소)는 변경 가능.<br>
+          <strong>A</strong>: <code>*p = 3</code> → *p 변경 시도 → ❌ 컴파일 에러<br>
+          <strong>B</strong>: <code>p = &amp;b</code> → p(주소) 변경 → ✅ OK (다른 int를 가리키도록 변경)<br>
+          <strong>C</strong>: <code>(*p)++</code> → *p 증가 시도 → ❌ 컴파일 에러
+        </div>
+      </div>
+
+      <div style="text-align:center">
+        <button class="btn-primary" onclick="showScore()">결과 확인</button>
+      </div>
+      <div class="quiz-score" id="quiz-score">
+        <div class="score-num" id="score-display">0/6</div>
+        <div class="score-label" id="score-msg">결과를 확인하세요!</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ── TAB SWITCHER ──
+function switchTab(btn, panelId) {
+  const tabs = btn.closest('.tabs');
+  tabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  tabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ── COPY BUTTON ──
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ 복사됨'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── POINTER DEMO ──
+function runPtrDemo() {
+  const a = parseInt(document.getElementById('ptr-a').value) || 1;
+  const b = parseInt(document.getElementById('ptr-b').value) || 2;
+  const baseAddr = 1000;
+  const vis = document.getElementById('ptr-mem-vis');
+  const steps = document.getElementById('ptr-steps');
+
+  vis.innerHTML = `
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <div>
+        <div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;text-align:center">a (${baseAddr})</div>
+        <div style="border:1px solid rgba(86,207,225,.4);background:rgba(86,207,225,.12);width:64px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:4px">
+          <span style="color:var(--accent);font-weight:700;font-size:14px">${a}</span>
+          <span style="font-size:9px;color:var(--muted)">int</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;text-align:center">b (${baseAddr+4})</div>
+        <div style="border:1px solid rgba(255,166,87,.4);background:rgba(255,166,87,.12);width:64px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:4px">
+          <span style="color:var(--accent5);font-weight:700;font-size:14px">${b}</span>
+          <span style="font-size:9px;color:var(--muted)">int</span>
+        </div>
+      </div>
+      <div style="font-size:20px;color:var(--muted)">→</div>
+      <div>
+        <div style="font-size:9px;color:var(--muted);font-family:'Space Mono',monospace;text-align:center">p (${baseAddr+8})</div>
+        <div style="border:1px solid rgba(210,168,255,.4);background:rgba(210,168,255,.12);width:80px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:4px">
+          <span style="color:var(--accent4);font-weight:700;font-size:12px">${baseAddr}</span>
+          <span style="font-size:9px;color:var(--muted)">int*</span>
+        </div>
+      </div>
+    </div>`;
+
+  const stepsHtml = [
+    { code: `int a=${a}, b=${b}, *p;`, desc: 'a, b 변수와 포인터 p 선언' },
+    { code: `p = &a;`, desc: `p = ${baseAddr} (a의 주소)` },
+    { code: `b = *p;`, desc: `b = *p = *${baseAddr} = ${a} → b는 이제 ${a}` },
+    { code: `*p = 3;`, desc: `*p = 3 → a[${baseAddr}] = 3` },
+  ];
+  steps.innerHTML = stepsHtml.map(s =>
+    `<div style="display:flex;gap:12px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--border)">
+       <code style="color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:12px;min-width:180px">${s.code}</code>
+       <span style="color:var(--muted);font-size:12px">${s.desc}</span>
+     </div>`
+  ).join('');
+}
+function resetPtrDemo() {
+  document.getElementById('ptr-mem-vis').innerHTML = '<span style="color:var(--muted)">▶ 실행 버튼을 눌러보세요</span>';
+  document.getElementById('ptr-steps').innerHTML = '';
+}
+
+// ── POINTER ARITHMETIC ──
+let arithStep = 0;
+function buildArithBefore() {
+  const types = [
+    {label:'char*', inc:1, cls:'char-type'},
+    {label:'int*',  inc:4, cls:'int-type'},
+    {label:'double*',inc:8,cls:'dbl-type'},
+  ];
+  ['arith-before','arith-after'].forEach((id,phase) => {
+    const el = document.getElementById(id);
+    el.innerHTML = types.map(t => {
+      const addr = phase === 0 ? 10000 : 10000 + t.inc;
+      return `<div class="ptr-arith-cell ${t.cls}" style="min-width:90px">
+        <span class="addr">${t.label}</span>
+        <span class="val">${addr}</span>
+      </div>`;
+    }).join('');
+  });
+}
+function runArith() {
+  document.getElementById('arith-result').innerHTML = `
+    <span style="color:var(--accent)">pc++ → 10000 + sizeof(char) = <strong>10001</strong></span><br>
+    <span style="color:var(--accent5)">pi++ → 10000 + sizeof(int)  = <strong>10004</strong></span><br>
+    <span style="color:var(--accent4)">pd++ → 10000 + sizeof(double)= <strong>10008</strong></span>`;
+  document.querySelectorAll('#arith-after .ptr-arith-cell').forEach(c => c.classList.add('active'));
+}
+function resetArith() {
+  document.getElementById('arith-result').innerHTML = '<span style="color:var(--muted)">▶ 실행을 눌러보세요</span>';
+  document.querySelectorAll('#arith-after .ptr-arith-cell').forEach(c => c.classList.remove('active'));
+}
+buildArithBefore();
+
+// ── HEAP SIMULATOR ──
+let heapState = 'empty'; // empty, allocated, reallocated, freed
+function heapReset() {
+  heapState = 'empty';
+  const el = document.getElementById('heap-blocks-wrap');
+  el.innerHTML = '<span style="color:var(--muted);font-size:12px;font-family:\'Space Mono\',monospace">Heap 비어있음</span>';
+  document.getElementById('heap-status').textContent = '상태: 초기화됨';
+}
+function heapMalloc() {
+  if (heapState !== 'empty' && heapState !== 'freed') return;
+  heapState = 'allocated';
+  const el = document.getElementById('heap-blocks-wrap');
+  el.innerHTML = '';
+  const vals = [1,2,3,4,5];
+  vals.forEach((v,i) => {
+    const b = document.createElement('div');
+    b.className = 'heap-block alloc';
+    b.style.width = '52px';
+    b.textContent = `pi[${i}]\n${v}`;
+    b.style.whiteSpace = 'pre';
+    b.style.fontSize = '10px';
+    b.style.textAlign = 'center';
+    b.style.lineHeight = '1.4';
+    el.appendChild(b);
+    setTimeout(() => { b.style.opacity='0'; b.style.transition='opacity 0s'; b.style.opacity='1'; b.style.transition='opacity .3s'; }, i*80);
+  });
+  document.getElementById('heap-status').innerHTML = '<span style="color:var(--accent)">✅ malloc(5×int=20Bytes) 성공 — pi[0~4] 할당됨</span>';
+}
+function heapRealloc() {
+  if (heapState !== 'allocated') return;
+  heapState = 'reallocated';
+  const el = document.getElementById('heap-blocks-wrap');
+  el.innerHTML = '';
+  const vals = [1,2,3,4,5,'NEW','NEW'];
+  vals.forEach((v,i) => {
+    const b = document.createElement('div');
+    b.className = 'heap-block ' + (i >= 5 ? 'free-block' : 'alloc');
+    b.style.width = '52px';
+    b.textContent = `pi[${i}]\n${v}`;
+    b.style.whiteSpace = 'pre';
+    b.style.fontSize = '10px';
+    b.style.textAlign = 'center';
+    b.style.lineHeight = '1.4';
+    el.appendChild(b);
+  });
+  document.getElementById('heap-status').innerHTML = '<span style="color:var(--accent5)">🔄 realloc(7×int=28Bytes) — 기존 5개 보존 + 2개 확장</span>';
+}
+function heapFree() {
+  if (heapState === 'empty') return;
+  heapState = 'freed';
+  const el = document.getElementById('heap-blocks-wrap');
+  el.querySelectorAll('.heap-block').forEach(b => {
+    b.className = 'heap-block free-block';
+    setTimeout(() => { b.className = 'heap-block dangling'; }, 500);
+  });
+  document.getElementById('heap-status').innerHTML = '<span style="color:var(--accent3)">🗑️ free() 완료 — Dangling Pointer 주의! pi = NULL로 초기화 권장</span>';
+}
+
+// ── QUIZ ──
+const answers = {};
+function checkQuiz(opt, qNum, result) {
+  const card = document.getElementById('qcard' + qNum);
+  const fb   = document.getElementById('qf' + qNum);
+  if (card.dataset.answered) return;
+  card.dataset.answered = 'true';
+  answers[qNum] = result;
+  card.querySelectorAll('.quiz-opt').forEach(o => o.style.pointerEvents = 'none');
+  opt.classList.add(result);
+  if (result === 'wrong') {
+    card.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct');
+    });
+  }
+  fb.className = 'quiz-feedback show ' + result;
+}
+function showScore() {
+  const correct = Object.values(answers).filter(v => v === 'correct').length;
+  document.getElementById('score-display').textContent = correct + '/6';
+  const pct = correct / 6;
+  document.getElementById('score-msg').textContent =
+    pct === 1  ? '🎉 완벽합니다! 포인터 마스터!' :
+    pct >= .8  ? '👍 훌륭해요! 거의 다 맞혔습니다!' :
+    pct >= .6  ? '🙂 잘 했어요! 틀린 부분을 복습해봐요.' :
+                 '📚 포인터 개념을 다시 한 번 살펴봐요!';
+  document.getElementById('quiz-score').classList.add('show');
+}
+
+// ── ACTIVE NAV ──
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      navItems.forEach(n => n.classList.toggle('active', n.getAttribute('href') === '#' + e.target.id));
+  });
+}, { threshold: 0.25 });
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 07 — 함수 | C 프로그래밍</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0d1117;
+  --bg2:     #161b22;
+  --bg3:     #21262d;
+  --border:  #30363d;
+  --text:    #e6edf3;
+  --muted:   #8b949e;
+  --accent:  #39d353;   /* teal-green — lec07 */
+  --accent2: #58a6ff;
+  --accent3: #f78166;
+  --accent4: #d2a8ff;
+  --accent5: #ffa657;
+  --yellow:  #e3b341;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', sans-serif; font-size: 15px; line-height: 1.7; }
+
+/* ── SIDEBAR ── */
+.sidebar { position: fixed; top: 0; left: 0; width: 240px; height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); overflow-y: auto; z-index: 100; padding: 0 0 40px; }
+.sidebar-logo { padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
+.sidebar-logo .course { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.sidebar-logo .title { font-size: 13px; font-weight: 700; color: var(--accent); margin-top: 4px; }
+.sidebar-logo .lec-num { display: inline-block; background: var(--accent); color: var(--bg); font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 8px; }
+.nav-section { padding: 12px 0 4px; }
+.nav-section-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); padding: 0 20px 6px; }
+.nav-part { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); padding: 10px 20px 4px; opacity: .7; }
+.nav-item { display: block; padding: 6px 20px; color: var(--muted); text-decoration: none; font-size: 12px; border-left: 2px solid transparent; transition: all .15s; }
+.nav-item:hover, .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(57,211,83,.08); }
+.nav-item .dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: currentColor; margin-right: 8px; vertical-align: middle; }
+
+/* ── MAIN ── */
+.main { margin-left: 240px; padding: 40px 48px 80px; max-width: 960px; }
+
+/* ── HERO ── */
+.hero { background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1f14 100%); border: 1px solid var(--border); border-radius: 12px; padding: 40px 48px; margin-bottom: 48px; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, rgba(57,211,83,.12) 0%, transparent 70%); }
+.hero-tag { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); background: rgba(57,211,83,.1); border: 1px solid rgba(57,211,83,.2); padding: 3px 12px; border-radius: 20px; display: inline-block; margin-bottom: 16px; }
+.hero h1 { font-size: 32px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+.hero h1 span { color: var(--accent); }
+.hero-sub { font-size: 16px; color: var(--muted); margin-bottom: 24px; }
+.hero-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero-pill { font-size: 12px; background: var(--bg3); border: 1px solid var(--border); color: var(--muted); padding: 4px 12px; border-radius: 20px; font-family: 'Space Mono', monospace; }
+
+/* ── PART DIVIDER ── */
+.part-divider { display: flex; align-items: center; gap: 16px; margin: 48px 0 32px; }
+.part-divider-line { flex: 1; height: 1px; background: var(--border); }
+.part-divider-label { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); background: rgba(57,211,83,.1); border: 1px solid rgba(57,211,83,.25); padding: 4px 14px; border-radius: 20px; white-space: nowrap; }
+
+/* ── SECTION ── */
+.section { margin-bottom: 56px; scroll-margin-top: 24px; }
+.section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.section-num { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--bg); background: var(--accent); padding: 2px 10px; border-radius: 4px; font-weight: 700; }
+.section h2 { font-size: 20px; font-weight: 700; }
+
+/* ── CONCEPT CARD ── */
+.concept-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 16px; }
+.concept-card.hl-green  { border-color: rgba(57,211,83,.4);  background: linear-gradient(135deg, var(--bg2), rgba(57,211,83,.04)); }
+.concept-card.hl-blue   { border-color: rgba(88,166,255,.4); background: linear-gradient(135deg, var(--bg2), rgba(88,166,255,.04)); }
+.concept-card.hl-purple { border-color: rgba(210,168,255,.4);background: linear-gradient(135deg, var(--bg2), rgba(210,168,255,.04)); }
+.concept-card.hl-orange { border-color: rgba(255,166,87,.4); background: linear-gradient(135deg, var(--bg2), rgba(255,166,87,.04)); }
+.concept-card.hl-red    { border-color: rgba(247,129,102,.4);background: linear-gradient(135deg, var(--bg2), rgba(247,129,102,.04)); }
+.concept-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 12px; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+.concept-card p { color: #c9d1d9; font-size: 14px; margin-bottom: 10px; }
+.concept-card ul { list-style: none; margin-top: 8px; }
+.concept-card ul li { color: #c9d1d9; font-size: 14px; padding: 4px 0 4px 20px; position: relative; }
+.concept-card ul li::before { content: '▸'; position: absolute; left: 0; color: var(--accent); }
+
+/* ── CODE BLOCK ── */
+.code-block { background: #010409; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin: 16px 0; }
+.code-header { background: var(--bg3); border-bottom: 1px solid var(--border); padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; }
+.code-filename { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); }
+.code-lang { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--bg); background: var(--accent); padding: 2px 8px; border-radius: 3px; }
+.copy-btn { background: var(--bg2); border: 1px solid var(--border); color: var(--muted); font-family: 'Space Mono', monospace; font-size: 10px; padding: 3px 10px; border-radius: 4px; cursor: pointer; transition: all .15s; }
+.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+.copy-btn.copied { color: #39d353; border-color: #39d353; }
+.code-body { padding: 20px; overflow-x: auto; }
+.code-body pre { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; margin: 0; }
+.kw { color: #ff7b72; } .ty { color: #79c0ff; } .cm { color: #8b949e; font-style: italic; }
+.nm { color: #ffa657; } .st { color: #a5d6ff; } .fn { color: #d2a8ff; }
+.op { color: #e6edf3; } .nb { color: #79c0ff; } .pp { color: #ff7b72; }
+
+/* ── CALLOUT ── */
+.callout { border-radius: 8px; padding: 14px 18px; margin: 16px 0; font-size: 13px; display: flex; gap: 12px; }
+.callout.tip    { background: rgba(57,211,83,.08);   border: 1px solid rgba(57,211,83,.25); }
+.callout.warn   { background: rgba(255,166,87,.08);  border: 1px solid rgba(255,166,87,.3); }
+.callout.info   { background: rgba(88,166,255,.08);  border: 1px solid rgba(88,166,255,.25); }
+.callout.error  { background: rgba(247,129,102,.08); border: 1px solid rgba(247,129,102,.3); }
+.callout.purple { background: rgba(210,168,255,.08); border: 1px solid rgba(210,168,255,.3); }
+.callout-icon { font-size: 18px; flex-shrink: 0; }
+.callout-body { color: #c9d1d9; line-height: 1.6; }
+.callout-body strong { display: block; margin-bottom: 4px; }
+
+/* ── OUTPUT ── */
+.output-box { background: #010409; border: 1px solid var(--accent); border-radius: 6px; padding: 10px 16px; margin-top: 8px; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--accent); }
+.output-box::before { content: '$ '; color: var(--muted); }
+
+/* ── CARD GRID ── */
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+/* ── DATA TABLE ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 16px 0; }
+.data-table thead tr { background: var(--bg3); }
+.data-table th { text-align: left; padding: 10px 14px; color: var(--muted); font-weight: 700; font-family: 'Space Mono', monospace; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid var(--border); }
+.data-table td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.data-table tbody tr:hover { background: rgba(255,255,255,.02); }
+
+/* ── FUNCTION ANATOMY ── */
+.fn-anatomy { background: #010409; border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin: 16px 0; font-family: 'JetBrains Mono', monospace; position: relative; }
+.fn-part { border-radius: 6px; padding: 4px 0; transition: all .2s; cursor: pointer; position: relative; }
+.fn-part:hover { opacity: .85; }
+.fn-part.return-type { color: #79c0ff; }
+.fn-part.fn-name     { color: #d2a8ff; }
+.fn-part.params      { color: #ffa657; }
+.fn-part.body-vars   { color: #e6edf3; opacity: .7; }
+.fn-part.return-stmt { color: #ff7b72; }
+.fn-tooltip {
+  display: none; position: absolute; left: 110%; top: 50%; transform: translateY(-50%);
+  background: var(--bg3); border: 1px solid var(--border); border-radius: 6px;
+  padding: 8px 12px; font-family: 'Noto Sans KR', sans-serif; font-size: 12px;
+  color: var(--text); white-space: nowrap; z-index: 10; min-width: 200px; line-height: 1.5;
+  box-shadow: 0 4px 12px rgba(0,0,0,.4);
+}
+.fn-part:hover .fn-tooltip { display: block; }
+.fn-header-line { display: flex; gap: 4px; font-size: 14px; line-height: 2; flex-wrap: wrap; align-items: center; }
+
+/* ── CALL FLOW DIAGRAM ── */
+.call-flow { display: flex; gap: 0; margin: 16px 0; align-items: stretch; }
+.call-block { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px; flex: 1; position: relative; }
+.call-block.caller { border-color: rgba(88,166,255,.4); }
+.call-block.callee { border-color: rgba(57,211,83,.4); }
+.call-block-label { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.call-block.caller .call-block-label { color: var(--accent2); }
+.call-block.callee .call-block-label { color: var(--accent); }
+.call-arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 12px; gap: 8px; }
+.call-arrow-line { font-size: 20px; color: var(--muted); }
+.call-arrow-label { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); white-space: nowrap; }
+
+/* ── SCOPE VISUALIZER ── */
+.scope-block { border-radius: 8px; padding: 16px; margin: 4px 0; position: relative; border: 2px dashed; }
+.scope-block.global { border-color: rgba(57,211,83,.4); background: rgba(57,211,83,.04); }
+.scope-block.local1 { border-color: rgba(88,166,255,.4); background: rgba(88,166,255,.05); margin: 8px 0 8px 20px; }
+.scope-block.local2 { border-color: rgba(210,168,255,.4); background: rgba(210,168,255,.05); margin: 8px 0 8px 40px; }
+.scope-label { font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+.scope-block.global .scope-label { color: var(--accent); }
+.scope-block.local1 .scope-label { color: var(--accent2); }
+.scope-block.local2 .scope-label { color: var(--accent4); }
+.scope-var { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 3px 10px; border-radius: 4px; margin: 2px 4px 2px 0; }
+.scope-var.green  { background: rgba(57,211,83,.15);  color: var(--accent);  border: 1px solid rgba(57,211,83,.3); }
+.scope-var.blue   { background: rgba(88,166,255,.15); color: var(--accent2); border: 1px solid rgba(88,166,255,.3); }
+.scope-var.purple { background: rgba(210,168,255,.15);color: var(--accent4); border: 1px solid rgba(210,168,255,.3); }
+
+/* ── STORAGE CLASS TABLE ── */
+.sc-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 16px 0; }
+.sc-table th { padding: 10px 12px; background: var(--bg3); color: var(--muted); font-family: 'Space Mono', monospace; font-size: 10px; text-transform: uppercase; border: 1px solid var(--border); text-align: center; }
+.sc-table td { padding: 10px 12px; border: 1px solid var(--border); text-align: center; vertical-align: middle; }
+.sc-table tbody tr:hover { background: rgba(255,255,255,.02); }
+.kw-badge { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 3px; }
+.kw-auto     { background: rgba(88,166,255,.15);  color: var(--accent2); border: 1px solid rgba(88,166,255,.3); }
+.kw-register { background: rgba(57,211,83,.15);   color: var(--accent);  border: 1px solid rgba(57,211,83,.3); }
+.kw-static   { background: rgba(255,166,87,.15);  color: var(--accent5); border: 1px solid rgba(255,166,87,.3); }
+.kw-extern   { background: rgba(210,168,255,.15); color: var(--accent4); border: 1px solid rgba(210,168,255,.3); }
+
+/* ── RECURSION STACK ── */
+.stack-wrap { background: #010409; border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 16px 0; }
+.stack-title { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent); margin-bottom: 14px; }
+.stack-frames { display: flex; flex-direction: column-reverse; gap: 4px; min-height: 60px; }
+.stack-frame { border-radius: 6px; padding: 8px 16px; font-family: 'JetBrains Mono', monospace; font-size: 12px; display: flex; justify-content: space-between; align-items: center; animation: slideIn .3s ease; border: 1px solid; }
+@keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.stack-frame.push { background: rgba(57,211,83,.12); border-color: rgba(57,211,83,.4); color: var(--accent); }
+.stack-frame.base { background: rgba(88,166,255,.12); border-color: rgba(88,166,255,.4); color: var(--accent2); }
+.stack-frame.pop  { background: rgba(255,166,87,.12); border-color: rgba(255,166,87,.4); color: var(--accent5); opacity: .5; }
+.stack-result { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 700; padding: 10px 16px; background: rgba(57,211,83,.1); border: 1px solid rgba(57,211,83,.3); border-radius: 6px; color: var(--accent); text-align: center; margin-top: 8px; display: none; }
+.demo-btn { background: var(--accent); color: var(--bg); border: none; padding: 6px 16px; border-radius: 5px; font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; cursor: pointer; transition: all .15s; }
+.demo-btn:hover { opacity: .85; }
+.demo-btn.secondary { background: var(--bg3); color: var(--muted); border: 1px solid var(--border); }
+.demo-input { background: var(--bg3); border: 1px solid var(--border); color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 13px; padding: 4px 8px; border-radius: 4px; width: 60px; text-align: center; }
+
+/* ── TABS ── */
+.tabs { margin: 16px 0; }
+.tab-bar { display: flex; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.tab-btn { padding: 8px 18px; background: none; border: none; color: var(--muted); cursor: pointer; font-family: 'Noto Sans KR', sans-serif; font-size: 13px; border-bottom: 2px solid transparent; transition: all .2s; position: relative; bottom: -1px; }
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-panel { display: none; padding: 20px 0; }
+.tab-panel.active { display: block; }
+
+/* ── QUIZ ── */
+.quiz-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 32px; margin-top: 32px; }
+.quiz-header { text-align: center; margin-bottom: 32px; }
+.quiz-header h2 { font-size: 22px; margin-bottom: 8px; }
+.quiz-header p { color: var(--muted); font-size: 14px; }
+.quiz-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+.quiz-card .q-num { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent); margin-bottom: 8px; }
+.quiz-card .q-text { font-size: 14px; font-weight: 700; margin-bottom: 14px; line-height: 1.5; }
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 16px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 13px; transition: all .15s; display: flex; align-items: flex-start; gap: 10px; }
+.quiz-opt:hover { border-color: var(--accent); background: rgba(57,211,83,.05); }
+.quiz-opt.correct { border-color: var(--accent); background: rgba(57,211,83,.1); color: var(--accent); }
+.quiz-opt.wrong   { border-color: var(--accent3); background: rgba(247,129,102,.1); color: var(--accent3); }
+.quiz-opt .opt-label { font-family: 'Space Mono', monospace; font-size: 11px; width: 22px; height: 22px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.quiz-feedback { margin-top: 10px; font-size: 13px; padding: 10px 14px; border-radius: 6px; display: none; line-height: 1.6; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: rgba(57,211,83,.1); color: var(--accent); border: 1px solid rgba(57,211,83,.3); }
+.quiz-feedback.wrong   { background: rgba(247,129,102,.1); color: var(--accent3); border: 1px solid rgba(247,129,102,.3); }
+.quiz-score { text-align: center; padding: 24px; background: var(--bg3); border-radius: 8px; margin-top: 20px; display: none; }
+.quiz-score.show { display: block; }
+.score-num { font-family: 'Space Mono', monospace; font-size: 48px; font-weight: 700; color: var(--accent); line-height: 1; }
+.score-label { color: var(--muted); font-size: 14px; margin-top: 8px; }
+.btn-primary { background: var(--accent); color: var(--bg); border: none; padding: 10px 24px; border-radius: 6px; font-family: 'Noto Sans KR', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .15s; margin-top: 16px; }
+.btn-primary:hover { opacity: .85; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 20px 20px 60px; }
+  .card-grid, .card-grid-3 { grid-template-columns: 1fr; }
+  .hero { padding: 24px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="course">C 프로그래밍 및 실습</div>
+    <div class="title">함수 (Functions)</div>
+    <div class="lec-num">Lecture 07</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">목차</div>
+    <div class="nav-part">Part 1 — 함수 기초</div>
+    <a class="nav-item active" href="#intro"><span class="dot"></span>함수의 필요성</a>
+    <a class="nav-item" href="#definition"><span class="dot"></span>함수 정의</a>
+    <a class="nav-item" href="#return"><span class="dot"></span>return 문</a>
+    <a class="nav-item" href="#call"><span class="dot"></span>함수 호출</a>
+    <a class="nav-item" href="#array-fn"><span class="dot"></span>배열과 함수</a>
+    <a class="nav-item" href="#prototype"><span class="dot"></span>함수 원형 선언</a>
+    <div class="nav-part">Part 2 — 함수와 변수</div>
+    <a class="nav-item" href="#scope"><span class="dot"></span>Scope (참조 범위)</a>
+    <a class="nav-item" href="#local-global"><span class="dot"></span>지역 / 전역 변수</a>
+    <a class="nav-item" href="#storage"><span class="dot"></span>Storage Classes</a>
+    <a class="nav-item" href="#recursion"><span class="dot"></span>재귀 함수</a>
+    <a class="nav-item" href="#quiz"><span class="dot"></span>퀴즈 🎯</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Lecture 07</div>
+    <h1>Functions<br><span>함수</span></h1>
+    <p class="hero-sub">프로그래밍방법론및실습 — 서울시립대학교 기계정보공학과</p>
+    <div class="hero-pills">
+      <span class="hero-pill">Function Definition</span>
+      <span class="hero-pill">Prototype</span>
+      <span class="hero-pill">Call-by-Value</span>
+      <span class="hero-pill">Scope</span>
+      <span class="hero-pill">Local / Global</span>
+      <span class="hero-pill">Storage Class</span>
+      <span class="hero-pill">Recursion</span>
+    </div>
+  </div>
+
+  <!-- ══ PART 1 ══ -->
+  <div class="part-divider">
+    <div class="part-divider-line"></div>
+    <div class="part-divider-label">Part 1 — 함수 기초</div>
+    <div class="part-divider-line"></div>
+  </div>
+
+  <!-- ── SECTION 1: 함수의 필요성 ── -->
+  <section class="section" id="intro">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>함수 (Function)의 필요성</h2>
+    </div>
+
+    <div class="concept-card hl-green">
+      <h3><span>💡</span>함수란?</h3>
+      <p><strong style="color:var(--accent)">특정한 기능을 수행하는 독립된 프로그램 블록</strong>으로, 전체 프로그램을 기능 단위 모듈로 나누는 데 사용합니다.</p>
+      <ul>
+        <li>C 언어로 작성된 프로그램은 하나 이상의 함수를 가짐 — 함수는 프로그램의 기본 <strong style="color:var(--accent5)">building block</strong></li>
+        <li>함수는 이름(식별자)을 가지며, 이름으로 호출함</li>
+        <li>입력 데이터(인자)를 받아 처리 후 결과를 반환할 수 있음</li>
+      </ul>
+    </div>
+
+    <!-- 함수화 전후 비교 -->
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent3)"><span>😓</span>함수 없이 — 코드 중복</h3>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:12px 16px">
+<pre><span class="cm">// 같은 연산을 여러 번 반복 작성</span>
+<span class="nm">result1</span> = <span class="nm">a</span> * <span class="nm">a</span> + <span class="nb">2</span>*<span class="nm">a</span> + <span class="nb">1</span>;
+<span class="cm">// ...</span>
+<span class="nm">result2</span> = <span class="nm">b</span> * <span class="nm">b</span> + <span class="nb">2</span>*<span class="nm">b</span> + <span class="nb">1</span>;
+<span class="cm">// ...</span>
+<span class="nm">result3</span> = <span class="nm">c</span> * <span class="nm">c</span> + <span class="nb">2</span>*<span class="nm">c</span> + <span class="nb">1</span>;
+<span class="cm">// 수정 시 모든 곳을 바꿔야 함 😱</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="concept-card hl-green">
+        <h3 style="color:var(--accent)"><span>✅</span>함수 사용 — 모듈화</h3>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:12px 16px">
+<pre><span class="ty">int</span> <span class="fn">calc</span>(<span class="ty">int</span> <span class="nm">x</span>) {
+  <span class="kw">return</span> <span class="nm">x</span>*<span class="nm">x</span> + <span class="nb">2</span>*<span class="nm">x</span> + <span class="nb">1</span>;
+}
+<span class="nm">result1</span> = <span class="fn">calc</span>(<span class="nm">a</span>);
+<span class="nm">result2</span> = <span class="fn">calc</span>(<span class="nm">b</span>);
+<span class="nm">result3</span> = <span class="fn">calc</span>(<span class="nm">c</span>);
+<span class="cm">// 수정은 함수 한 곳만! 🎉</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 장점 카드들 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">함수 단위 모듈화의 장점</h3>
+    <div class="card-grid-3">
+      <div class="concept-card" style="padding:16px">
+        <h3 style="color:var(--accent);font-size:13px"><span>📖</span>가독성 향상</h3>
+        <p style="font-size:12px">중복 코드를 함수로 모듈화 → 간결한 코드</p>
+      </div>
+      <div class="concept-card" style="padding:16px">
+        <h3 style="color:var(--accent2);font-size:13px"><span>♻️</span>코드 재사용</h3>
+        <p style="font-size:12px">다른 프로젝트에도 함수 단위로 재사용 가능</p>
+      </div>
+      <div class="concept-card" style="padding:16px">
+        <h3 style="color:var(--accent5);font-size:13px"><span>🔧</span>유지보수 용이</h3>
+        <p style="font-size:12px">기능 개선 시 해당 함수만 수정하면 됨</p>
+      </div>
+    </div>
+
+    <!-- 함수의 종류 -->
+    <div class="callout info">
+      <span class="callout-icon">📦</span>
+      <div class="callout-body">
+        <strong>함수의 종류</strong>
+        <strong style="color:var(--accent2)">표준 라이브러리 함수</strong>: C 언어가 기본 제공 — <code>printf()</code>, <code>scanf()</code>, <code>sqrt()</code>, <code>strlen()</code> 등<br>
+        <strong style="color:var(--accent5)">사용자 정의 함수</strong>: 프로그래머가 직접 작성 — 본 강의의 핵심!
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: 함수 정의 ── -->
+  <section class="section" id="definition">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>함수 정의 (Function Definition)</h2>
+    </div>
+
+    <div class="concept-card hl-green">
+      <h3><span>🔧</span>함수 정의 구조</h3>
+      <p>함수는 <strong style="color:var(--accent5)">헤더(Header)</strong>와 <strong style="color:var(--accent2)">몸체(Body)</strong>로 구성됩니다.</p>
+    </div>
+
+    <!-- 인터랙티브 함수 해부도 -->
+    <div class="fn-anatomy">
+      <div style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:12px">▸ 각 부분에 마우스를 올려 설명을 확인하세요</div>
+      <div class="fn-header-line">
+        <span class="fn-part return-type" style="font-size:14px">
+          <span style="color:#79c0ff">int</span>
+          <div class="fn-tooltip">
+            <strong style="color:#79c0ff">return_type (반환형)</strong><br>
+            함수가 수행한 결과 값의 데이터 타입.<br>반환값이 없으면 <code>void</code>를 사용.
+          </div>
+        </span>
+        <span>&nbsp;</span>
+        <span class="fn-part fn-name" style="font-size:14px">
+          <span style="color:#d2a8ff">add_ints</span>
+          <div class="fn-tooltip">
+            <strong style="color:#d2a8ff">function_name (함수 이름)</strong><br>
+            식별자 규칙을 따르는 이름.<br>기능을 명확히 표현하는 이름 권장.
+          </div>
+        </span>
+        <span style="color:var(--text)">(</span>
+        <span class="fn-part params" style="font-size:14px">
+          <span style="color:#ffa657">int x, int y</span>
+          <div class="fn-tooltip">
+            <strong style="color:#ffa657">parameter list (매개변수 목록)</strong><br>
+            함수가 처리할 입력 데이터를 저장하는 변수.<br>여러 개면 쉼표로 구분. 없으면 <code>void</code> 또는 빈칸.
+          </div>
+        </span>
+        <span style="color:var(--text)">)</span>
+      </div>
+      <div style="color:var(--text);font-size:14px">{</div>
+      <div style="padding-left:28px">
+        <div class="fn-part body-vars" style="font-size:14px">
+          &nbsp;&nbsp;<span style="color:#79c0ff">int</span> <span style="color:#ffa657">result</span>;
+          <div class="fn-tooltip" style="left:auto;right:110%;top:50%">
+            <strong>변수 선언 (Variable Declarations)</strong><br>
+            함수 내부에서 사용할 지역 변수 선언.<br>함수 종료 시 메모리에서 해제됨.
+          </div>
+        </div>
+        <div style="color:#e6edf3;font-size:14px">&nbsp;&nbsp;<span style="color:#ffa657">result</span> = <span style="color:#ffa657">x</span> + <span style="color:#ffa657">y</span>;</div>
+        <div class="fn-part return-stmt" style="font-size:14px">
+          &nbsp;&nbsp;<span style="color:#ff7b72">return</span> <span style="color:#ffa657">result</span>;
+          <div class="fn-tooltip">
+            <strong style="color:#ff7b72">return 문</strong><br>
+            값을 호출자에게 반환하고 함수 실행 종료.<br>반환형이 void면 <code>return;</code> 또는 생략 가능.
+          </div>
+        </div>
+      </div>
+      <div style="color:var(--text);font-size:14px">}</div>
+    </div>
+
+    <!-- 상세 설명 카드 -->
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent5)"><span>📋</span>함수 헤더 (Header)</h3>
+        <ul>
+          <li><strong style="color:#79c0ff">반환형 (return_type)</strong>: int, float, char, void…</li>
+          <li><strong style="color:#d2a8ff">함수 이름</strong>: 식별자 규칙 준수, 기능을 명확히</li>
+          <li><strong style="color:#ffa657">매개변수 목록</strong>: 각각 타입과 이름 명시. 없으면 빈칸 또는 void</li>
+        </ul>
+      </div>
+      <div class="concept-card">
+        <h3 style="color:var(--accent2)"><span>📦</span>함수 몸체 (Body)</h3>
+        <ul>
+          <li>중괄호 <code style="color:var(--accent5)">{ }</code>로 둘러싸인 부분</li>
+          <li>지역 변수 선언</li>
+          <li>명령문들 (연산, 조건, 반복…)</li>
+          <li>다른 함수 호출 가능</li>
+          <li>return 문으로 값 반환</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 예시 코드 -->
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">add_ints.c — 함수 정의 예시</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="cm">/* 두 정수를 입력받아 합을 반환하는 함수 */</span>
+<span class="ty">int</span> <span class="fn">add_ints</span>(<span class="ty">int</span> <span class="nm">x</span>, <span class="ty">int</span> <span class="nm">y</span>)
+{
+  <span class="ty">int</span> <span class="nm">result</span>;
+  <span class="nm">result</span> = <span class="nm">x</span> + <span class="nm">y</span>;
+  <span class="kw">return</span> <span class="nm">result</span>;
+}
+
+<span class="cm">// [축약형] 임시 변수 없이 바로 반환</span>
+<span class="ty">int</span> <span class="fn">add_ints</span>(<span class="ty">int</span> <span class="nm">x</span>, <span class="ty">int</span> <span class="nm">y</span>)
+{
+  <span class="kw">return</span> <span class="nm">x</span> + <span class="nm">y</span>;
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: return 문 ── -->
+  <section class="section" id="return">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>return 문</h2>
+    </div>
+
+    <div class="concept-card hl-green">
+      <h3><span>↩️</span>return 문의 역할</h3>
+      <p>return 문을 만나면 함수의 실행은 <strong style="color:var(--accent)">즉시 종료</strong>되고, 제어는 호출한 곳으로 돌아갑니다.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent5)"><span>📝</span>return 문 형식</h3>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:12px 16px">
+<pre><span class="kw">return</span>;            <span class="cm">// void 함수</span>
+<span class="kw">return</span> <span class="nm">expression</span>; <span class="cm">// 값 반환</span>
+
+<span class="cm">// 다양한 표현식 예시</span>
+<span class="kw">return</span> <span class="nb">1</span>;
+<span class="kw">return</span> ++<span class="nm">a</span>;
+<span class="kw">return</span> (<span class="nm">a</span> * <span class="nm">b</span>);
+<span class="kw">return</span> <span class="nm">x</span> + <span class="nm">y</span>;</pre>
+          </div>
+        </div>
+      </div>
+      <div class="concept-card">
+        <h3 style="color:var(--accent2)"><span>⚡</span>핵심 특성</h3>
+        <ul>
+          <li>괄호 있어도 되고 없어도 됨</li>
+          <li>수식의 <strong style="color:var(--accent5)">계산값</strong>이 반환됨</li>
+          <li>return 문 개수 제한 없음 (0개도 가능)</li>
+          <li>반환형이 다르면 <strong style="color:var(--accent5)">자동 형변환</strong></li>
+          <li>몸체 끝 <code>}</code>를 만나도 함수 종료</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- return 활용 예시들 -->
+    <div class="tabs">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'r1')">복수 return</button>
+        <button class="tab-btn" onclick="switchTab(this,'r2')">타입 변환</button>
+        <button class="tab-btn" onclick="switchTab(this,'r3')">return 없음</button>
+      </div>
+      <div class="tab-panel active" id="r1">
+        <div class="code-block">
+          <div class="code-header"><span class="code-filename">절대값 — 복수 return 문</span><span class="code-lang">C</span></div>
+          <div class="code-body">
+<pre><span class="cm">// 실수 x의 절대값을 반환하는 함수</span>
+<span class="ty">double</span> <span class="fn">absolute_value</span>(<span class="ty">double</span> <span class="nm">x</span>)
+{
+  <span class="kw">if</span> (<span class="nm">x</span> &gt;= <span class="nb">0.0</span>)
+    <span class="kw">return</span> <span class="nm">x</span>;      <span class="cm">// ← 여기서 종료</span>
+  <span class="kw">else</span>
+    <span class="kw">return</span> -<span class="nm">x</span>;     <span class="cm">// ← 또는 여기서 종료</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="r2">
+        <div class="code-block">
+          <div class="code-header"><span class="code-filename">자동 타입 변환 — int → float</span><span class="code-lang">C</span></div>
+          <div class="code-body">
+<pre><span class="ty">float</span> <span class="fn">f</span>(<span class="ty">char</span> <span class="nm">a</span>, <span class="ty">char</span> <span class="nm">b</span>, <span class="ty">char</span> <span class="nm">c</span>)
+{
+  <span class="ty">int</span> <span class="nm">i</span>;
+  <span class="cm">// ...</span>
+  <span class="kw">return</span> <span class="nm">i</span>; <span class="cm">/* int → float 자동 변환 */</span>
+}
+<span class="cm">// 컴파일러가 반환형(float)에 맞게 변환</span></pre>
+          </div>
+        </div>
+        <div class="callout warn" style="margin-top:8px">
+          <span class="callout-icon">⚠️</span>
+          <div class="callout-body">반환 타입과 실제 반환값의 타입이 다르면 자동 변환이 일어납니다. 의도치 않은 데이터 손실이 발생할 수 있으므로 주의하세요!</div>
+        </div>
+      </div>
+      <div class="tab-panel" id="r3">
+        <div class="code-block">
+          <div class="code-header"><span class="code-filename">void 함수 — return 없음</span><span class="code-lang">C</span></div>
+          <div class="code-body">
+<pre><span class="cm">// 화면에 별(*)을 출력하는 함수</span>
+<span class="ty">void</span> <span class="fn">print_stars</span>(<span class="ty">void</span>)
+{
+  <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt; <span class="nb">30</span>; <span class="nm">i</span>++)
+    <span class="fn">printf</span>(<span class="st">"*"</span>);
+  <span class="cm">// return 문이 없음</span>
+  <span class="cm">// ← "}" 를 만나면 자동 종료</span>
+}</pre>
+          </div>
+        </div>
+        <div class="callout tip" style="margin-top:8px">
+          <span class="callout-icon">💡</span>
+          <div class="callout-body">return 문이 없으면 함수 몸체의 끝인 <code>}</code>를 만날 때 자동 종료됩니다. void 함수에서 중간에 빠져나오고 싶다면 <code>return;</code>을 사용하세요.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 4: 함수 호출 ── -->
+  <section class="section" id="call">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>함수 호출 (Function Call)</h2>
+    </div>
+
+    <div class="concept-card hl-blue">
+      <h3 style="color:var(--accent2)"><span>📞</span>함수 호출 흐름</h3>
+      <ul>
+        <li>C 프로그램의 실행은 항상 <strong style="color:var(--accent5)">main() 함수</strong>로부터 시작</li>
+        <li>함수 이름을 만나면 해당 함수가 <strong style="color:var(--accent2)">호출(call)</strong>됨</li>
+        <li>호출자(caller)는 피호출자(callee)가 종료될 때까지 <strong style="color:var(--accent5)">대기</strong></li>
+        <li>피호출자 실행 완료 → 제어가 호출자로 복귀</li>
+      </ul>
+    </div>
+
+    <!-- Call flow diagram -->
+    <div class="call-flow">
+      <div class="call-block caller">
+        <div class="call-block-label">Caller (main)</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;line-height:2">
+          <div style="color:var(--muted)">...</div>
+          <div id="call-line" style="background:rgba(88,166,255,.1);border-radius:4px;padding:0 6px;border-left:2px solid var(--accent2)">value = <span style="color:#d2a8ff">get_max</span>(<span style="color:#ffa657">10, 20</span>);</div>
+          <div style="color:var(--muted)">...</div>
+        </div>
+      </div>
+      <div class="call-arrow">
+        <div class="call-arrow-label">① 인자 전달</div>
+        <div class="call-arrow-line">→</div>
+        <div class="call-arrow-line">←</div>
+        <div class="call-arrow-label">④ 값 반환</div>
+      </div>
+      <div class="call-block callee">
+        <div class="call-block-label">Callee (get_max)</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;line-height:2">
+          <div style="color:#79c0ff">int <span style="color:#d2a8ff">get_max</span>(<span style="color:#ffa657">int x, int y</span>) {</div>
+          <div style="padding-left:16px;color:#e6edf3">② <span style="color:#ff7b72">if</span>(x > y) <span style="color:#ff7b72">return</span> x;</div>
+          <div style="padding-left:16px;color:#e6edf3">③ <span style="color:#ff7b72">else return</span> y;</div>
+          <div style="color:#e6edf3">}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Call-by-Value -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">📋 Call-by-Value (값에 의한 호출)</h3>
+    <div class="concept-card hl-green">
+      <h3><span>📦</span>인자는 복사되어 전달된다!</h3>
+      <p>함수가 호출되면 <strong style="color:var(--accent)">인자 값들은 메모리에 복사</strong>되어 매개변수에 전달됩니다.</p>
+      <ul>
+        <li>전달된 인자 값의 개수와 타입이 매개변수와 일치해야 함</li>
+        <li>함수 내에서 매개변수 값을 변경해도 원본에 영향 없음</li>
+        <li>인자: 호출 시 전달하는 값 / 매개변수: 함수 헤더의 변수</li>
+      </ul>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">call_by_value.c — 인자 복사 전달</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="ty">int</span> <span class="fn">get_max</span>(<span class="ty">int</span> <span class="nm">x</span>, <span class="ty">int</span> <span class="nm">y</span>)  <span class="cm">// x ← 10, y ← 20 (복사!)</span>
+{
+  <span class="kw">if</span> (<span class="nm">x</span> &gt; <span class="nm">y</span>) <span class="kw">return</span> <span class="nm">x</span>;
+  <span class="kw">else</span>       <span class="kw">return</span> <span class="nm">y</span>;
+}
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+  <span class="ty">int</span> <span class="nm">value</span>;
+  <span class="nm">value</span> = <span class="fn">get_max</span>(<span class="nb">10</span>, <span class="nb">20</span>);  <span class="cm">// 인자: 10, 20</span>
+  <span class="fn">printf</span>(<span class="st">"max = %d\n"</span>, <span class="nm">value</span>);  <span class="cm">// 20</span>
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">📌</span>
+      <div class="callout-body">
+        <strong>Parameters vs Arguments</strong>
+        <strong style="color:var(--accent2)">매개변수(Parameters)</strong>: 함수 헤더에 정의된 변수 — <code>int x, int y</code><br>
+        <strong style="color:var(--accent5)">인자(Arguments)</strong>: 호출 시 전달하는 실제 값 — <code>10, 20</code><br>
+        호출 시 순서대로 복사해서 전달: x ← 10, y ← 20
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: 배열과 함수 ── -->
+  <section class="section" id="array-fn">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>배열과 함수 (Call-by-Reference)</h2>
+    </div>
+
+    <div class="concept-card hl-orange">
+      <h3 style="color:var(--accent5)"><span>⚡</span>배열 전달은 다르다!</h3>
+      <p>배열을 함수에 전달할 때는 배열 원소 전체가 복사되는 것이 아니라, <strong style="color:var(--accent5)">배열의 시작 주소(포인터)</strong>가 전달됩니다. 이를 <strong style="color:var(--accent3)">Call-by-Reference</strong>라 합니다.</p>
+      <ul>
+        <li>함수 내에서 배열 원소를 수정하면 <strong style="color:var(--accent3)">원본 배열이 변경됨</strong></li>
+        <li>함수 내에서 인자로 전달된 배열의 크기를 알 수 없음 → <strong style="color:var(--accent5)">별도 파라미터로 전달</strong></li>
+      </ul>
+    </div>
+
+    <!-- 1차원 배열 -->
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">arraySum.c — 1차원 배열 전달</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="cm">// arr[]: 1차원 배열임을 알려줌 (크기 생략 가능)</span>
+<span class="cm">// n   : 배열 원소 개수를 별도 파라미터로 받음</span>
+<span class="ty">int</span> <span class="fn">arraySum</span>(<span class="ty">int</span> <span class="nm">arr</span>[], <span class="ty">int</span> <span class="nm">n</span>)
+{
+  <span class="ty">int</span> <span class="nm">i</span>, <span class="nm">sum</span> = <span class="nb">0</span>;
+  <span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt; <span class="nm">n</span>; ++<span class="nm">i</span>)
+    <span class="nm">sum</span> += <span class="nm">arr</span>[<span class="nm">i</span>];
+  <span class="kw">return</span> <span class="nm">sum</span>;
+}
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+  <span class="ty">int</span> <span class="nm">arr1</span>[<span class="nb">3</span>] = { <span class="nb">1</span>, <span class="nb">2</span>, <span class="nb">3</span> };
+  <span class="fn">printf</span>(<span class="st">"sum = %d\n"</span>, <span class="fn">arraySum</span>(<span class="nm">arr1</span>, <span class="nb">3</span>));
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+      </div>
+    </div>
+    <div class="output-box">sum = 6</div>
+
+    <!-- 2차원 배열 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">2차원 배열 전달</h3>
+    <div class="callout info">
+      <span class="callout-icon">📏</span>
+      <div class="callout-body">
+        <strong>다차원 배열 매개변수 규칙</strong>
+        매개변수 정의 시 각 차원의 크기를 지정해야 합니다. 단, <strong style="color:var(--accent5)">최상위 차원(첫 번째 차원)의 크기만 생략 가능</strong>합니다.
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">sum2dArray.c — 2차원 배열 전달</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="pp">#define</span> <span class="nm">ROWS</span> <span class="nb">2</span>
+<span class="pp">#define</span> <span class="nm">COLS</span> <span class="nb">3</span>
+
+<span class="cm">// arr[][COLS]: 열 크기 COLS는 반드시 명시!</span>
+<span class="cm">// 첫 번째 차원(행)은 생략 가능</span>
+<span class="ty">int</span> <span class="fn">sum2dArray</span>(<span class="ty">int</span> <span class="nm">arr</span>[][<span class="nm">COLS</span>], <span class="ty">int</span> <span class="nm">rows</span>)
+{
+  <span class="ty">int</span> <span class="nm">sum</span> = <span class="nb">0</span>, <span class="nm">i</span>, <span class="nm">j</span>;
+  <span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt; <span class="nm">rows</span>; <span class="nm">i</span>++)
+    <span class="kw">for</span> (<span class="nm">j</span> = <span class="nb">0</span>; <span class="nm">j</span> &lt; <span class="nm">COLS</span>; <span class="nm">j</span>++)
+      <span class="nm">sum</span> += <span class="nm">arr</span>[<span class="nm">i</span>][<span class="nm">j</span>];
+  <span class="kw">return</span> <span class="nm">sum</span>;
+}
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+  <span class="ty">int</span> <span class="nm">arr2d</span>[<span class="nm">ROWS</span>][<span class="nm">COLS</span>] = {{<span class="nb">1</span>,<span class="nb">2</span>,<span class="nb">3</span>},{<span class="nb">4</span>,<span class="nb">5</span>,<span class="nb">6</span>}};
+  <span class="fn">printf</span>(<span class="st">"sum = %d\n"</span>, <span class="fn">sum2dArray</span>(<span class="nm">arr2d</span>, <span class="nm">ROWS</span>));
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+      </div>
+    </div>
+    <div class="output-box">sum = 21</div>
+  </section>
+
+  <!-- ── SECTION 6: 함수 원형 선언 ── -->
+  <section class="section" id="prototype">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>함수 원형 선언 (Function Prototype)</h2>
+    </div>
+
+    <div class="concept-card hl-green">
+      <h3><span>📣</span>왜 필요한가?</h3>
+      <p>컴파일러는 함수를 사용하기 <strong style="color:var(--accent)">전에</strong> 그 함수의 정보를 알아야 합니다. 함수 정의보다 함수 호출이 먼저 나오는 경우, 미리 <strong style="color:var(--accent5)">원형(prototype)</strong>을 선언해서 컴파일러에게 함수 존재를 알려줍니다.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent5)"><span>✂️</span>원형 선언 방법</h3>
+        <p style="font-size:13px">함수 정의의 헤더 부분만 추출한 후 끝에 <strong style="color:var(--accent3)">세미콜론(;)</strong>을 붙임</p>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:10px 14px">
+<pre><span class="cm">// 함수 정의 (전체)</span>
+<span class="ty">int</span> <span class="fn">compute_sum</span>(<span class="ty">int</span> <span class="nm">n</span>) { ... }
+
+<span class="cm">// 함수 원형 선언 (헤더 + 세미콜론)</span>
+<span class="ty">int</span> <span class="fn">compute_sum</span>(<span class="ty">int</span> <span class="nm">n</span>);   <span class="cm">// ✅</span>
+<span class="ty">int</span> <span class="fn">compute_sum</span>(<span class="ty">int</span>);      <span class="cm">// ✅ 이름 생략 가능</span>
+<span class="ty">int</span> <span class="fn">compute_sum</span>(<span class="nm">n</span>);        <span class="cm">// ❌ 타입 필수!</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="concept-card">
+        <h3 style="color:var(--accent2)"><span>📐</span>소스 코드 구조 가이드라인</h3>
+        <ul>
+          <li>사용자 정의 함수의 <strong style="color:var(--accent5)">원형을 소스 최상단</strong>에 모두 선언</li>
+          <li>또는 함수 정의를 main() <strong style="color:var(--accent5)">앞에 배치</strong></li>
+          <li>라이브러리 함수는 헤더 파일(<code>#include</code>)이 원형 역할</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">prototype_example.c — 권장 구조</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="cm">/* ① 함수 원형 선언 — 소스 최상단에 모두 선언 */</span>
+<span class="ty">int</span> <span class="fn">compute_sum</span>(<span class="ty">int</span> <span class="nm">n</span>);
+<span class="ty">void</span> <span class="fn">print_result</span>(<span class="ty">int</span> <span class="nm">result</span>);
+
+<span class="cm">/* ② main 함수 */</span>
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+  <span class="ty">int</span> <span class="nm">s</span> = <span class="fn">compute_sum</span>(<span class="nb">100</span>); <span class="cm">// 원형 선언 덕분에 OK</span>
+  <span class="fn">print_result</span>(<span class="nm">s</span>);
+  <span class="kw">return</span> <span class="nb">0</span>;
+}
+
+<span class="cm">/* ③ 함수 정의 — main 뒤에 위치해도 OK */</span>
+<span class="ty">int</span> <span class="fn">compute_sum</span>(<span class="ty">int</span> <span class="nm">n</span>) {
+  <span class="ty">int</span> <span class="nm">i</span>, <span class="nm">result</span> = <span class="nb">0</span>;
+  <span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">1</span>; <span class="nm">i</span> &lt;= <span class="nm">n</span>; <span class="nm">i</span>++) <span class="nm">result</span> += <span class="nm">i</span>;
+  <span class="kw">return</span> <span class="nm">result</span>;
+}
+<span class="ty">void</span> <span class="fn">print_result</span>(<span class="ty">int</span> <span class="nm">result</span>) {
+  <span class="fn">printf</span>(<span class="st">"결과 = %d\n"</span>, <span class="nm">result</span>);
+}</pre>
+      </div>
+    </div>
+
+    <!-- 컴파일러 인식 방법 비교 -->
+    <div class="callout purple">
+      <span class="callout-icon">🔍</span>
+      <div class="callout-body">
+        <strong>컴파일러가 함수를 인식하는 3가지 방법</strong>
+        ① 함수 호출 부분이 나오기 전에 <strong style="color:var(--accent4)">함수 정의</strong>가 있는 경우<br>
+        ② 명시적 <strong style="color:var(--accent4)">함수 원형 선언</strong>이 있는 경우<br>
+        ③ 표준 헤더 파일 포함(<strong style="color:var(--accent4)">#include</strong>)으로 라이브러리 함수 원형 사용
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PART 2 ══ -->
+  <div class="part-divider">
+    <div class="part-divider-line"></div>
+    <div class="part-divider-label">Part 2 — 함수와 변수 · 재귀</div>
+    <div class="part-divider-line"></div>
+  </div>
+
+  <!-- ── SECTION 7: Scope ── -->
+  <section class="section" id="scope">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>변수의 속성 &amp; Scope (참조 범위)</h2>
+    </div>
+
+    <div class="concept-card hl-green">
+      <h3><span>🔍</span>변수의 세 가지 속성</h3>
+      <div class="card-grid-3" style="margin-top:12px">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center">
+          <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">Scope</div>
+          <div style="font-size:11px;color:var(--muted)">참조 범위<br>변수를 사용할 수 있는 코드 범위</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center">
+          <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent2);margin-bottom:4px">Lifetime</div>
+          <div style="font-size:11px;color:var(--muted)">수명<br>변수가 메모리에 존재하는 시간</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center">
+          <div style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent4);margin-bottom:4px">Linkage</div>
+          <div style="font-size:11px;color:var(--muted)">연결<br>다른 파일/함수와의 변수 연결 관계</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">📌 기본 Scope 규칙</h3>
+    <div class="concept-card">
+      <h3><span>🔒</span>블록 단위 참조 범위</h3>
+      <p style="font-size:13px">변수는 그 변수가 <strong style="color:var(--accent)">선언된 블록 내에서만</strong> 사용(참조)이 가능합니다. 블록이 중첩된 경우, 내부 블록에서 같은 이름의 변수를 재정의하면 외부 블록 변수는 가려(shadow)집니다.</p>
+    </div>
+
+    <!-- 인터랙티브 Scope 시각화 -->
+    <div class="scope-block global">
+      <div class="scope-label">전역 영역 (Global scope)</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:8px">전역 변수</div>
+      <span class="scope-var green">global_var</span>
+      <div class="scope-block local1">
+        <div class="scope-label">main() 블록 (outer block)</div>
+        <span class="scope-var blue">a = 2</span>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin:4px 0">printf(a) → <span style="color:var(--accent2)">2</span> 출력</div>
+        <div class="scope-block local2">
+          <div class="scope-label">내부 블록 (inner block) — a가 재정의됨</div>
+          <span class="scope-var purple">a = 5</span>
+          <span style="font-size:11px;color:var(--accent4);margin-left:8px">(outer a를 가림)</span>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin:4px 0">printf(a) → <span style="color:var(--accent4)">5</span> 출력</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-top:6px">printf(++a) → <span style="color:var(--accent2)">3</span> 출력 (outer a = 2+1)</div>
+      </div>
+    </div>
+
+    <div class="code-block" style="margin-top:16px">
+      <div class="code-header">
+        <span class="code-filename">LAB: scope1.c — 블록 중첩 Scope</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>)
+{
+  <span class="ty">int</span> <span class="nm">a</span> = <span class="nb">2</span>; <span class="cm">/* outer block a */</span>
+  <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="nm">a</span>);    <span class="cm">// 2 출력</span>
+  {
+    <span class="ty">int</span> <span class="nm">a</span> = <span class="nb">5</span>; <span class="cm">/* inner block a — outer a를 가림 */</span>
+    <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="nm">a</span>);  <span class="cm">// 5 출력</span>
+  } <span class="cm">/* inner a 소멸 → outer a 복귀 */</span>
+  <span class="fn">printf</span>(<span class="st">"%d\n"</span>, ++<span class="nm">a</span>); <span class="cm">// 3 출력 (outer a)</span>
+}</pre>
+      </div>
+    </div>
+    <div class="output-box">2<br>5<br>3</div>
+  </section>
+
+  <!-- ── SECTION 8: 지역변수 vs 전역변수 ── -->
+  <section class="section" id="local-global">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <h2>지역 변수 vs 전역 변수</h2>
+    </div>
+
+    <!-- 비교 테이블 -->
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>지역 변수 (Local)</th>
+          <th>전역 변수 (Global)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>선언 위치</strong></td>
+          <td>함수(블록) 내부</td>
+          <td>함수 외부</td>
+        </tr>
+        <tr>
+          <td><strong>참조 범위</strong></td>
+          <td>해당 함수(블록) 내부만</td>
+          <td>소스 파일 전체 (extern: 다른 파일까지)</td>
+        </tr>
+        <tr>
+          <td><strong>수명</strong></td>
+          <td>함수 호출 시 생성, 종료 시 소멸</td>
+          <td>프로그램 전체 실행 기간</td>
+        </tr>
+        <tr>
+          <td><strong>초기값</strong></td>
+          <td>쓰레기 값 (명시적 초기화 필요)</td>
+          <td>자동으로 0으로 초기화</td>
+        </tr>
+        <tr>
+          <td><strong>저장 위치</strong></td>
+          <td>Stack 메모리</td>
+          <td>Data 세그먼트</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="card-grid">
+      <!-- 지역변수 코드 -->
+      <div class="concept-card hl-blue">
+        <h3 style="color:var(--accent2)"><span>📦</span>지역 변수 예시</h3>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:10px 14px">
+<pre><span class="ty">int</span> <span class="fn">compute_sum</span>(<span class="ty">int</span> <span class="nm">n</span>) {
+  <span class="ty">int</span> <span class="nm">i</span>, <span class="nm">result</span> = <span class="nb">0</span>; <span class="cm">// 지역변수</span>
+  <span class="kw">for</span> (<span class="nm">i</span>=<span class="nb">1</span>; <span class="nm">i</span>&lt;=<span class="nm">n</span>; <span class="nm">i</span>++)
+    <span class="nm">result</span> += <span class="nm">i</span>;
+  <span class="kw">return</span> <span class="nm">result</span>;
+}
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+  <span class="ty">int</span> <span class="nm">sum</span>; <span class="cm">// main의 지역변수</span>
+  <span class="nm">sum</span> = <span class="fn">compute_sum</span>(<span class="nb">100</span>);
+  <span class="cm">// i, result는 여기서 접근 불가!</span>
+}</pre>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px">sum ↔ i, result 서로 독립. 이름 중복 허용!</p>
+      </div>
+      <!-- 전역변수 코드 -->
+      <div class="concept-card hl-green">
+        <h3 style="color:var(--accent)"><span>🌐</span>전역 변수 예시</h3>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:10px 14px">
+<pre><span class="ty">int</span> <span class="nm">global</span> = <span class="nb">123</span>; <span class="cm">// 전역변수</span>
+
+<span class="ty">void</span> <span class="fn">sub1</span>() {
+  <span class="fn">printf</span>(<span class="st">"%d\n"</span>, ++<span class="nm">global</span>); <span class="cm">// 124</span>
+}
+<span class="ty">void</span> <span class="fn">sub2</span>() {
+  <span class="fn">printf</span>(<span class="st">"%d\n"</span>, ++<span class="nm">global</span>); <span class="cm">// 125</span>
+}
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+  <span class="fn">sub1</span>(); <span class="fn">sub2</span>();
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px">모든 함수에서 공유 → 값이 누적됨</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>전역 변수 남용 주의!</strong>
+        전역 변수는 프로그램 전체에서 공유되므로 어디서든 수정될 수 있어 <strong style="color:var(--accent3)">버그 추적이 어렵고 유지보수가 힘들어집니다</strong>. 함수 매개변수로 주고받는 방식을 우선하고, 전역 변수는 꼭 필요한 경우에만 사용하세요.
+      </div>
+    </div>
+
+    <!-- 같은 이름의 전역/지역 -->
+    <div class="concept-card">
+      <h3><span>⚖️</span>같은 이름의 전역 + 지역 변수</h3>
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-header"><span class="code-filename">LAB: shadow.c — 지역 변수가 전역을 가림</span><span class="code-lang">C</span></div>
+        <div class="code-body">
+<pre><span class="ty">int</span> <span class="nm">a</span> = <span class="nb">33</span>;  <span class="cm">/* 전역 a */</span>
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+  <span class="ty">int</span> <span class="nm">b</span> = <span class="nb">77</span>;
+  <span class="fn">printf</span>(<span class="st">"a = %d\n"</span>, <span class="nm">a</span>);  <span class="cm">// 33 (전역 a)</span>
+  <span class="fn">printf</span>(<span class="st">"b = %d\n"</span>, <span class="nm">b</span>);  <span class="cm">// 77</span>
+  <span class="kw">return</span> <span class="nb">0</span>;
+}
+<span class="ty">void</span> <span class="fn">some_func</span>(<span class="ty">void</span>) {
+  <span class="ty">int</span> <span class="nm">a</span> = <span class="nb">11</span>;  <span class="cm">/* 지역 a — 전역 a를 가림! */</span>
+  <span class="cm">// 이런 패턴은 혼선을 일으키므로 피할 것</span>
+}</pre>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--accent3);margin-top:8px">같은 이름의 전역/지역 변수가 공존하면 지역 변수가 우선됩니다. 혼선 방지를 위해 이런 패턴은 피하세요!</p>
+    </div>
+  </section>
+
+  <!-- ── SECTION 9: Storage Classes ── -->
+  <section class="section" id="storage">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <h2>저장 유형 (Storage Classes)</h2>
+    </div>
+
+    <div class="concept-card hl-green">
+      <h3><span>🗄️</span>Storage Class란?</h3>
+      <p>변수 선언 앞에 붙는 키워드로 <strong style="color:var(--accent)">실제 저장 영역과 수명(lifetime)</strong>을 결정합니다.</p>
+    </div>
+
+    <!-- Storage Class 통합 테이블 -->
+    <table class="sc-table">
+      <thead>
+        <tr>
+          <th>Keyword</th>
+          <th>Storage Class</th>
+          <th>사용 위치</th>
+          <th>Scope</th>
+          <th>Lifetime</th>
+          <th>초기값</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="kw-badge kw-auto">auto</span></td>
+          <td>automatic</td>
+          <td>함수/블록 내부</td>
+          <td>local</td>
+          <td>블록 진입 시 생성, 종료 시 소멸</td>
+          <td style="color:var(--accent3)">쓰레기</td>
+        </tr>
+        <tr>
+          <td><span class="kw-badge kw-register">register</span></td>
+          <td>register</td>
+          <td>함수/블록 내부</td>
+          <td>local</td>
+          <td>블록 진입 시 생성, 종료 시 소멸</td>
+          <td style="color:var(--accent3)">쓰레기</td>
+        </tr>
+        <tr>
+          <td><span class="kw-badge kw-static">static</span> (지역)</td>
+          <td>static (local)</td>
+          <td>함수/블록 내부</td>
+          <td>local</td>
+          <td>프로그램 전체 (permanent)</td>
+          <td style="color:var(--accent2)">0</td>
+        </tr>
+        <tr>
+          <td><span class="kw-badge kw-static">static</span> (전역)</td>
+          <td>static (global)</td>
+          <td>함수 외부</td>
+          <td>해당 소스 파일</td>
+          <td>프로그램 전체 (permanent)</td>
+          <td style="color:var(--accent2)">0</td>
+        </tr>
+        <tr>
+          <td>(없음)</td>
+          <td>global</td>
+          <td>함수 외부</td>
+          <td>전체 소스</td>
+          <td>프로그램 전체 (permanent)</td>
+          <td style="color:var(--accent2)">0</td>
+        </tr>
+        <tr>
+          <td><span class="kw-badge kw-extern">extern</span></td>
+          <td>external</td>
+          <td>함수 외부</td>
+          <td>전체 소스</td>
+          <td>프로그램 전체 (permanent)</td>
+          <td style="color:var(--accent2)">0 (다른 파일에 정의)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- 상세 탭 -->
+    <div class="tabs">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'sc1')">auto</button>
+        <button class="tab-btn" onclick="switchTab(this,'sc2')">register</button>
+        <button class="tab-btn" onclick="switchTab(this,'sc3')">static (지역)</button>
+        <button class="tab-btn" onclick="switchTab(this,'sc4')">static (전역)</button>
+        <button class="tab-btn" onclick="switchTab(this,'sc5')">extern</button>
+      </div>
+
+      <div class="tab-panel active" id="sc1">
+        <div class="concept-card">
+          <h3 style="color:var(--accent2)"><span>⚡</span>auto class</h3>
+          <p style="font-size:13px">지역 변수의 <strong style="color:var(--accent5)">기본(default)</strong> 저장 유형. <code>auto</code> 키워드는 보통 생략합니다.</p>
+          <p style="font-size:12px;color:var(--muted)">이름의 유래: 선언된 블록 시작 시 메모리 <strong>자동(automatic)</strong> 할당, 블록 종료 시 자동 회수</p>
+          <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:10px 14px">
+<pre><span class="ty">int</span> <span class="nm">x</span>;         <span class="cm">// 같은 표현</span>
+<span class="kw">auto</span> <span class="ty">int</span> <span class="nm">x</span>;  <span class="cm">// 보통 auto는 생략</span></pre>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="sc2">
+        <div class="concept-card">
+          <h3 style="color:var(--accent)"><span>⚡</span>register class</h3>
+          <p style="font-size:13px">컴파일러에게 해당 변수를 <strong style="color:var(--accent)">CPU 레지스터에 저장</strong>하도록 요청합니다. 자주 사용하는 루프 카운터 변수에 효과적.</p>
+          <p style="font-size:12px;color:var(--muted)">레지스터 할당이 어려우면 자동으로 auto처럼 메모리에 저장됨. 최근 컴파일러는 자동 최적화를 잘 하므로 사용 빈도 낮음.</p>
+          <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:10px 14px">
+<pre><span class="kw">register</span> <span class="ty">int</span> <span class="nm">i</span>;
+<span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt; <span class="nb">100</span>; <span class="nm">i</span>++)
+  <span class="nm">sum</span> += <span class="nm">i</span>;
+<span class="cm">// i가 CPU 레지스터에 저장 → 빠른 접근</span></pre>
+          </div></div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="sc3">
+        <div class="concept-card">
+          <h3 style="color:var(--accent5)"><span>🔋</span>static 지역 변수</h3>
+          <p style="font-size:13px">지역 변수처럼 해당 블록 내에서만 접근 가능하지만, <strong style="color:var(--accent5)">값과 저장 공간이 프로그램 종료까지 유지</strong>됩니다.</p>
+          <div class="code-block" style="margin-top:8px">
+            <div class="code-header"><span class="code-filename">LAB: staticVar.c</span><span class="code-lang">C</span></div>
+            <div class="code-body"><pre><span class="ty">void</span> <span class="fn">sub</span>(<span class="ty">void</span>) {
+  <span class="ty">int</span>           <span class="nm">auto_count</span>   = <span class="nb">0</span>; <span class="cm">// 매번 0으로 초기화</span>
+  <span class="kw">static</span> <span class="ty">int</span>   <span class="nm">static_count</span> = <span class="nb">0</span>; <span class="cm">// 최초 한 번만 초기화</span>
+  <span class="nm">auto_count</span>++;
+  <span class="nm">static_count</span>++;
+  <span class="fn">printf</span>(<span class="st">"auto=%d, static=%d\n"</span>,
+         <span class="nm">auto_count</span>, <span class="nm">static_count</span>);
+}
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+  <span class="fn">sub</span>(); <span class="fn">sub</span>(); <span class="fn">sub</span>(); <span class="kw">return</span> <span class="nb">0</span>;
+}</pre></div>
+          </div>
+          <div class="output-box" style="margin-top:8px">auto=1, static=1<br>auto=1, static=2<br>auto=1, static=3</div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="sc4">
+        <div class="concept-card">
+          <h3 style="color:var(--accent5)"><span>🔒</span>static 전역 변수</h3>
+          <p style="font-size:13px">전역 변수 앞에 <code>static</code>을 붙이면 참조 범위가 <strong style="color:var(--accent5)">해당 소스 파일로 제한</strong>됩니다. 다른 파일에서는 접근 불가.</p>
+          <div class="code-block" style="margin-top:8px"><div class="code-body" style="padding:10px 14px">
+<pre><span class="cm">/* file1.c */</span>
+<span class="kw">static</span> <span class="ty">int</span> <span class="nm">file_private</span> = <span class="nb">0</span>;
+<span class="cm">// 이 파일 내 함수들만 접근 가능</span>
+<span class="cm">// 다른 소스 파일에서는 extern으로도 접근 불가</span></pre>
+          </div></div>
+          <p style="font-size:12px;color:var(--muted);margin-top:8px">파일 단위 캡슐화(encapsulation)에 유용합니다.</p>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="sc5">
+        <div class="concept-card">
+          <h3 style="color:var(--accent4)"><span>🔗</span>extern class</h3>
+          <p style="font-size:13px">다른 소스 파일에 정의된 전역 변수를 현재 파일에서 사용할 때 선언합니다.</p>
+          <div class="code-block" style="margin-top:8px">
+            <div class="code-header"><span class="code-filename">file1.c + file2.c — extern 사용</span><span class="code-lang">C</span></div>
+            <div class="code-body"><pre><span class="cm">/* file1.c — 변수 정의 */</span>
+<span class="ty">int</span> <span class="nm">a</span> = <span class="nb">1</span>;
+<span class="ty">int</span> <span class="nm">b</span> = <span class="nb">2</span>, <span class="nm">c</span> = <span class="nb">3</span>;
+
+<span class="cm">/* file2.c — 외부 변수 참조 선언 */</span>
+<span class="kw">extern</span> <span class="ty">int</span> <span class="nm">a</span>;  <span class="cm">// file1.c의 a를 사용함을 선언</span>
+<span class="ty">int</span> <span class="fn">f</span>(<span class="ty">void</span>) {
+  <span class="ty">int</span> <span class="nm">b</span>, <span class="nm">c</span>;  <span class="cm">// 지역변수 b, c (file1의 b,c와 별개)</span>
+  <span class="nm">a</span> = <span class="nm">b</span> = <span class="nm">c</span> = <span class="nb">4</span>;
+  <span class="kw">return</span> (<span class="nm">a</span> + <span class="nm">b</span> + <span class="nm">c</span>);  <span class="cm">// 12</span>
+}</pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 10: 재귀 함수 ── -->
+  <section class="section" id="recursion">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>재귀 함수 (Recursion)</h2>
+    </div>
+
+    <div class="concept-card hl-purple">
+      <h3 style="color:var(--accent4)"><span>🔄</span>재귀 함수란?</h3>
+      <p><strong style="color:var(--accent4)">자기 자신을 호출하는 함수</strong>입니다. 복잡한 알고리즘을 간결하게 표현할 수 있습니다.</p>
+      <ul>
+        <li>Fibonacci 수열, Factorial(계승), GCD (최대공약수)</li>
+        <li>정렬/탐색 알고리즘, Tower of Hanoi 문제</li>
+      </ul>
+    </div>
+
+    <!-- 재귀의 일반 구조 -->
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent2)"><span>🛑</span>Base Case (종료 조건)</h3>
+        <p style="font-size:13px">더 이상 재귀 호출을 하지 않고 <strong style="color:var(--accent2)">직접 값을 반환</strong>하는 조건. 반드시 있어야 무한 재귀를 방지!</p>
+      </div>
+      <div class="concept-card">
+        <h3 style="color:var(--accent4)"><span>🔁</span>General Recursive Case</h3>
+        <p style="font-size:13px">자기 자신을 호출하되, <strong style="color:var(--accent4)">반드시 base case에 가까워지도록</strong> 인자를 변경해서 호출.</p>
+      </div>
+    </div>
+
+    <!-- Factorial 예시 -->
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">factorial.c — 재귀로 구현한 n!</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="cm">/*
+ * n! = 1           (n == 1)  ← base case
+ * n! = n × (n-1)! (n  > 1)  ← general case
+ */</span>
+<span class="ty">int</span> <span class="fn">factorial</span>(<span class="ty">int</span> <span class="nm">n</span>)
+{
+  <span class="kw">if</span> (<span class="nm">n</span> == <span class="nb">1</span>)              <span class="cm">/* base case */</span>
+    <span class="kw">return</span> <span class="nb">1</span>;
+  <span class="kw">else</span>                       <span class="cm">/* general recursive case */</span>
+    <span class="kw">return</span> (<span class="nm">n</span> * <span class="fn">factorial</span>(<span class="nm">n</span> - <span class="nb">1</span>));
+}</pre>
+      </div>
+    </div>
+
+    <!-- 인터랙티브 재귀 스택 시뮬레이터 -->
+    <div class="stack-wrap">
+      <div class="stack-title">▶ 인터랙티브 재귀 호출 스택 시뮬레이터 — factorial(n)</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+        <label style="font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)">n =</label>
+        <input type="number" class="demo-input" id="rec-n" value="4" min="1" max="8">
+        <button class="demo-btn" onclick="runRecursion()">▶ 시뮬레이션</button>
+        <button class="demo-btn secondary" onclick="resetRecursion()">↺ 초기화</button>
+        <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--muted)">(max 8)</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;margin-bottom:8px">
+        🟢 호출(PUSH) → 🔵 base case → 🟠 반환(POP)
+      </div>
+      <div class="stack-frames" id="stack-frames"></div>
+      <div class="stack-result" id="stack-result"></div>
+    </div>
+
+    <!-- 재귀 vs 반복 비교 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">재귀 vs 반복(Iterative) 비교</h3>
+    <div class="card-grid">
+      <div class="concept-card hl-purple">
+        <h3 style="color:var(--accent4)"><span>🔄</span>재귀 (Recursive)</h3>
+        <ul>
+          <li>코드가 더 짧고 직관적</li>
+          <li>개념 이해 후 구현 쉬움</li>
+          <li style="color:var(--accent3)">호출마다 스택 메모리 사용</li>
+          <li style="color:var(--accent3)">처리 시간이 더 길 수 있음</li>
+          <li style="color:var(--accent3)">스택 오버플로우 위험</li>
+        </ul>
+      </div>
+      <div class="concept-card hl-blue">
+        <h3 style="color:var(--accent2)"><span>🔁</span>반복 (Iterative)</h3>
+        <ul>
+          <li>메모리 효율적</li>
+          <li>일반적으로 더 빠름</li>
+          <li>스택 오버플로우 위험 없음</li>
+          <li style="color:var(--accent3)">코드가 길어질 수 있음</li>
+          <li style="color:var(--accent3)">복잡한 알고리즘은 이해하기 어려울 수 있음</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>언제 재귀를 쓸까?</strong>
+        응용의 특성에 맞게 재귀와 반복 중 신중하게 선택하세요. Fibonacci, Factorial처럼 수학적 정의가 재귀적인 문제에 재귀가 자연스럽습니다. 단, 성능이 중요한 응용에서는 반복 방식을 고려하세요.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 11: 퀴즈 ── -->
+  <section class="section" id="quiz">
+    <div class="quiz-section">
+      <div class="quiz-header">
+        <h2>🎯 퀴즈</h2>
+        <p>함수 개념을 확인해봅시다 (Part 1 + Part 2). 클릭하여 정답을 확인하세요!</p>
+      </div>
+
+      <!-- Q1: 함수 원형 선언 오류 -->
+      <div class="quiz-card" id="qcard1">
+        <div class="q-num">QUIZ 01 / 06</div>
+        <div class="q-text">다음 함수 원형 선언 중 <strong style="color:var(--accent3)">잘못된 것</strong>을 고르시오.</div>
+        <div class="code-block" style="margin-bottom:14px"><div class="code-body" style="padding:10px 14px">
+<pre>① <span class="ty">int</span>  <span class="fn">func</span>(<span class="ty">int</span> <span class="nm">x</span>, <span class="nm">y</span>);
+② <span class="ty">void</span> <span class="fn">func</span>(<span class="nm">x</span>, <span class="nm">y</span>);
+③ <span class="ty">char</span> <span class="fn">func</span>(<span class="ty">double</span>);
+④ <span class="ty">void</span> <span class="fn">func</span>(<span class="ty">void</span>);</pre>
+        </div></div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">A</span> ①만 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'correct')"><span class="opt-label">B</span> ①과 ②가 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">C</span> ③과 ④가 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">D</span> 모두 올바름</div>
+        </div>
+        <div class="quiz-feedback" id="qf1">
+          ✅ <strong>정답: B — ①과 ②</strong><br>
+          <strong>① </strong><code>int func(int x, y);</code> — 매개변수마다 타입을 명시해야 함. <code>y</code>에 타입 없음 → 오류. 올바른 표현: <code>int func(int x, int y);</code><br>
+          <strong>② </strong><code>void func(x, y);</code> — 타입 없이 이름만 나열 → 오류. 올바른 표현: <code>void func(int x, int y);</code> 또는 <code>void func(int, int);</code><br>
+          ③ 타입만 있고 이름 없어도 유효 (이름은 생략 가능). ④ 완전히 올바른 원형.
+        </div>
+      </div>
+
+      <!-- Q2: OX 문제 — 함수 기초 -->
+      <div class="quiz-card" id="qcard2">
+        <div class="q-num">QUIZ 02 / 06</div>
+        <div class="q-text">다음 중 <strong style="color:var(--accent)">옳은 것(O)</strong>을 고르시오.</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'correct')"><span class="opt-label">A</span> 함수는 자기 자신을 호출할 수 있다. (재귀)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">B</span> 모든 함수는 반드시 return 문을 가져야 한다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">C</span> C 함수는 최소 하나 이상의 인자를 가져야 한다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">D</span> 함수 원형 선언에서 매개변수 이름은 함수 정의와 항상 일치해야 한다.</div>
+        </div>
+        <div class="quiz-feedback" id="qf2">
+          ✅ <strong>정답: A</strong><br>
+          <strong>B → X</strong>: void 함수는 return 문이 없어도 됨. 함수 몸체 끝의 <code>}</code>에서 자동 종료.<br>
+          <strong>C → X</strong>: 인자가 없는 함수는 <code>void</code>나 빈 괄호로 선언 가능.<br>
+          <strong>D → X</strong>: 원형 선언에서 매개변수 이름은 중요하지 않음. 타입만 일치하면 됨.
+        </div>
+      </div>
+
+      <!-- Q3: return 타입 매칭 -->
+      <div class="quiz-card" id="qcard3">
+        <div class="q-num">QUIZ 03 / 06</div>
+        <div class="q-text"><code>int f(void);</code> 원형 선언과 <strong style="color:var(--accent)">올바르게 매칭</strong>되는 return 문은?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">A</span> <code>return;</code></div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">B</span> <code>return 1.0;</code></div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'correct')"><span class="opt-label">C</span> <code>return 10+20;</code></div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">D</span> 위 세 가지 모두 가능</div>
+        </div>
+        <div class="quiz-feedback" id="qf3">
+          ✅ <strong>정답: C — <code>return 10+20;</code></strong><br>
+          <code>int f(void)</code>: 반환형이 <code>int</code>이므로 정수 값을 반환해야 합니다.<br>
+          <strong>A</strong>: <code>return;</code>은 void 함수용. <code>void g(int,int)</code>에 매칭.<br>
+          <strong>B</strong>: <code>return 1.0;</code>은 double 값. <code>double h(double,int)</code>에 매칭.<br>
+          <strong>C</strong>: <code>10+20 = 30</code>은 int. <code>int f(void)</code>에 매칭 ✅
+        </div>
+      </div>
+
+      <!-- Q4: OX — 변수/Storage -->
+      <div class="quiz-card" id="qcard4">
+        <div class="q-num">QUIZ 04 / 06</div>
+        <div class="q-text">다음 중 <strong style="color:var(--accent)">옳은 것(O)</strong>을 고르시오.</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">A</span> 지역 변수는 함수 내부 또는 외부 모두 선언 가능하다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'correct')"><span class="opt-label">B</span> 하나의 프로그램에서 서로 다른 함수 안에 같은 이름의 지역 변수가 존재할 수 있다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">C</span> 지역 변수와 전역 변수 모두 자동으로 0으로 초기화된다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">D</span> 정적 지역 변수(static)는 해당 블록 종료 시 메모리에서 사라진다.</div>
+        </div>
+        <div class="quiz-feedback" id="qf4">
+          ✅ <strong>정답: B</strong><br>
+          <strong>A → X</strong>: 지역 변수는 함수(블록) 내부에서만 선언 가능. 외부 선언은 전역 변수.<br>
+          <strong>B → O</strong>: 지역 변수는 scope가 독립적이므로 다른 함수에서 같은 이름을 써도 충돌 없음.<br>
+          <strong>C → X</strong>: 지역 변수는 자동 초기화 안 됨(쓰레기 값). 전역/static 변수만 0으로 초기화.<br>
+          <strong>D → X</strong>: static 지역 변수는 블록 종료 후에도 메모리와 값이 프로그램 종료까지 유지됨.
+        </div>
+      </div>
+
+      <!-- Q5: static 지역변수 출력 -->
+      <div class="quiz-card" id="qcard5">
+        <div class="q-num">QUIZ 05 / 06</div>
+        <div class="q-text">다음 코드의 출력 결과는?</div>
+        <div class="code-block" style="margin-bottom:14px"><div class="code-body" style="padding:10px 14px">
+<pre><span class="ty">void</span> <span class="fn">counter</span>() {
+  <span class="kw">static</span> <span class="ty">int</span> <span class="nm">cnt</span> = <span class="nb">0</span>;
+  <span class="nm">cnt</span>++;
+  <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="nm">cnt</span>);
+}
+<span class="ty">int</span> <span class="fn">main</span>() {
+  <span class="fn">counter</span>(); <span class="fn">counter</span>(); <span class="fn">counter</span>();
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+        </div></div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">A</span> 1 / 1 / 1</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'correct')"><span class="opt-label">B</span> 1 / 2 / 3</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">C</span> 0 / 1 / 2</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">D</span> 컴파일 오류</div>
+        </div>
+        <div class="quiz-feedback" id="qf5">
+          ✅ <strong>정답: B — 1 / 2 / 3</strong><br>
+          <code>static int cnt = 0</code>은 프로그램 시작 시 딱 한 번 초기화됩니다.<br>
+          이후 함수가 호출될 때마다 <code>cnt</code>의 이전 값이 유지됩니다:<br>
+          1번째 호출: cnt = 0+1 = <strong style="color:var(--accent)">1</strong> 출력<br>
+          2번째 호출: cnt = 1+1 = <strong style="color:var(--accent)">2</strong> 출력<br>
+          3번째 호출: cnt = 2+1 = <strong style="color:var(--accent)">3</strong> 출력
+        </div>
+      </div>
+
+      <!-- Q6: 재귀 결과 -->
+      <div class="quiz-card" id="qcard6">
+        <div class="q-num">QUIZ 06 / 06</div>
+        <div class="q-text">다음 재귀 함수에서 <code>mystery(5)</code>의 반환값은?</div>
+        <div class="code-block" style="margin-bottom:14px"><div class="code-body" style="padding:10px 14px">
+<pre><span class="ty">int</span> <span class="fn">mystery</span>(<span class="ty">int</span> <span class="nm">n</span>) {
+  <span class="kw">if</span> (<span class="nm">n</span> &lt;= <span class="nb">1</span>)
+    <span class="kw">return</span> <span class="nm">n</span>;
+  <span class="kw">return</span> <span class="fn">mystery</span>(<span class="nm">n</span>-<span class="nb">1</span>) + <span class="fn">mystery</span>(<span class="nm">n</span>-<span class="nb">2</span>);
+}</pre>
+        </div></div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">A</span> 4</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'correct')"><span class="opt-label">B</span> 5</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">C</span> 8</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">D</span> 120</div>
+        </div>
+        <div class="quiz-feedback" id="qf6">
+          ✅ <strong>정답: B — 5</strong><br>
+          이 함수는 <strong style="color:var(--accent)">피보나치(Fibonacci) 수열</strong>을 구현합니다:<br>
+          mystery(1)=1, mystery(2)=1, mystery(3)=2, mystery(4)=3, <strong>mystery(5)=5</strong><br>
+          전개: mystery(5) = mystery(4)+mystery(3) = 3+2 = <strong style="color:var(--accent)">5</strong>
+        </div>
+      </div>
+
+      <div style="text-align:center">
+        <button class="btn-primary" onclick="showScore()">결과 확인</button>
+      </div>
+      <div class="quiz-score" id="quiz-score">
+        <div class="score-num" id="score-display">0/6</div>
+        <div class="score-label" id="score-msg">결과를 확인하세요!</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ── TAB SWITCHER ──
+function switchTab(btn, panelId) {
+  const tabs = btn.closest('.tabs');
+  tabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  tabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ── COPY BUTTON ──
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = '✓ 복사됨'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── RECURSION STACK SIMULATOR ──
+let recAnimating = false;
+function runRecursion() {
+  if (recAnimating) return;
+  const n = Math.min(parseInt(document.getElementById('rec-n').value) || 4, 8);
+  resetRecursion();
+  recAnimating = true;
+  const frames = document.getElementById('stack-frames');
+  const result = document.getElementById('stack-result');
+
+  // Build trace: push phase
+  const pushPhase = [];
+  for (let i = n; i >= 2; i--) pushPhase.push({ type: 'push', label: `factorial(${i})`, sub: `n=${i} ≠ 1 → 재귀 호출` });
+  pushPhase.push({ type: 'base', label: `factorial(1)`, sub: `base case → return 1` });
+
+  // Pop phase with values
+  let val = 1;
+  const popPhase = [];
+  for (let i = 2; i <= n; i++) {
+    val *= i;
+    popPhase.push({ type: 'pop', label: `factorial(${i}) → return ${i} × ${val/i} = ${val}`, sub: `반환 후 스택에서 제거` });
+  }
+
+  const allSteps = [...pushPhase, ...popPhase];
+  let idx = 0;
+
+  function nextStep() {
+    if (idx >= allSteps.length) {
+      result.style.display = 'block';
+      result.textContent = `factorial(${n}) = ${val}`;
+      recAnimating = false;
+      return;
+    }
+    const s = allSteps[idx++];
+    if (s.type === 'pop') {
+      // remove last push frame
+      const pushFrames = frames.querySelectorAll('.stack-frame.push, .stack-frame.base');
+      if (pushFrames.length > 0) {
+        const last = pushFrames[pushFrames.length - 1];
+        last.classList.add('pop');
+        setTimeout(() => {
+          if (last.parentNode) last.parentNode.removeChild(last);
+          // add pop result label
+          const el = document.createElement('div');
+          el.className = 'stack-frame pop';
+          el.innerHTML = `<span>${s.label}</span><span style="font-size:10px;opacity:.7">↩ 반환</span>`;
+          frames.appendChild(el);
+          setTimeout(() => { if (el.parentNode) el.parentNode.removeChild(el); nextStep(); }, 400);
+        }, 200);
+        return;
+      }
+    } else {
+      const el = document.createElement('div');
+      el.className = `stack-frame ${s.type}`;
+      el.innerHTML = `<span>${s.label}</span><span style="font-size:10px;opacity:.7">${s.sub}</span>`;
+      frames.appendChild(el);
+    }
+    setTimeout(nextStep, 500);
+  }
+  nextStep();
+}
+
+function resetRecursion() {
+  document.getElementById('stack-frames').innerHTML = '';
+  const r = document.getElementById('stack-result');
+  r.style.display = 'none'; r.textContent = '';
+  recAnimating = false;
+}
+
+// ── QUIZ ──
+const answers = {};
+function checkQuiz(opt, qNum, result) {
+  const card = document.getElementById('qcard' + qNum);
+  const fb   = document.getElementById('qf' + qNum);
+  if (card.dataset.answered) return;
+  card.dataset.answered = 'true';
+  answers[qNum] = result;
+  card.querySelectorAll('.quiz-opt').forEach(o => o.style.pointerEvents = 'none');
+  opt.classList.add(result);
+  if (result === 'wrong') {
+    card.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct');
+    });
+  }
+  fb.className = 'quiz-feedback show ' + result;
+}
+function showScore() {
+  const correct = Object.values(answers).filter(v => v === 'correct').length;
+  document.getElementById('score-display').textContent = correct + '/6';
+  const pct = correct / 6;
+  document.getElementById('score-msg').textContent =
+    pct === 1  ? '🎉 완벽합니다! 함수 마스터!' :
+    pct >= .8  ? '👍 훌륭해요! 거의 다 맞혔습니다!' :
+    pct >= .6  ? '🙂 잘 했어요! 틀린 부분을 복습해봐요.' :
+                 '📚 함수 개념을 다시 한 번 살펴봐요!';
+  document.getElementById('quiz-score').classList.add('show');
+}
+
+// ── ACTIVE NAV ──
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting)
+      navItems.forEach(n => n.classList.toggle('active', n.getAttribute('href') === '#' + e.target.id));
+  });
+}, { threshold: 0.25 });
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

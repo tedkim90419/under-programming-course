@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 03 — 수식과 연산자 | C 프로그래밍</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;--yellow:#e3b341;--code-bg:#010409;--keyword:#ff7b72;--type:#79c0ff;--string:#a5d6ff;--comment:#8b949e;--fn:#d2a8ff;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:15px;line-height:1.7;}
+
+/* SIDEBAR */
+.sidebar{position:fixed;top:0;left:0;width:240px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;z-index:100;padding:0 0 40px;}
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);}
+.sidebar-logo .course{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.sidebar-logo .title{font-size:13px;font-weight:700;color:var(--accent5);margin-top:4px;}
+.sidebar-logo .lec-num{display:inline-block;background:var(--accent5);color:var(--bg);font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:8px;}
+.nav-section{padding:16px 0 8px;}
+.nav-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:0 20px 8px;}
+.nav-item{display:block;padding:7px 20px;color:var(--muted);text-decoration:none;font-size:13px;border-left:2px solid transparent;transition:all .15s;}
+.nav-item:hover,.nav-item.active{color:var(--accent5);border-left-color:var(--accent5);background:rgba(255,166,87,.08);}
+.nav-item .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:8px;vertical-align:middle;}
+
+/* MAIN */
+.main{margin-left:240px;padding:40px 48px 80px;max-width:1040px;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#1a1500 100%);border:1px solid var(--border);border-radius:12px;padding:40px 48px;margin-bottom:48px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(255,166,87,.15) 0%,transparent 70%);}
+.hero-tag{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent5);background:rgba(255,166,87,.1);border:1px solid rgba(255,166,87,.2);padding:3px 12px;border-radius:20px;display:inline-block;margin-bottom:16px;}
+.hero h1{font-size:32px;font-weight:700;line-height:1.2;margin-bottom:8px;}
+.hero h1 span{color:var(--accent5);}
+.hero-sub{font-size:16px;color:var(--muted);margin-bottom:24px;}
+.hero-pills{display:flex;flex-wrap:wrap;gap:8px;}
+.hero-pill{font-size:12px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:20px;font-family:'Space Mono',monospace;}
+
+/* SECTION */
+.section{margin-bottom:56px;scroll-margin-top:24px;}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.section-num{font-family:'Space Mono',monospace;font-size:11px;color:var(--bg);background:var(--accent5);padding:2px 10px;border-radius:4px;font-weight:700;}
+.section h2{font-size:20px;font-weight:700;}
+
+/* CONCEPT CARD */
+.concept-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px;}
+.concept-card.highlight{border-color:rgba(255,166,87,.35);background:linear-gradient(135deg,var(--bg2),rgba(255,166,87,.04));}
+.concept-card h3{font-size:15px;font-weight:700;margin-bottom:12px;color:var(--accent5);display:flex;align-items:center;gap:8px;}
+.concept-card p{color:#c9d1d9;font-size:14px;margin-bottom:10px;}
+.concept-card ul{list-style:none;margin-top:8px;}
+.concept-card ul li{color:#c9d1d9;font-size:14px;padding:4px 0 4px 20px;position:relative;}
+.concept-card ul li::before{content:'▸';position:absolute;left:0;color:var(--accent2);}
+
+/* CODE BLOCK */
+.code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0;}
+.code-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;}
+.code-filename{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);}
+.code-lang{font-family:'Space Mono',monospace;font-size:10px;color:var(--bg);background:var(--accent2);padding:2px 8px;border-radius:3px;}
+.code-body{padding:20px;overflow-x:auto;}
+.code-body pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;white-space:pre;}
+.copy-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;cursor:pointer;transition:all .15s;}
+.copy-btn:hover{background:var(--accent2);color:var(--bg);border-color:var(--accent2);}
+
+/* Syntax */
+.kw{color:#ff7b72;font-weight:700;} .ty{color:#79c0ff;} .cm{color:#8b949e;font-style:italic;}
+.st{color:#a5d6ff;} .fn{color:#d2a8ff;} .nm{color:#ffa657;} .pp{color:#d2a8ff;} .op{color:#f78166;font-weight:700;}
+
+/* CALLOUT */
+.callout{border-radius:8px;padding:14px 18px;margin:16px 0;border-left:3px solid;font-size:14px;}
+.callout.tip{background:rgba(63,185,80,.08);border-color:var(--accent2);}
+.callout.warn{background:rgba(247,129,102,.08);border-color:var(--accent3);}
+.callout.info{background:rgba(88,166,255,.08);border-color:var(--accent);}
+.callout.note{background:rgba(210,168,255,.08);border-color:var(--accent4);}
+.callout-title{font-weight:700;margin-bottom:4px;}
+.callout.tip .callout-title{color:var(--accent2);}
+.callout.warn .callout-title{color:var(--accent3);}
+.callout.info .callout-title{color:var(--accent);}
+.callout.note .callout-title{color:var(--accent4);}
+
+/* DATA TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:14px;margin:16px 0;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+.data-table th{background:var(--bg3);color:var(--muted);padding:10px 14px;text-align:left;font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.data-table td{padding:10px 14px;border-bottom:1px solid rgba(48,54,61,.5);font-family:'JetBrains Mono',monospace;font-size:13px;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(255,255,255,.02);}
+.data-table td.desc{font-family:'Noto Sans KR',sans-serif;font-size:13px;}
+.data-table td.result{color:var(--accent2);font-weight:700;}
+.data-table td.op-cell{color:var(--accent5);font-weight:700;font-size:15px;text-align:center;}
+.data-table td.hi{color:var(--accent);}
+.data-table td.warn-cell{color:var(--accent3);}
+
+/* TRUTH TABLE */
+.truth-table{width:auto;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:13px;margin:14px 0;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+.truth-table th{background:var(--bg3);color:var(--muted);padding:8px 18px;text-align:center;border-bottom:1px solid var(--border);font-family:'Space Mono',monospace;font-size:11px;}
+.truth-table td{padding:8px 18px;text-align:center;border-bottom:1px solid rgba(48,54,61,.5);}
+.truth-table tr:last-child td{border-bottom:none;}
+.truth-table .t{color:var(--accent2);font-weight:700;}
+.truth-table .f{color:var(--accent3);font-weight:700;}
+
+/* QUIZ */
+.quiz-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:14px;}
+.quiz-q{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--text);line-height:1.6;}
+.qnum{display:inline-block;background:var(--accent5);color:var(--bg);font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:1px 8px;border-radius:3px;margin-right:8px;}
+.quiz-options{display:flex;flex-direction:column;gap:8px;}
+.quiz-option{padding:9px 14px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);font-size:13px;cursor:pointer;transition:all .15s;font-family:'JetBrains Mono',monospace;text-align:left;}
+.quiz-option:hover{border-color:var(--accent5);color:var(--accent5);}
+.quiz-option.correct{background:rgba(63,185,80,.15);border-color:var(--accent2);color:var(--accent2);}
+.quiz-option.wrong{background:rgba(247,129,102,.1);border-color:var(--accent3);color:var(--accent3);}
+.quiz-explain{display:none;margin-top:14px;padding:12px 16px;background:rgba(63,185,80,.07);border-radius:6px;border-left:3px solid var(--accent2);font-size:13px;color:#c9d1d9;line-height:1.7;}
+.quiz-explain.show{display:block;}
+
+/* TWO-COL / THREE-COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:16px 0;}
+
+/* SUBSEC */
+.subsec{margin:28px 0 12px;}
+.subsec h3{font-size:16px;font-weight:700;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.tag{font-size:10px;font-family:'Space Mono',monospace;background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:2px 8px;border-radius:3px;}
+
+/* BADGE */
+.badge{display:inline-block;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;}
+.badge.lab{background:rgba(255,166,87,.2);color:var(--accent5);border:1px solid rgba(255,166,87,.3);}
+.badge.warn{background:rgba(247,129,102,.2);color:var(--accent3);border:1px solid rgba(247,129,102,.3);}
+
+/* TYPE CHAIN */
+.type-chain{display:flex;align-items:center;flex-wrap:wrap;gap:4px;margin:14px 0;padding:14px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);}
+.tbox{padding:4px 10px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.3);color:var(--accent);}
+.tc-arrow{color:var(--accent5);font-size:16px;padding:0 2px;}
+
+/* EXPR VIZ */
+.expr-viz{display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;margin:12px 0;flex-wrap:wrap;}
+.expr-viz .box{padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg3);}
+.expr-viz .box.cond{border-color:var(--accent);color:var(--accent);background:rgba(88,166,255,.08);}
+.expr-viz .box.val1{border-color:var(--accent2);color:var(--accent2);background:rgba(63,185,80,.08);}
+.expr-viz .box.val2{border-color:var(--accent3);color:var(--accent3);background:rgba(247,129,102,.08);}
+.expr-viz .box.op{border-color:var(--accent5);color:var(--accent5);background:rgba(255,166,87,.08);}
+
+/* DEMO BOX */
+.demo-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:13px;}
+.demo-box .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-family:'Space Mono',monospace;}
+
+/* INLINE CODE */
+.ic{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--bg3);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--accent5);}
+
+/* PART DIVIDER */
+.part-divider{background:linear-gradient(90deg,var(--bg3),transparent);border-left:3px solid var(--accent4);border-radius:4px;padding:10px 18px;margin:32px 0 24px;font-family:'Space Mono',monospace;font-size:13px;color:var(--accent4);font-weight:700;}
+
+/* PREC TABLE */
+.prec-table{width:100%;border-collapse:collapse;margin:16px 0;}
+.prec-table td{padding:9px 12px;border:1px solid var(--border);font-size:13px;vertical-align:middle;}
+.prec-level{background:var(--bg3);color:var(--accent5);font-weight:700;font-family:'Space Mono',monospace;text-align:center;width:55px;}
+.prec-ops{background:var(--bg2);font-family:'JetBrains Mono',monospace;color:var(--accent);}
+.prec-assoc{background:var(--bg2);color:var(--muted);font-size:12px;width:130px;}
+.prec-desc{background:var(--bg2);color:#c9d1d9;font-size:13px;font-family:'Noto Sans KR',sans-serif;}
+.prec-note{background:var(--bg2);color:var(--accent4);font-size:12px;font-family:'Noto Sans KR',sans-serif;}
+
+/* BIT VISUAL */
+.bit-row{display:flex;align-items:center;gap:4px;margin:8px 0;flex-wrap:wrap;}
+.bit-cell{width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;border:1px solid var(--border);}
+.bit-cell.b0{background:var(--bg3);color:var(--muted);}
+.bit-cell.b1{background:rgba(88,166,255,.18);border-color:rgba(88,166,255,.5);color:var(--accent);}
+.bit-cell.shifted{background:rgba(255,166,87,.15);border-color:rgba(255,166,87,.4);color:var(--accent5);}
+.bit-lbl{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;min-width:55px;}
+</style>
+</head>
+<body>
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="course">C Programming</div>
+    <div class="title">수식과 연산자</div>
+    <div class="lec-num">LECTURE 03</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Part I — 기초 연산자</div>
+    <a class="nav-item" href="#intro"><span class="dot"></span>수식과 연산 개념</a>
+    <a class="nav-item" href="#arithmetic"><span class="dot"></span>산술 연산자</a>
+    <a class="nav-item" href="#incr"><span class="dot"></span>증감 연산자</a>
+    <a class="nav-item" href="#assign"><span class="dot"></span>대입 연산자</a>
+    <a class="nav-item" href="#prec1"><span class="dot"></span>우선순위와 결합규칙</a>
+    <a class="nav-item" href="#typeconv"><span class="dot"></span>형 변환</a>
+    <a class="nav-item" href="#quiz1"><span class="dot"></span>Quiz — Part I</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Part II — 논리·비트</div>
+    <a class="nav-item" href="#relational"><span class="dot"></span>관계/동치 연산자</a>
+    <a class="nav-item" href="#logical"><span class="dot"></span>논리 연산자</a>
+    <a class="nav-item" href="#conditional"><span class="dot"></span>조건/콤마 연산자</a>
+    <a class="nav-item" href="#bitwise"><span class="dot"></span>비트 연산자</a>
+    <a class="nav-item" href="#prec2"><span class="dot"></span>전체 우선순위 표</a>
+    <a class="nav-item" href="#quiz2"><span class="dot"></span>Quiz — Part II</a>
+  </div>
+</nav>
+
+<main class="main">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">Lecture 03</div>
+  <h1>Expressions &amp; <span>Operators</span></h1>
+  <p class="hero-sub">수식과 연산자 — 산술·증감·대입·관계·논리·비트 연산자 완전 정리</p>
+  <div class="hero-pills">
+    <span class="hero-pill">산술 Arithmetic</span>
+    <span class="hero-pill">증감 Increment</span>
+    <span class="hero-pill">대입 Assignment</span>
+    <span class="hero-pill">관계 Relational</span>
+    <span class="hero-pill">논리 Logical</span>
+    <span class="hero-pill">비트 Bitwise</span>
+    <span class="hero-pill">조건 Conditional</span>
+    <span class="hero-pill">형변환 Type Conversion</span>
+  </div>
+</div>
+
+<!-- ══ 01. 수식과 연산 개념 ══ -->
+<section class="section" id="intro">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>수식 (Expression) 과 연산 (Operation)</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="concept-card highlight">
+      <h3>🧮 수식 (Expression)</h3>
+      <p><strong>연산자(Operator)</strong>와 <strong>피연산자(Operand)</strong>로 구성된, <strong>값(value)을 가지는</strong> 구성 단위</p>
+      <ul>
+        <li><strong>연산자</strong>: 어떤 연산인지 나타내는 기호 (<span class="ic">+  -  *  /  %</span>)</li>
+        <li><strong>피연산자</strong>: 연산의 대상 — 변수, 상수, 또는 또 다른 수식</li>
+        <li>단일 변수, 단일 상수도 수식으로 간주</li>
+      </ul>
+    </div>
+    <div class="concept-card highlight">
+      <h3>⚙️ 연산 (Operation)</h3>
+      <p>주어진 수식을 계산하여 <strong>값(value)을 얻어내는 과정</strong></p>
+      <div class="demo-box">
+        <div class="label">수식 구조</div>
+        <span style="color:var(--accent3)">x</span>
+        <span style="color:var(--accent5);font-size:18px;font-weight:700"> + </span>
+        <span style="color:var(--accent2)">y</span>
+        &nbsp;&nbsp;<span style="color:var(--muted)">→ 피연산자 + 연산자 + 피연산자</span>
+      </div>
+      <div class="callout tip" style="margin-top:8px">
+        <div class="callout-title">💡 핵심</div>
+        모든 수식은 결과 값을 가짐 ⟺ 값을 가지는 것은 모두 수식!
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>연산자 분류 <span class="tag">Classification</span></h3></div>
+  <div class="two-col">
+    <div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:8px">① 기능에 따른 분류</p>
+      <table class="data-table">
+        <tr><th>기능</th><th style="text-align:center">기호</th></tr>
+        <tr><td class="desc">증감</td><td class="op-cell">++ &nbsp;--</td></tr>
+        <tr><td class="desc">산술</td><td class="op-cell">+ &nbsp;- &nbsp;* &nbsp;/ &nbsp;%</td></tr>
+        <tr><td class="desc">대입</td><td class="op-cell">= &nbsp;+= &nbsp;-= ...</td></tr>
+        <tr><td class="desc">관계/동치</td><td class="op-cell">&gt; &lt; &gt;= &lt;= == !=</td></tr>
+        <tr><td class="desc">논리</td><td class="op-cell">! &nbsp;&amp;&amp; &nbsp;||</td></tr>
+        <tr><td class="desc">비트</td><td class="op-cell">~ &amp; | ^ &lt;&lt; &gt;&gt;</td></tr>
+        <tr><td class="desc">조건</td><td class="op-cell">? :</td></tr>
+      </table>
+    </div>
+    <div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:8px">② 피연산자 수에 따른 분류</p>
+      <table class="data-table">
+        <tr><th>분류</th><th>피연산자</th><th>예시</th></tr>
+        <tr>
+          <td class="hi">단항 Unary</td><td>1개</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--accent4)">++x, !a, ~b</td>
+        </tr>
+        <tr>
+          <td class="hi">이항 Binary</td><td>2개</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--accent4)">x+y, a&amp;&amp;b</td>
+        </tr>
+        <tr>
+          <td class="hi">삼항 Ternary</td><td>3개</td>
+          <td style="font-family:'JetBrains Mono',monospace;color:var(--accent4)">a?b:c</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</section>
+<!-- ══ 02. 산술 연산자 ══ -->
+<section class="section" id="arithmetic">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>산술 연산자 (Arithmetic Operator)</h2>
+  </div>
+
+  <table class="data-table">
+    <tr><th>이름</th><th style="text-align:center">기호</th><th>사용 예</th><th>결과</th><th>설명</th></tr>
+    <tr><td class="desc">덧셈 Addition</td><td class="op-cell">+</td><td><span class="ic">7 + 4</span></td><td class="result">11</td><td class="desc">두 값의 합</td></tr>
+    <tr><td class="desc">뺄셈 Subtraction</td><td class="op-cell">-</td><td><span class="ic">7 - 4</span></td><td class="result">3</td><td class="desc">두 값의 차</td></tr>
+    <tr><td class="desc">곱셈 Multiplication</td><td class="op-cell">*</td><td><span class="ic">7 * 4</span></td><td class="result">28</td><td class="desc">두 값의 곱</td></tr>
+    <tr><td class="desc">나눗셈 Division</td><td class="op-cell">/</td><td><span class="ic">7 / 4</span></td><td class="result">1</td><td class="desc">정수÷정수 → 몫만 (소수점 버림)</td></tr>
+    <tr><td class="desc">나머지 Modulus</td><td class="op-cell">%</td><td><span class="ic">7 % 4</span></td><td class="result">3</td><td class="desc">정수에만 적용 가능</td></tr>
+  </table>
+
+  <div class="two-col">
+    <div class="callout warn">
+      <div class="callout-title">⚠️ 정수 나눗셈 주의</div>
+      <code style="font-family:'JetBrains Mono',monospace">7 / 4 = <strong style="color:var(--accent3)">1</strong></code> &nbsp;(Python은 1.75)<br>
+      부호가 다를 때: 몫은 음수, 나머지는 <strong>나누어지는 수의 부호</strong>를 따름<br>
+      <code style="font-family:'JetBrains Mono',monospace">7/-4 = -1 &nbsp;&nbsp;-7/4 = -1</code>
+    </div>
+    <div class="callout info">
+      <div class="callout-title">ℹ️ C언어 규칙</div>
+      연산자 생략 불가: <code style="font-family:'JetBrains Mono',monospace">2x</code> ❌ → <code style="font-family:'JetBrains Mono',monospace">2*x</code> ✓<br>
+      거듭제곱 연산자 없음: <code style="font-family:'JetBrains Mono',monospace">x*x</code> 사용<br>
+      <code style="font-family:'JetBrains Mono',monospace">%</code>는 실수 타입에 사용 불가 (컴파일 에러)
+    </div>
+  </div>
+
+  <div class="subsec"><h3>LAB: arithmetic1.c <span class="badge lab">LAB</span></h3></div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">arithmetic1.c</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    </div>
+    <div class="code-body"><pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+    <span class="ty">int</span> x, y, result;
+    <span class="fn">printf</span>(<span class="st">"두 개의 정수를 입력하시오: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d %d"</span>, &amp;x, &amp;y);
+    result = x + y;  <span class="fn">printf</span>(<span class="st">"%d + %d = %d\n"</span>, x, y, result);
+    result = x - y;  <span class="fn">printf</span>(<span class="st">"%d - %d = %d\n"</span>, x, y, result);
+    result = x * y;  <span class="fn">printf</span>(<span class="st">"%d * %d = %d\n"</span>, x, y, result);
+    result = x / y;  <span class="fn">printf</span>(<span class="st">"%d / %d = %d\n"</span>, x, y, result); <span class="cm">// 정수 몫</span>
+    result = x % y;  <span class="fn">printf</span>(<span class="st">"%d %% %d = %d\n"</span>, x, y, result); <span class="cm">// %% 로 % 출력</span>
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre></div>
+  </div>
+
+  <div class="subsec"><h3>LAB: arithmetic2.c — 실수형 연산 <span class="badge lab">LAB</span></h3></div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">arithmetic2.c</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    </div>
+    <div class="code-body"><pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+    <span class="ty">double</span> x, y, result;
+    <span class="fn">printf</span>(<span class="st">"두 개의 실수를 입력하시오: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%lf %lf"</span>, &amp;x, &amp;y);
+    result = x / y;  <span class="cm">// 실수 나눗셈: 7.0/4.0 = 1.75</span>
+    <span class="fn">printf</span>(<span class="st">"%f / %f = %f\n"</span>, x, y, result);
+    <span class="kw">return</span> <span class="nm">0</span>;
+}
+<span class="cm">/* 실수 피연산자에는 % 연산을 정의하지 않음 → 컴파일 에러 */</span></pre></div>
+  </div>
+
+  <div class="subsec"><h3>LAB: modulo.c — 나머지 연산자 활용 <span class="badge lab">LAB</span></h3></div>
+  <div class="callout info">
+    <div class="callout-title">💡 % 연산 활용</div>
+    짝수/홀수 판별: <code style="font-family:'JetBrains Mono',monospace">x % 2</code> &nbsp;|&nbsp;
+    배수 판별: <code style="font-family:'JetBrains Mono',monospace">x % 3 == 0</code> &nbsp;|&nbsp;
+    단위 변환 (초 → 분:초 등)
+  </div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">modulo.c</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    </div>
+    <div class="code-body"><pre><span class="pp">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="pp">#define</span> <span class="nm">SEC_PER_MINUTE</span>  <span class="nm">60</span>
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>) {
+    <span class="ty">int</span> input, minute, second;
+    <span class="fn">printf</span>(<span class="st">"초를 입력하시오: "</span>);
+    <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;input);
+    minute = input / <span class="nm">SEC_PER_MINUTE</span>;   <span class="cm">// 몇 분</span>
+    second = input % <span class="nm">SEC_PER_MINUTE</span>;   <span class="cm">// 몇 초</span>
+    <span class="fn">printf</span>(<span class="st">"%d초는 %d분 %d초입니다.\n"</span>, input, minute, second);
+    <span class="kw">return</span> <span class="nm">0</span>;
+}</pre></div>
+  </div>
+</section>
+
+<!-- ══ 03. 증감 연산자 ══ -->
+<section class="section" id="incr">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>증감 연산자 (Increment / Decrement)</h2>
+  </div>
+
+  <div class="concept-card highlight">
+    <h3>🔢 증감 연산자란?</h3>
+    <p>변수의 값을 <strong>1만큼만 증가 또는 감소</strong>시키는 단항(unary) 연산자. 주로 반복문에서 카운터 제어에 사용.</p>
+    <ul>
+      <li><strong>전위(Prefix)</strong>와 <strong>후위(Postfix)</strong> 두 가지 형태 존재</li>
+      <li>단독 사용 시: <span class="ic">++x;</span> ≡ <span class="ic">x++;</span> ≡ <span class="ic">x = x + 1;</span></li>
+      <li>다른 연산자와 함께 쓰일 때 동작이 달라짐!</li>
+    </ul>
+  </div>
+
+  <table class="data-table">
+    <tr><th>형태</th><th style="text-align:center">기호</th><th>실행 방식</th><th>예시 (x=10일 때)</th></tr>
+    <tr>
+      <td style="color:var(--accent);font-weight:700">전위 Prefix</td>
+      <td class="op-cell">++x</td>
+      <td class="desc">먼저 1 증가 → 나머지 식 진행</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent2)">y=++x; <span style="color:var(--muted)">// x=11, y=11</span></td>
+    </tr>
+    <tr>
+      <td style="color:var(--accent);font-weight:700">전위 Prefix</td>
+      <td class="op-cell">--x</td>
+      <td class="desc">먼저 1 감소 → 나머지 식 진행</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent2)">y=--x; <span style="color:var(--muted)">// x=9, y=9</span></td>
+    </tr>
+    <tr>
+      <td style="color:var(--accent5);font-weight:700">후위 Postfix</td>
+      <td class="op-cell">x++</td>
+      <td class="desc">먼저 대입 → 나중에 1 증가</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent5)">y=x++; <span style="color:var(--muted)">// y=10, x=11</span></td>
+    </tr>
+    <tr>
+      <td style="color:var(--accent5);font-weight:700">후위 Postfix</td>
+      <td class="op-cell">x--</td>
+      <td class="desc">먼저 대입 → 나중에 1 감소</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent5)">y=x--; <span style="color:var(--muted)">// y=10, x=9</span></td>
+    </tr>
+  </table>
+
+  <div class="two-col">
+    <div class="demo-box">
+      <div class="label">전위 증감 — y = ++x (x=10)</div>
+      <p style="font-size:13px;color:var(--text);margin:8px 0">① x를 11로 증가 &nbsp;② y ← 11 대입</p>
+      <p style="font-size:12px;color:var(--accent2)">→ 증가된 x 값이 y에 대입된다</p>
+    </div>
+    <div class="demo-box">
+      <div class="label">후위 증감 — y = x++ (x=10)</div>
+      <p style="font-size:13px;color:var(--text);margin:8px 0">① y ← 10 대입 &nbsp;② x를 11로 증가</p>
+      <p style="font-size:12px;color:var(--accent5)">→ 기존 x 값이 먼저 y에 대입된다</p>
+    </div>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-title">⚠️ 증감 연산자 주의사항</div>
+    <strong>변수에만 사용 가능!</strong> &nbsp;
+    <code style="font-family:'JetBrains Mono',monospace">10++</code> ❌ &nbsp;
+    <code style="font-family:'JetBrains Mono',monospace">(x+1)++</code> ❌<br><br>
+    후위 증감은 다른 연산자와 함께 쓰일 때 <strong>가장 마지막에 계산</strong>됨:<br>
+    <code style="font-family:'JetBrains Mono',monospace">y = (1 + x++) + 10; &nbsp;<span style="color:var(--comment)">// 괄호가 있어도 x 증가는 맨 나중</span></code><br><br>
+    같은 수식에서 같은 변수를 두 번 이상 쓸 때 증감 연산자 사용 피할 것 — 컴파일러별 결과 다를 수 있음.
+  </div>
+</section>
+
+<!-- ══ 04. 대입 연산자 ══ -->
+<section class="section" id="assign">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>대입 연산자 (Assignment Operator)</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="concept-card">
+      <h3>📝 기본 형식</h3>
+      <div class="demo-box">
+        <div class="label">문법</div>
+        <span style="color:var(--type);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700">variable</span>
+        <span style="color:var(--accent3);font-size:18px;font-weight:700"> = </span>
+        <span style="color:var(--string);font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700">expression</span>
+      </div>
+      <p style="margin-top:10px">좌변 (l-value)은 반드시 <strong>변수</strong>여야 함!</p>
+      <div class="demo-box" style="margin-top:8px">
+        <div class="label">올바른 예 ✓</div>
+        <code style="font-family:'JetBrains Mono',monospace;color:var(--accent2)">a = (b=2) + (c=3);<br>y = x = 3; &nbsp;<span style="color:var(--muted)">// 우결합</span></code>
+      </div>
+      <div class="demo-box" style="margin-top:8px">
+        <div class="label">잘못된 예 ❌</div>
+        <code style="font-family:'JetBrains Mono',monospace;color:var(--accent3)">100 = x + y;<br>++x = 10;</code>
+      </div>
+    </div>
+    <div class="concept-card">
+      <h3>⚡ 복합 대입 연산자</h3>
+      <table class="data-table" style="margin-top:10px">
+        <tr><th>복합 대입</th><th>동일 표현</th></tr>
+        <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--accent5)">y += expr</td><td style="font-family:'JetBrains Mono',monospace;color:var(--muted)">y = y + (expr)</td></tr>
+        <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--accent5)">y -= expr</td><td style="font-family:'JetBrains Mono',monospace;color:var(--muted)">y = y - (expr)</td></tr>
+        <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--accent5)">y *= expr</td><td style="font-family:'JetBrains Mono',monospace;color:var(--muted)">y = y * (expr)</td></tr>
+        <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--accent5)">y /= expr</td><td style="font-family:'JetBrains Mono',monospace;color:var(--muted)">y = y / (expr)</td></tr>
+        <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--accent5)">y %= expr</td><td style="font-family:'JetBrains Mono',monospace;color:var(--muted)">y = y % (expr)</td></tr>
+      </table>
+      <p style="font-size:12px;color:var(--muted);margin-top:6px">기타: &gt;&gt;= &nbsp;&lt;&lt;= &nbsp;&amp;= &nbsp;^= &nbsp;|=</p>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">복합 대입 연산자 예제</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    </div>
+    <div class="code-body"><pre><span class="ty">int</span> x <span class="op">=</span> <span class="nm">10</span>, y <span class="op">=</span> <span class="nm">10</span>, z <span class="op">=</span> <span class="nm">33</span>;
+x <span class="op">+=</span> <span class="nm">1</span>;          <span class="cm">// x = x + 1   → x = 11</span>
+y <span class="op">*=</span> <span class="nm">2</span>;          <span class="cm">// y = y * 2   → y = 20</span>
+z <span class="op">%=</span> <span class="nm">10</span> <span class="op">+</span> <span class="nm">20</span>;  <span class="cm">// z = z % 30  → z = 3</span></pre></div>
+  </div>
+  <div class="callout tip">
+    <div class="callout-title">💡 y *= x + 3 의 해석</div>
+    <code style="font-family:'JetBrains Mono',monospace">y *= x + 3</code> &nbsp;→&nbsp;
+    <code style="font-family:'JetBrains Mono',monospace">y = y * (x + 3)</code> &nbsp;
+    <span style="color:var(--accent3)">(y = y*x + 3 이 아님!)</span>
+  </div>
+</section>
+<!-- ══ 05. 우선순위와 결합규칙 ══ -->
+<section class="section" id="prec1">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>우선순위와 결합규칙 (Precedence &amp; Associativity)</h2>
+  </div>
+
+  <div class="concept-card">
+    <h3>📊 Precedence &amp; Associativity → 연산 순서(evaluation order) 결정</h3>
+    <ul>
+      <li><strong>Precedence (우선순위)</strong>: 우선순위가 높은 연산자부터 먼저 적용</li>
+      <li><strong>Associativity (결합규칙)</strong>: 우선순위가 같은 연산자가 나열되어 있으면 결합규칙에 따라 순서 결정</li>
+    </ul>
+  </div>
+
+  <table class="prec-table">
+    <tr>
+      <td class="prec-level" rowspan="1" style="color:var(--accent2);font-size:10px">높음↑</td>
+      <td class="prec-ops">( )</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc">괄호</td>
+      <td class="prec-note"></td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops">+(unary) &nbsp;-(unary) &nbsp;++ &nbsp;-- &nbsp;sizeof &nbsp;(type)</td>
+      <td class="prec-assoc" style="color:var(--accent5)">right to left</td>
+      <td class="prec-desc">단항 연산자</td>
+      <td class="prec-note"></td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops">* &nbsp;/ &nbsp;%</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc">곱셈류</td>
+      <td class="prec-note"></td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops">+ &nbsp;-</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc">덧셈류</td>
+      <td class="prec-note"></td>
+    </tr>
+    <tr>
+      <td class="prec-level" style="color:var(--accent3);font-size:10px">낮음↓</td>
+      <td class="prec-ops">= &nbsp;+= &nbsp;-= &nbsp;*= &nbsp;/= &nbsp;%=</td>
+      <td class="prec-assoc" style="color:var(--accent5)">right to left</td>
+      <td class="prec-desc">대입 연산자</td>
+      <td class="prec-note"></td>
+    </tr>
+  </table>
+
+  <div class="callout info">
+    <div class="callout-title">📝 우선순위 예시</div>
+    <code style="font-family:'JetBrains Mono',monospace">1+2*3 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↔ &nbsp;1+(2*3)</code><br>
+    <code style="font-family:'JetBrains Mono',monospace">-a*b-c &nbsp;&nbsp;&nbsp;&nbsp;↔ &nbsp;((-a)*b)-c</code><br>
+    <code style="font-family:'JetBrains Mono',monospace">-++--x &nbsp;&nbsp;&nbsp;&nbsp;↔ &nbsp;-(++(--x)) &nbsp;</code><span style="color:var(--muted);font-size:12px">(right-to-left)</span>
+  </div>
+</section>
+
+<!-- ══ 06. 형 변환 ══ -->
+<section class="section" id="typeconv">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>형 변환 (Type Conversion)</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="concept-card">
+      <h3>🤖 ① 묵시적(자동) 변환</h3>
+      <p>컴파일러가 변환 수행</p>
+      <ul>
+        <li><strong>정수적 승격 (Integral Promotion)</strong></li>
+        <li><strong>산술/대입 연산에 의한 변환 (Arithmetic Conversion)</strong></li>
+      </ul>
+    </div>
+    <div class="concept-card">
+      <h3>✍️ ② 명시적 변환 (Type Casting)</h3>
+      <p>프로그래머가 소스코드에 명시</p>
+      <ul>
+        <li>용법: <span class="ic">(type) expr</span></li>
+        <li>예: <span class="ic">(double) num1 / num2</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>묵시적 변환 ① — Integral Promotion <span class="tag">정수적 승격</span></h3></div>
+  <div class="concept-card">
+    <h3>📈 Integral Promotion</h3>
+    <p><span class="ic">int</span> 타입보다 작은 범위를 가진 정수형 타입 데이터는 수식 연산 시 <strong>자동으로 int 타입으로 변환</strong>됨</p>
+    <div class="type-chain">
+      <span class="tbox" style="background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.3);color:var(--accent2)">char</span>
+      <span class="tc-arrow">→</span>
+      <span class="tbox" style="background:rgba(63,185,80,.1);border-color:rgba(63,185,80,.3);color:var(--accent2)">short</span>
+      <span class="tc-arrow">→</span>
+      <span class="tbox">int</span>
+      <span style="color:var(--muted);font-size:12px;margin-left:8px">(자동 승격)</span>
+    </div>
+    <div class="callout tip" style="margin-top:8px">
+      <div class="callout-title">💡 Tip</div>
+      가능하다면 수식에 쓰이는 피연산자의 타입은 일치시키는 게 제일 좋음.
+    </div>
+  </div>
+
+  <div class="subsec"><h3>묵시적 변환 ② — 산술/대입 연산 자동 변환 <span class="tag">Arithmetic Conversion</span></h3></div>
+  <div class="concept-card">
+    <h3>🔀 자동 타입 변환 규칙</h3>
+    <p>두 피연산자 타입이 다를 때 <strong>데이터 손실을 최소화하는 방향</strong>으로 자동 변환</p>
+    <div class="type-chain">
+      <span class="tbox">int</span><span class="tc-arrow">→</span>
+      <span class="tbox">unsigned int</span><span class="tc-arrow">→</span>
+      <span class="tbox">long</span><span class="tc-arrow">→</span>
+      <span class="tbox">unsigned long</span><span class="tc-arrow">→</span>
+      <span class="tbox" style="color:var(--accent5);border-color:rgba(255,166,87,.4)">float</span><span class="tc-arrow">→</span>
+      <span class="tbox" style="color:var(--accent5);border-color:rgba(255,166,87,.4)">double</span><span class="tc-arrow">→</span>
+      <span class="tbox" style="color:var(--accent5);border-color:rgba(255,166,87,.4)">long double</span>
+    </div>
+    <div class="two-col" style="margin-top:12px">
+      <div class="demo-box">
+        <div class="label">Promotion (확장)</div>
+        <code style="font-family:'JetBrains Mono',monospace"><span class="ty">double</span> f;<br>f = <span class="nm">10</span>; <span class="cm">// f에는 10.0 저장</span></code>
+      </div>
+      <div class="demo-box">
+        <div class="label">Demotion (축소 → 데이터 손실!)</div>
+        <code style="font-family:'JetBrains Mono',monospace"><span class="ty">int</span> i;<br>i = <span class="nm">3.14</span>; <span class="cm">// i에는 3만 저장</span></code>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>명시적 변환 — Type Casting <span class="tag">Explicit</span></h3></div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">divTest.c — 정수 vs 실수 나눗셈</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    </div>
+    <div class="code-body"><pre><span class="ty">int</span> num1 <span class="op">=</span> <span class="nm">3</span>, num2 <span class="op">=</span> <span class="nm">4</span>;
+<span class="ty">double</span> divResult;
+
+divResult <span class="op">=</span> num1 <span class="op">/</span> num2;            <span class="cm">// 정수 나눗셈 → 0.000000</span>
+<span class="fn">printf</span>(<span class="st">"나눗셈 결과: %f \n"</span>, divResult);
+
+divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span class="op">/</span> num2;  <span class="cm">// 실수 나눗셈 → 0.750000</span>
+<span class="fn">printf</span>(<span class="st">"나눗셈 결과: %f \n"</span>, divResult);</pre></div>
+  </div>
+  <div class="callout warn">
+    <div class="callout-title">⚠️ 잘못된 타입 캐스팅</div>
+    <code style="font-family:'JetBrains Mono',monospace">(double) x = 77</code>
+    &nbsp;→ <code style="font-family:'JetBrains Mono',monospace">((double)x) = 77</code>
+    &nbsp;<strong style="color:var(--accent3)">컴파일 에러!</strong>&nbsp;
+    캐스팅 결과는 r-value이므로 좌변이 될 수 없음.
+  </div>
+
+  <div class="subsec"><h3>자동 변환 타입 예시 (typeConv_s.c) <span class="badge lab">LAB</span></h3></div>
+  <div class="callout info" style="margin-bottom:4px">
+    <div class="callout-title">선언</div>
+    <code style="font-family:'JetBrains Mono',monospace">char c; &nbsp;short s; &nbsp;int i; &nbsp;long l; &nbsp;unsigned u; &nbsp;unsigned long ul; &nbsp;float f; &nbsp;double d; &nbsp;long double ld;</code>
+  </div>
+  <table class="data-table">
+    <tr><th>Expression</th><th>결과 Type</th><th>Expression</th><th>결과 Type</th></tr>
+    <tr><td><code>c - s / i</code></td><td class="result">int</td><td><code>u * 7 - i</code></td><td class="result">unsigned int</td></tr>
+    <tr><td><code>u * 2.0 - i</code></td><td class="result">double</td><td><code>f * 7 - i</code></td><td class="result">float</td></tr>
+    <tr><td><code>c + 3</code></td><td class="result">int</td><td><code>7 * s * ul</code></td><td class="result">unsigned long</td></tr>
+    <tr><td><code>c + 5.0</code></td><td class="result">double</td><td><code>ld + c</code></td><td class="result">long double</td></tr>
+    <tr><td><code>d + s</code></td><td class="result">double</td><td><code>u - ul</code></td><td class="result">unsigned long</td></tr>
+    <tr><td><code>2 * i / l</code></td><td class="result">long</td><td><code>u - l</code></td><td class="result">unsigned long</td></tr>
+  </table>
+</section>
+<!-- ══ QUIZ 1 ══ -->
+<section class="section" id="quiz1">
+  <div class="section-header">
+    <span class="section-num">Q1</span>
+    <h2>Quiz — Part I</h2>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q1</span>다음 중 우선순위가 가장 높은 연산자는?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">① 대입 연산자 =</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">② 전위 증감 연산자 ++x</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">③ 산술 연산자 * / %</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">④ 괄호 연산자 ( )</button>
+    </div>
+    <div class="quiz-explain">✅ <strong>④ 괄호 연산자</strong>가 가장 높은 우선순위입니다.<br>순서: ( ) &gt; 단항(++/--) &gt; * / % &gt; + - &gt; 대입(=)</div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q2</span><code style="font-family:'JetBrains Mono',monospace">int x=10; int y=20;</code> 으로 선언 시 올바른 수식이 <strong>아닌</strong> 것은?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">① x = 10 + y; &nbsp;&nbsp;→ x에 30 저장 ✓</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">② 5 = x + y; &nbsp;&nbsp;→ 잘못된 수식! ❌</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">③ x %= 20; &nbsp;&nbsp;&nbsp;&nbsp;→ x에 10 저장 ✓</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">④ x=y=2; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ x,y 모두 2 저장 ✓</button>
+    </div>
+    <div class="quiz-explain">✅ <strong>② 5 = x + y;</strong> 는 잘못된 수식.<br>대입 연산자 좌변(l-value)은 반드시 <strong>변수</strong>여야 합니다. 상수 5는 l-value가 될 수 없음.</div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q3</span>아래 수식들의 예상 결과 값은? (C 프로그램으로 작성 시)<br>
+      <code style="font-family:'JetBrains Mono',monospace">
+        (a) 1.0 + 1.0 / 2.0 &nbsp;&nbsp;
+        (b) 1.0 + 1 / 2 &nbsp;&nbsp;
+        (c) 1.0 + 1.0 / 2 &nbsp;&nbsp;
+        (d) 1.0 + (double)1/2
+      </code>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">모두 1.5</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">(a) 1.5 &nbsp;&nbsp;(b) 1.0 &nbsp;&nbsp;(c) 1.5 &nbsp;&nbsp;(d) 1.5</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">(a) 1.5 &nbsp;&nbsp;(b) 1.5 &nbsp;&nbsp;(c) 1.0 &nbsp;&nbsp;(d) 1.5</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">모두 1.0</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>(a) 1.5</strong> — double/double = 0.5, 1.0+0.5 = 1.5<br>
+      ✅ <strong>(b) 1.0</strong> — <code>1/2</code>는 정수 나눗셈 = 0, 1.0+0 = 1.0<br>
+      ✅ <strong>(c) 1.5</strong> — <code>1.0/2</code>에서 2가 double로 승격 → 0.5, 1.0+0.5 = 1.5<br>
+      ✅ <strong>(d) 1.5</strong> — <code>(double)1/2</code> = 1.0/2 = 0.5, 1.0+0.5 = 1.5
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q4</span>형 변환에 대한 다음 설명 중 <strong>잘못된 것</strong>을 모두 고르시오.</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">① 형 변환에는 암시적 형 변환과 명시적 형 변환이 있다. ✓</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">② "short + short" 연산 결과는 short 타입이다. ❌</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">③ "float + float" 연산 결과는 double 타입이다. ❌</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">④ "int / int" 연산 결과는 int 타입이다. ✓</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>②③ 이 잘못된 설명</strong><br>
+      ② short + short → Integral Promotion에 의해 <strong>int</strong>로 승격되어 연산<br>
+      ③ float + float → 결과는 <strong>float</strong> (double이 아님)<br>
+      ⑤ 실수→int 명시적 형변환: 소수점 이하 <strong>버림</strong> (반올림 ❌)
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q5</span>아래 수식에서 각 연산이 실행되는 순서를 올바르게 쓰시오.<br>
+      <code style="font-family:'JetBrains Mono',monospace;font-size:15px">z = x + y * z / 8 % 2 - 3;</code>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">z= → +x → *y → /8 → %2 → -3</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">① y*z → ÷8 → %2 → x+… → …-3 → z=</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">x+y → *z → /8 → %2 → -3 → z=</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ 우선순위: <code>* / %</code> &gt; <code>+ -</code> &gt; <code>=</code><br>
+      ① <code>y*z</code> &nbsp;② <code>(y*z)/8</code> &nbsp;③ <code>((y*z)/8)%2</code> &nbsp;④ <code>x + …</code> &nbsp;⑤ <code>… - 3</code> &nbsp;⑥ <code>z = …</code>
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q6</span>아래 코드들의 실행 결과를 각각 쓰시오.<br>
+      <code style="font-family:'JetBrains Mono',monospace">
+        (a) int i=5; i=i/3; printf("%d",i);<br>
+        (b) int x=2*9/3+9; printf("%d",x);<br>
+        (c) int x=-5%2*3/2; printf("%d",x);
+      </code>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">(a)1 &nbsp;(b)14 &nbsp;(c)-4</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">(a)1 &nbsp;(b)15 &nbsp;(c)-1</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">(a)2 &nbsp;(b)15 &nbsp;(c)-3</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ (a) <code>5/3 = 1</code><br>
+      ✅ (b) <code>2*9=18, 18/3=6, 6+9=15</code><br>
+      ✅ (c) <code>-5%2 = -1</code> (나머지는 나누어지는 수의 부호 따름), <code>-1*3 = -3</code>, <code>-3/2 = -1</code>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ PART II ══════════════ -->
+<div class="part-divider">▶ Part II — 관계 · 동치 · 논리 · 비트 연산자</div>
+
+<!-- ══ 07. 관계/동치 연산자 ══ -->
+<section class="section" id="relational">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2>관계 / 동치 연산자 (Relational / Equality)</h2>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-title">📋 배경 — 프로그램 실행 흐름 (Flow of Execution)</div>
+    문장들은 일반적으로 <strong>소스 코드에 명시된 순서대로 순차 실행</strong>. 선택(if/switch)이나 반복(while/for)에 필요한 <strong>"조건식"</strong>을 표현하기 위해 관계·논리 연산자가 활용됨.
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="subsec"><h3>관계 연산자 (Relational)</h3></div>
+      <table class="truth-table">
+        <tr><th>x - y</th><th>x &lt; y</th><th>x &gt; y</th><th>x &lt;= y</th><th>x &gt;= y</th></tr>
+        <tr><td>양수</td><td class="f">0</td><td class="t">1</td><td class="f">0</td><td class="t">1</td></tr>
+        <tr><td>0</td><td class="f">0</td><td class="f">0</td><td class="t">1</td><td class="t">1</td></tr>
+        <tr><td>음수</td><td class="t">1</td><td class="f">0</td><td class="t">1</td><td class="f">0</td></tr>
+      </table>
+      <div class="callout info" style="margin-top:8px;font-size:13px">
+        <div class="callout-title">💡 하드웨어 구현</div>
+        <code>x&lt;y</code>의 처리는 <code>x-y</code> 연산 후 결과를 0과 비교하는 방식 (CPU flags register)
+      </div>
+    </div>
+    <div>
+      <div class="subsec"><h3>동치 연산자 (Equality)</h3></div>
+      <table class="truth-table">
+        <tr><th>expr1-expr2</th><th>expr1 == expr2</th><th>expr1 != expr2</th></tr>
+        <tr><td>zero (같음)</td><td class="t">1</td><td class="f">0</td></tr>
+        <tr><td>nonzero (다름)</td><td class="f">0</td><td class="t">1</td></tr>
+      </table>
+      <div class="callout warn" style="margin-top:8px">
+        <div class="callout-title">⚠️ 절대 혼동 금지!</div>
+        <code style="font-family:'JetBrains Mono',monospace">x == y</code> &nbsp;동치 비교 (값 반환)<br>
+        <code style="font-family:'JetBrains Mono',monospace">x = y</code> &nbsp;&nbsp;대입 연산 (y를 x에 저장)<br>
+        <span style="color:var(--accent3)">이 두 수식은 완전히 다름!</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>관계 연산자 활용 예시</h3></div>
+  <table class="data-table">
+    <tr><th colspan="3">char c='w'; int i=1,j=2,k=-7; double x=7e+33,y=0.001;</th></tr>
+    <tr><th>Expression</th><th>Equivalent expression</th><th>Value</th></tr>
+    <tr><td><code>'a' + 1 &lt; c</code></td><td><code>('a' + 1) &lt; c</code></td><td class="result">1 (T)</td></tr>
+    <tr><td><code>-i - 5*j &gt;= k+1</code></td><td><code>((-i)-(5*j)) &gt;= (k+1)</code></td><td class="result">1 (T)</td></tr>
+    <tr><td><code>3 &lt; j &lt; 5</code></td><td><code>(3 &lt; j) &lt; 5 &nbsp;<span style="color:var(--comment)">// 주의!</span></code></td><td class="result">1 (T)</td></tr>
+    <tr><td><code>x &lt; x + y</code></td><td><code>x &lt; (x + y)</code></td><td class="warn-cell">부동소수점 오차 주의</td></tr>
+  </table>
+</section>
+<!-- ══ 08. 논리 연산자 ══ -->
+<section class="section" id="logical">
+  <div class="section-header">
+    <span class="section-num">08</span>
+    <h2>논리 연산자 (Logical Operator)</h2>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-title">ℹ️ C언어에서의 True / False</div>
+    <strong>참(True)</strong> = "0이 아닌 값" (연산 결과는 정수값 1로 출력)<br>
+    <strong>거짓(False)</strong> = 0 &nbsp;— 여기에는 <code style="font-family:'JetBrains Mono',monospace">0</code>, <code style="font-family:'JetBrains Mono',monospace">0.0</code>, <code style="font-family:'JetBrains Mono',monospace">'\0'</code>(널 문자), NULL 포인터 값 포함
+  </div>
+
+  <div class="three-col">
+    <div>
+      <div class="subsec"><h3>NOT ( ! ) 단항</h3></div>
+      <table class="truth-table">
+        <tr><th>expr</th><th>!expr</th></tr>
+        <tr><td>zero</td><td class="t">1</td></tr>
+        <tr><td>nonzero</td><td class="f">0</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="subsec"><h3>AND ( &amp;&amp; ) 이항</h3></div>
+      <table class="truth-table">
+        <tr><th>A</th><th>B</th><th>A &amp;&amp; B</th></tr>
+        <tr><td>zero</td><td>zero</td><td class="f">0</td></tr>
+        <tr><td>zero</td><td>nonzero</td><td class="f">0</td></tr>
+        <tr><td>nonzero</td><td>zero</td><td class="f">0</td></tr>
+        <tr><td>nonzero</td><td>nonzero</td><td class="t">1</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="subsec"><h3>OR ( || ) 이항</h3></div>
+      <table class="truth-table">
+        <tr><th>A</th><th>B</th><th>A || B</th></tr>
+        <tr><td>zero</td><td>zero</td><td class="f">0</td></tr>
+        <tr><td>zero</td><td>nonzero</td><td class="t">1</td></tr>
+        <tr><td>nonzero</td><td>zero</td><td class="t">1</td></tr>
+        <tr><td>nonzero</td><td>nonzero</td><td class="t">1</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>단축 계산 (Short-Circuit Evaluation) <span class="tag">⚡ 중요!</span></h3></div>
+  <div class="concept-card highlight">
+    <h3>⚡ Short-Circuit Evaluation</h3>
+    <p>결과가 첫 번째 수식에서 판가름 나면, 논리 연산자로 연결된 <strong>다음 수식을 실행하지 않음!</strong></p>
+    <div class="two-col" style="margin-top:14px">
+      <div class="demo-box">
+        <div class="label">&amp;&amp; 단축 계산</div>
+        <code style="font-family:'JetBrains Mono',monospace">
+          <span style="color:var(--accent3)">( 2 &gt; 3 )</span> &amp;&amp;
+          <span style="color:var(--muted)">( ++x &lt; 5 )</span>
+        </code>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px">첫 항이 거짓(0) → ++x 실행 안 됨!</p>
+      </div>
+      <div class="demo-box">
+        <div class="label">|| 단축 계산</div>
+        <code style="font-family:'JetBrains Mono',monospace">
+          <span style="color:var(--accent2)">( 3 &gt; 2 )</span> ||
+          <span style="color:var(--muted)">( --x &lt; 5 )</span>
+        </code>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px">첫 항이 참(1) → --x 실행 안 됨!</p>
+      </div>
+    </div>
+    <div class="code-block" style="margin-top:12px">
+      <div class="code-header">
+        <span class="code-filename">Short-Circuit 활용 예</span>
+        <span class="code-lang">C</span>
+      </div>
+      <div class="code-body"><pre><span class="ty">unsigned int</span> i;
+<span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;i);     <span class="cm">// -1 을 입력하면 unsigned이므로 매우 큰 수</span>
+<span class="kw">if</span> (i &lt; <span class="nm">0</span> &amp;&amp; <span class="nm">1</span>) {    <span class="cm">// unsigned는 항상 ≥ 0 이므로 i&lt;0 이 거짓</span>
+    <span class="fn">printf</span>(<span class="st">"negative value\n"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">printf</span>(<span class="st">"0 or positive value\n"</span>);
+}</pre></div>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-title">💡 !! 연산에 주의</div>
+    <code style="font-family:'JetBrains Mono',monospace">!!5 = !(!(5)) = !(0) = 1</code><br>
+    <code style="font-family:'JetBrains Mono',monospace">!!s ≠ s</code> &nbsp;(s=5이면 !!s=1, s=5는 다름)
+  </div>
+
+  <div class="subsec"><h3>논리 연산자 활용 예시</h3></div>
+  <table class="data-table">
+    <tr><th colspan="3">char c='B'; int i=3,j=3,k=3; double x=0.0,y=2.3;</th></tr>
+    <tr><th>Expression</th><th>Equivalent expression</th><th>Value</th></tr>
+    <tr><td><code>i &amp;&amp; j &amp;&amp; k</code></td><td><code>(i &amp;&amp; j) &amp;&amp; k</code></td><td class="result">1</td></tr>
+    <tr><td><code>x || i &amp;&amp; j-3</code></td><td><code>x || (i &amp;&amp; (j-3))</code></td><td class="result">0</td></tr>
+    <tr><td><code>i &lt; j &amp;&amp; x &lt; y</code></td><td><code>(i&lt;j) &amp;&amp; (x&lt;y)</code></td><td class="result">0</td></tr>
+    <tr><td><code>'A'&lt;=c &amp;&amp; c&lt;='Z'</code></td><td><code>('A'&lt;=c) &amp;&amp; (c&lt;='Z')</code></td><td class="result">1</td></tr>
+    <tr><td><code>c-1=='A' || c+1=='Z'</code></td><td><code>((c-1)=='A') || ((c+1)=='Z')</code></td><td class="result">1</td></tr>
+  </table>
+  <div class="callout info">
+    <div class="callout-title">ℹ️ 우선순위</div>
+    <code>&amp;&amp;</code>의 우선순위가 <code>||</code>보다 높음. 그러나 둘 모두 단항·산술·관계 연산자보다 낮음.
+  </div>
+</section>
+
+<!-- ══ 09. 조건/콤마 연산자 ══ -->
+<section class="section" id="conditional">
+  <div class="section-header">
+    <span class="section-num">09</span>
+    <h2>조건 연산자 / 콤마 연산자</h2>
+  </div>
+
+  <div class="subsec"><h3>조건 연산자 (Conditional Operator ? :) <span class="tag">삼항 Ternary</span></h3></div>
+  <div class="concept-card highlight">
+    <h3>❓ 조건 연산자 — C언어의 유일한 삼항 연산자</h3>
+    <div class="expr-viz">
+      <div class="box cond">조건식 expr1</div>
+      <div class="box op">?</div>
+      <div class="box val1">값1 expr2</div>
+      <div class="box op">:</div>
+      <div class="box val2">값2 expr3</div>
+    </div>
+    <ul style="margin-top:12px">
+      <li>expr1을 먼저 실행하여 true/false 판정</li>
+      <li>expr1이 <strong>참(true)</strong> → expr2 실행, 결과가 전체 수식의 값</li>
+      <li>expr1이 <strong>거짓(false)</strong> → expr3 실행, 결과가 전체 수식의 값</li>
+    </ul>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">조건 연산자 활용 예시</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    </div>
+    <div class="code-body"><pre>absolute_value <span class="op">=</span> (x <span class="op">&gt;</span> <span class="nm">0</span>) ? x : -x;    <span class="cm">// 절대값</span>
+max_value      <span class="op">=</span> (x <span class="op">&gt;</span> y) ? x : y;      <span class="cm">// 최대값</span>
+min_value      <span class="op">=</span> (x <span class="op">&lt;</span> y) ? x : y;      <span class="cm">// 최소값</span>
+(age <span class="op">&gt;=</span> <span class="nm">19</span>) ? <span class="fn">printf</span>(<span class="st">"성인\n"</span>) : <span class="fn">printf</span>(<span class="st">"청소년\n"</span>);</pre></div>
+  </div>
+
+  <table class="data-table">
+    <tr><th colspan="4">char a='a',b='b'; int i=1,j=2; double x=7.07;</th></tr>
+    <tr><th>Expression</th><th>Equivalent</th><th>Value</th><th>Type</th></tr>
+    <tr>
+      <td><code>i==j ? a-1 : b+1</code></td>
+      <td><code>(i==j) ? (a-1) : (b+1)</code></td>
+      <td class="result">99 ('c')</td><td><code>int</code></td>
+    </tr>
+    <tr>
+      <td><code>j%3==0 ? i+4 : x</code></td>
+      <td><code>((j%3)==0) ? (i+4) : x</code></td>
+      <td class="result">7.07</td><td><code>double</code></td>
+    </tr>
+    <tr>
+      <td><code>j%3 ? i+4 : x</code></td>
+      <td><code>(j%3) ? (i+4) : x</code></td>
+      <td class="result">5.0</td><td><code>double</code></td>
+    </tr>
+  </table>
+
+  <div class="subsec"><h3>콤마 연산자 (,) <span class="tag">가장 낮은 우선순위</span></h3></div>
+  <div class="concept-card">
+    <h3>📌 콤마 연산자</h3>
+    <ul>
+      <li>콤마(,)로 연결된 수식들: <strong>왼쪽부터 오른쪽으로 순차 실행</strong></li>
+      <li>C 언어 연산자 중 <strong>가장 낮은 우선순위</strong></li>
+      <li>for 반복문, 여러 변수 초기화에 주로 사용</li>
+    </ul>
+    <div class="code-block" style="margin-top:12px">
+      <div class="code-header">
+        <span class="code-filename">콤마 연산자 예시</span><span class="code-lang">C</span>
+      </div>
+      <div class="code-body"><pre><span class="ty">int</span> x <span class="op">=</span> <span class="nm">2</span>, y <span class="op">=</span> <span class="nm">3</span>, z <span class="op">=</span> <span class="nm">4</span>;              <span class="cm">// 변수 선언 시 (자주 사용)</span>
+<span class="kw">for</span> (sum <span class="op">=</span> <span class="nm">0</span>, i <span class="op">=</span> <span class="nm">0</span>; i &lt; n; i++)   <span class="cm">// for문 초기화 (자주 사용)</span>
+    sum += i;
+
+x <span class="op">=</span> (<span class="nm">2</span><span class="op">+</span><span class="nm">3</span>, <span class="nm">5</span><span class="op">-</span><span class="nm">3</span>);  <span class="cm">// x에는 2 저장 (바람직하지 않은 사용)</span>
+<span class="fn">printf</span>(<span class="st">"Thank"</span>), <span class="fn">printf</span>(<span class="st">" you!\n"</span>);  <span class="cm">// 바람직하지 않은 사용</span></pre></div>
+    </div>
+  </div>
+</section>
+<!-- ══ 10. 비트 연산자 ══ -->
+<section class="section" id="bitwise">
+  <div class="section-header">
+    <span class="section-num">10</span>
+    <h2>비트 연산자 (Bitwise Operator)</h2>
+  </div>
+
+  <div class="callout note">
+    <div class="callout-title">📚 선수 지식</div>
+    2진수 표기·비트 논리연산·비트 이동 연산은 중등 수학(2진법), 1학년 2학기 디지털논리설계및실습, 2학년 1학기 전산수학 교과목에서 다루고 있으므로 충분히 복습해 오기 바람.
+  </div>
+
+  <!-- 2's Complement -->
+  <div class="subsec"><h3>숫자형 데이터의 비트 표현 <span class="tag">2's Complement</span></h3></div>
+  <div class="two-col">
+    <div class="concept-card">
+      <h3>🔢 부호 없는 정수 (unsigned)</h3>
+      <p>단순히 10진수를 2진수로 나타낸 것</p>
+      <div class="demo-box" style="font-size:13px">
+        <div class="label">41 → 이진수 변환</div>
+        <code style="font-family:'JetBrains Mono',monospace">41 = 0···0101001<sub>(2)</sub></code>
+      </div>
+    </div>
+    <div class="concept-card">
+      <h3>➖ 부호 있는 정수 (signed) — 2의 보수</h3>
+      <p>음수 -N은 N의 "2의 보수"를 취한 것</p>
+      <ul>
+        <li>1의 보수(bitwise complement)에 1을 더함</li>
+        <li>0의 2의 보수 = 0 (all bits off)</li>
+      </ul>
+    </div>
+  </div>
+  <table class="data-table">
+    <tr><th>N</th><th>이진수 표현 (16-bit)</th><th>1의 보수</th><th>2의 보수 (-N)</th><th>값</th></tr>
+    <tr>
+      <td class="hi">7</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">0000 0000 0000 0111</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">1111 1111 1111 1000</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">1111 1111 1111 1001</td>
+      <td class="result">-7</td>
+    </tr>
+    <tr>
+      <td class="hi">8</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">0000 0000 0000 1000</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">1111 1111 1111 0111</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">1111 1111 1111 1000</td>
+      <td class="result">-8</td>
+    </tr>
+    <tr>
+      <td class="hi">-7</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">1111 1111 1111 1001</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">0000 0000 0000 0110</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">0000 0000 0000 0111</td>
+      <td class="result">7</td>
+    </tr>
+  </table>
+
+  <!-- 연산자 종류 -->
+  <div class="subsec"><h3>비트 연산자 종류</h3></div>
+  <div class="two-col">
+    <table class="data-table">
+      <tr><th>분류</th><th style="text-align:center">기호</th><th>이름</th></tr>
+      <tr>
+        <td rowspan="4" style="color:var(--accent);font-weight:700;text-align:center;font-size:12px">Logical<br>ops</td>
+        <td class="op-cell">~</td><td class="desc">bitwise complement (단항)</td>
+      </tr>
+      <tr><td class="op-cell">&amp;</td><td class="desc">bitwise AND</td></tr>
+      <tr><td class="op-cell">|</td><td class="desc">bitwise OR</td></tr>
+      <tr><td class="op-cell">^</td><td class="desc">bitwise XOR (exclusive-or)</td></tr>
+      <tr>
+        <td rowspan="2" style="color:var(--accent5);font-weight:700;text-align:center;font-size:12px">Shift<br>ops</td>
+        <td class="op-cell">&lt;&lt;</td><td class="desc">left shift</td>
+      </tr>
+      <tr><td class="op-cell">&gt;&gt;</td><td class="desc">right shift</td></tr>
+    </table>
+    <div class="callout warn" style="align-self:start">
+      <div class="callout-title">⚠️ 중요</div>
+      비트 연산자는 <strong>"정수 타입" 피연산자에만</strong> 적용 가능.<br>
+      필요에 따라 정수적 승격(integral promotion)이 일어남에 주의.
+    </div>
+  </div>
+
+  <!-- 비트 논리 진리표 -->
+  <div class="subsec"><h3>비트 논리 연산자 진리표 (bit-by-bit)</h3></div>
+  <table class="truth-table">
+    <tr><th>a</th><th>b</th><th>~a</th><th>a &amp; b</th><th>a | b</th><th>a ^ b</th></tr>
+    <tr><td class="f">0</td><td class="f">0</td><td class="t">1</td><td class="f">0</td><td class="f">0</td><td class="f">0</td></tr>
+    <tr><td class="t">1</td><td class="f">0</td><td class="f">0</td><td class="f">0</td><td class="t">1</td><td class="t">1</td></tr>
+    <tr><td class="f">0</td><td class="t">1</td><td class="t">1</td><td class="f">0</td><td class="t">1</td><td class="t">1</td></tr>
+    <tr><td class="t">1</td><td class="t">1</td><td class="f">0</td><td class="t">1</td><td class="t">1</td><td class="f">0</td></tr>
+  </table>
+
+  <!-- 비트 논리 예시 -->
+  <div class="subsec"><h3>비트 논리 연산 예시</h3></div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">int a = 33333, b = -77777;</span>
+      <span class="code-lang">C</span>
+    </div>
+    <div class="code-body"><pre><span class="cm">/* a = 00000000 00000000 10000010 00110101  (33333) */</span>
+<span class="cm">/* b = 11111111 11111110 11010000 00101111 (-77777) */</span>
+
+a <span class="op">&amp;</span> b  <span class="cm">// 00000000 00000000 10000000 00100101 = 32805</span>
+a <span class="op">^</span> b  <span class="cm">// 11111111 11111110 01010010 00011010 = -110054</span>
+a <span class="op">|</span> b  <span class="cm">// 11111111 11111110 11010010 00111111 = -77249</span>
+<span class="op">~</span>(a<span class="op">|</span>b) <span class="cm">// 00000000 00000001 00101101 11000000 = 77248</span>
+<span class="op">~</span>a<span class="op">&amp;~</span>b  <span class="cm">// 00000000 00000001 00101101 11000000 = 77248 (De Morgan!)</span></pre></div>
+  </div>
+  <div class="callout tip">
+    <div class="callout-title">💡 De Morgan's Law</div>
+    <code style="font-family:'JetBrains Mono',monospace">~(a | b) == (~a &amp; ~b)</code> &nbsp;결과가 같음!
+  </div>
+
+  <!-- Shift -->
+  <div class="subsec"><h3>비트 이동 연산자 (Shift Operator) <span class="tag">&lt;&lt; &gt;&gt;</span></h3></div>
+  <div class="two-col">
+    <div class="concept-card">
+      <h3>⬅️ 왼쪽 이동 (Left Shift: &lt;&lt;)</h3>
+      <p><code style="font-family:'JetBrains Mono',monospace">expr1 &lt;&lt; expr2</code> — expr2 횟수만큼 왼쪽으로 이동</p>
+      <p style="font-size:13px;color:var(--muted)">이동 1회마다 최하위 비트(LSB)에 '0' 채워짐</p>
+      <div class="demo-box" style="margin-top:10px">
+        <div class="label">char c='Z' (=90₁₀) → int로 승격</div>
+        <div class="bit-row">
+          <span class="bit-lbl">c</span>
+          <span class="bit-cell b0">0</span><span class="bit-cell b1">1</span><span class="bit-cell b0">0</span><span class="bit-cell b1">1</span><span class="bit-cell b1">1</span><span class="bit-cell b0">0</span><span class="bit-cell b1">1</span><span class="bit-cell b0">0</span>
+          <span style="color:var(--muted);font-size:11px">=90</span>
+        </div>
+        <div class="bit-row">
+          <span class="bit-lbl">c&lt;&lt;1</span>
+          <span class="bit-cell b1">1</span><span class="bit-cell b0">0</span><span class="bit-cell b1">1</span><span class="bit-cell b1">1</span><span class="bit-cell b0">0</span><span class="bit-cell b1">1</span><span class="bit-cell b0">0</span><span class="bit-cell shifted">0</span>
+          <span style="color:var(--accent2);font-size:11px">=180</span>
+        </div>
+        <div class="bit-row">
+          <span class="bit-lbl">c&lt;&lt;4</span>
+          <span class="bit-cell b1">1</span><span class="bit-cell b0">0</span><span class="bit-cell b1">1</span><span class="bit-cell b0">0</span><span class="bit-cell shifted">0</span><span class="bit-cell shifted">0</span><span class="bit-cell shifted">0</span><span class="bit-cell shifted">0</span>
+          <span style="color:var(--accent2);font-size:11px">=1440</span>
+        </div>
+      </div>
+      <div class="callout tip" style="margin-top:8px">
+        <div class="callout-title">💡 수식</div>
+        <code style="font-family:'JetBrains Mono',monospace">n &lt;&lt; k = n × 2<sup>k</sup></code> (unsigned 기준)
+      </div>
+    </div>
+    <div class="concept-card">
+      <h3>➡️ 오른쪽 이동 (Right Shift: &gt;&gt;)</h3>
+      <p><code style="font-family:'JetBrains Mono',monospace">expr1 &gt;&gt; expr2</code> — expr2 횟수만큼 오른쪽으로 이동</p>
+      <p style="font-size:13px;color:var(--muted)">최상위 비트(MSB) 채움 방식은 타입에 따라 다름</p>
+      <ul style="font-size:13px;margin-top:8px">
+        <li><strong>unsigned</strong> 타입: MSB에 '0' 채움</li>
+        <li><strong>signed</strong> 타입: 원래 부호값 또는 '0' (구현 의존)</li>
+      </ul>
+      <div class="demo-box" style="margin-top:10px">
+        <div class="label">int a=1&lt;&lt;31 (최상위 비트만 1)</div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3)">a &gt;&gt; 3 → 111<span style="color:var(--accent5)">0000...0000</span> (부호 확장)</p>
+        <div class="label" style="margin-top:8px">unsigned b=1&lt;&lt;31</div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2)">b &gt;&gt; 3 → 000<span style="color:var(--accent5)">10000...0000</span> (0 채움)</p>
+      </div>
+      <div class="callout tip" style="margin-top:8px">
+        <div class="callout-title">💡 수식</div>
+        <code style="font-family:'JetBrains Mono',monospace">n &gt;&gt; k = n ÷ 2<sup>k</sup></code> (unsigned 기준)
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ══ 11. 전체 우선순위 표 ══ -->
+<section class="section" id="prec2">
+  <div class="section-header">
+    <span class="section-num">11</span>
+    <h2>전체 연산자 우선순위 표 (Complete Precedence Table)</h2>
+  </div>
+
+  <table class="prec-table">
+    <thead>
+      <tr>
+        <td class="prec-level" style="background:var(--bg3);color:var(--muted);font-size:11px">순위</td>
+        <td class="prec-ops" style="background:var(--bg3);color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase">Operator(s)</td>
+        <td class="prec-assoc" style="background:var(--bg3);color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase">Associativity</td>
+        <td class="prec-desc" style="background:var(--bg3);color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase">설명</td>
+      </tr>
+    </thead>
+    <tr>
+      <td class="prec-level" style="color:var(--accent2)">높음↑</td>
+      <td class="prec-ops">( )</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc">괄호</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops">+(unary) &nbsp;-(unary) &nbsp;++ &nbsp;-- &nbsp;sizeof &nbsp;(type) &nbsp;! &nbsp;~</td>
+      <td class="prec-assoc" style="color:var(--accent5)">right to left</td>
+      <td class="prec-desc">단항 연산자 (부호, 증감, 크기, 캐스팅, 논리NOT, 비트NOT)</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops">* &nbsp;/ &nbsp;%</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc">곱셈류</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops">+ &nbsp;-</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc">덧셈류</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops" style="color:var(--accent5)">&lt;&lt; &nbsp;&gt;&gt;</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc" style="color:var(--accent5)">비트 이동 (shift)</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops" style="color:var(--accent3)">&lt; &nbsp;&lt;= &nbsp;&gt; &nbsp;&gt;=</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc" style="color:var(--accent3)">관계 연산자</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops" style="color:var(--accent3)">== &nbsp;!=</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc" style="color:var(--accent3)">동치 연산자</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops" style="color:var(--accent5)">&amp;</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc" style="color:var(--accent5)">비트 AND</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops" style="color:var(--accent5)">^</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc" style="color:var(--accent5)">비트 XOR</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops" style="color:var(--accent5)">|</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc" style="color:var(--accent5)">비트 OR</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops" style="color:var(--accent4)">&amp;&amp;</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc" style="color:var(--accent4)">논리 AND</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops" style="color:var(--accent4)">||</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc" style="color:var(--accent4)">논리 OR</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops">? :</td>
+      <td class="prec-assoc" style="color:var(--accent5)">right to left</td>
+      <td class="prec-desc">조건 연산자 (삼항)</td>
+    </tr>
+    <tr>
+      <td class="prec-level"></td>
+      <td class="prec-ops">= &nbsp;+= &nbsp;-= &nbsp;*= &nbsp;/= &nbsp;%= &nbsp;&gt;&gt;= &nbsp;&lt;&lt;= &nbsp;&amp;= &nbsp;^= &nbsp;|=</td>
+      <td class="prec-assoc" style="color:var(--accent5)">right to left</td>
+      <td class="prec-desc">대입 연산자</td>
+    </tr>
+    <tr>
+      <td class="prec-level" style="color:var(--accent3)">낮음↓</td>
+      <td class="prec-ops">, (comma)</td>
+      <td class="prec-assoc">left to right</td>
+      <td class="prec-desc">콤마 연산자</td>
+    </tr>
+  </table>
+
+  <div class="callout tip">
+    <div class="callout-title">💡 기억 팁</div>
+    <strong>괄호 &gt; 단항 &gt; 곱셈류 &gt; 덧셈류 &gt; 시프트 &gt; 관계 &gt; 동치 &gt; 비트(&amp;^|) &gt; 논리(&amp;&amp;||) &gt; 조건 &gt; 대입 &gt; 콤마</strong>
+  </div>
+</section>
+
+<!-- ══ QUIZ 2 ══ -->
+<section class="section" id="quiz2">
+  <div class="section-header">
+    <span class="section-num">Q2</span>
+    <h2>Quiz — Part II</h2>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q1</span>다음 논리 연산자 중 우선순위가 가장 높은 것은?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">① || (논리 OR)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">② &amp;&amp; (논리 AND)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">③ ! (논리 NOT)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">④ 모두 같다</button>
+    </div>
+    <div class="quiz-explain">✅ <strong>③ ! (논리 NOT)</strong>이 단항 연산자로 가장 높음.<br>우선순위: ! &gt; &amp;&amp; &gt; ||<br>또한 논리 연산자들은 모두 산술·관계 연산자보다 낮은 우선순위를 가짐.</div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q2</span>Short-Circuit Evaluation에 대한 설명으로 옳은 것은?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">① A &amp;&amp; B 에서 B가 거짓이면 A는 실행하지 않는다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">② A &amp;&amp; B 에서 A가 거짓이면 B는 실행하지 않는다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">③ A || B 에서 A가 거짓이면 B는 실행하지 않는다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">④ 단축 계산은 C에서 지원하지 않는다</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>②</strong> A &amp;&amp; B 에서 A가 거짓(0)이면 전체는 이미 거짓이므로 B 실행 안 함.<br>
+      || 에서는 A가 참(1)이면 전체가 이미 참이므로 B 실행 안 함.
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q3</span>다음 조건 연산자 수식의 결과값과 타입은?<br>
+      <code style="font-family:'JetBrains Mono',monospace">int i=3, j=4; double x=2.5; &nbsp;&nbsp;i &lt; j ? i + 1 : x</code>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">4 (int 타입)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">4.0 (double 타입)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">2.5 (double 타입)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">컴파일 에러</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>4.0 (double 타입)</strong><br>
+      i &lt; j 는 참이므로 i+1 = 4가 선택됨.<br>
+      그런데 조건 연산자의 두 값의 타입이 다를 때 더 큰 타입으로 자동 변환 → int 4가 <strong>double 4.0</strong>으로 변환됨.
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q4</span>비트 연산에 관한 다음 설명 중 <strong>옳은</strong> 것은?</div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">① 비트 연산자는 실수형 변수에도 사용 가능하다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">② ~(a|b) 와 (~a)&amp;(~b) 는 항상 다른 결과를 낸다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">③ n &lt;&lt; k 는 unsigned 기준으로 n × 2^k 와 같다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">④ &gt;&gt; 연산은 항상 최상위 비트에 0을 채운다</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>③</strong> 맞음. <code>n &lt;&lt; k == n * 2^k</code> (unsigned 기준)<br>
+      ① 비트 연산자는 <strong>정수 타입에만</strong> 적용 가능<br>
+      ② <code>~(a|b) == (~a)&amp;(~b)</code> — De Morgan's Law로 <strong>항상 같음</strong><br>
+      ④ signed 타입의 &gt;&gt;는 구현에 따라 MSB에 <strong>부호 비트를 채울 수도 있음</strong>
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q5</span>다음 코드의 출력 결과는?<br>
+      <code style="font-family:'JetBrains Mono',monospace">
+        int x = 5, y = 3;<br>
+        printf("%d\n", x &gt; 3 &amp;&amp; y &lt; 5);<br>
+        printf("%d\n", x == 5 || y == 5);<br>
+        printf("%d\n", !(x &gt; y));
+      </code>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">1, 0, 1</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">0, 1, 0</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">1, 1, 0</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">1, 0, 0</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ 출력: <code>1 &nbsp;1 &nbsp;0</code><br>
+      ① <code>x&gt;3</code>은 참, <code>y&lt;5</code>는 참 → <code>1 &amp;&amp; 1 = 1</code><br>
+      ② <code>x==5</code>는 참 → <code>1 || ... = 1</code> (short-circuit)<br>
+      ③ <code>x&gt;y</code>는 참(1) → <code>!(1) = 0</code>
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q6</span><code style="font-family:'JetBrains Mono',monospace">unsigned char c = 0x55;</code> 일 때 <code style="font-family:'JetBrains Mono',monospace">~c</code>를 int로 출력하면?<br>
+      (0x55 = 0101 0101<sub>(2)</sub>)
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">0xAA (170)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">0xFFFFFFAA (-86 혹은 4294967210)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">0x00 (0)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">0x55 (85)</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>0xFFFFFFAA</strong><br>
+      c는 char 타입이므로 ~ 연산 전 <strong>int로 승격</strong>됨: <code>0x00000055</code><br>
+      ~ 적용 → <code>0xFFFFFFAA</code><br>
+      <code>printf("%#x\n", ~c);</code> 출력: <code>0xffffffaa</code>
+    </div>
+  </div>
+</section>
+</main><!-- end .main -->
+
+<script>
+function answerQuiz(btn, isCorrect) {
+  const item = btn.closest('.quiz-item');
+  const opts = item.querySelectorAll('.quiz-option');
+  const explain = item.querySelector('.quiz-explain');
+  opts.forEach(o => {
+    o.disabled = true;
+    o.style.cursor = 'default';
+  });
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (explain) explain.classList.add('show');
+}
+
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre ? pre.innerText : '';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.style.background = 'var(--accent2)';
+    btn.style.color = 'var(--bg)';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.background = ''; btn.style.color = ''; }, 1800);
+  });
+}
+
+// Active nav highlight on scroll
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navItems.forEach(n => {
+        n.classList.toggle('active', n.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

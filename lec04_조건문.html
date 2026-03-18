@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 04 — 조건문 | C 프로그래밍</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#21262d;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;--accent2:#3fb950;--accent3:#f78166;--accent4:#d2a8ff;--accent5:#ffa657;--code-bg:#010409;--keyword:#ff7b72;--type:#79c0ff;--string:#a5d6ff;--comment:#8b949e;--fn:#d2a8ff;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:15px;line-height:1.7;}
+
+.sidebar{position:fixed;top:0;left:0;width:240px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;z-index:100;padding:0 0 40px;}
+.sidebar-logo{padding:20px 20px 16px;border-bottom:1px solid var(--border);}
+.sidebar-logo .course{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.sidebar-logo .title{font-size:13px;font-weight:700;color:var(--accent2);margin-top:4px;}
+.sidebar-logo .lec-num{display:inline-block;background:var(--accent2);color:var(--bg);font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:8px;}
+.nav-section{padding:16px 0 8px;}
+.nav-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);padding:0 20px 8px;}
+.nav-item{display:block;padding:7px 20px;color:var(--muted);text-decoration:none;font-size:13px;border-left:2px solid transparent;transition:all .15s;}
+.nav-item:hover,.nav-item.active{color:var(--accent2);border-left-color:var(--accent2);background:rgba(63,185,80,.08);}
+.nav-item .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:8px;vertical-align:middle;}
+
+.main{margin-left:240px;padding:40px 48px 80px;max-width:1040px;}
+
+.hero{background:linear-gradient(135deg,#0d1117 0%,#161b22 50%,#001a0a 100%);border:1px solid var(--border);border-radius:12px;padding:40px 48px;margin-bottom:48px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(63,185,80,.15) 0%,transparent 70%);}
+.hero-tag{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent2);background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.2);padding:3px 12px;border-radius:20px;display:inline-block;margin-bottom:16px;}
+.hero h1{font-size:32px;font-weight:700;line-height:1.2;margin-bottom:8px;}
+.hero h1 span{color:var(--accent2);}
+.hero-sub{font-size:16px;color:var(--muted);margin-bottom:24px;}
+.hero-pills{display:flex;flex-wrap:wrap;gap:8px;}
+.hero-pill{font-size:12px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:20px;font-family:'Space Mono',monospace;}
+
+.section{margin-bottom:56px;scroll-margin-top:24px;}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.section-num{font-family:'Space Mono',monospace;font-size:11px;color:var(--bg);background:var(--accent2);padding:2px 10px;border-radius:4px;font-weight:700;}
+.section h2{font-size:20px;font-weight:700;}
+
+.concept-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px;}
+.concept-card.highlight{border-color:rgba(63,185,80,.35);background:linear-gradient(135deg,var(--bg2),rgba(63,185,80,.04));}
+.concept-card h3{font-size:15px;font-weight:700;margin-bottom:12px;color:var(--accent2);display:flex;align-items:center;gap:8px;}
+.concept-card p{color:#c9d1d9;font-size:14px;margin-bottom:10px;}
+.concept-card ul{list-style:none;margin-top:8px;}
+.concept-card ul li{color:#c9d1d9;font-size:14px;padding:4px 0 4px 20px;position:relative;}
+.concept-card ul li::before{content:'▸';position:absolute;left:0;color:var(--accent2);}
+
+.code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0;}
+.code-header{background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;}
+.code-filename{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);}
+.code-lang{font-family:'Space Mono',monospace;font-size:10px;color:var(--bg);background:var(--accent2);padding:2px 8px;border-radius:3px;}
+.code-body{padding:20px;overflow-x:auto;}
+.code-body pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;white-space:pre;}
+.copy-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;padding:3px 10px;border-radius:4px;cursor:pointer;transition:all .15s;}
+.copy-btn:hover{background:var(--accent2);color:var(--bg);border-color:var(--accent2);}
+
+.kw{color:#ff7b72;font-weight:700;} .ty{color:#79c0ff;} .cm{color:#8b949e;font-style:italic;}
+.st{color:#a5d6ff;} .fn{color:#d2a8ff;} .nm{color:#ffa657;} .pp{color:#d2a8ff;}
+
+.callout{border-radius:8px;padding:14px 18px;margin:16px 0;border-left:3px solid;font-size:14px;}
+.callout.tip{background:rgba(63,185,80,.08);border-color:var(--accent2);}
+.callout.warn{background:rgba(247,129,102,.08);border-color:var(--accent3);}
+.callout.info{background:rgba(88,166,255,.08);border-color:var(--accent);}
+.callout.note{background:rgba(210,168,255,.08);border-color:var(--accent4);}
+.callout-title{font-weight:700;margin-bottom:4px;}
+.callout.tip .callout-title{color:var(--accent2);}
+.callout.warn .callout-title{color:var(--accent3);}
+.callout.info .callout-title{color:var(--accent);}
+.callout.note .callout-title{color:var(--accent4);}
+
+.data-table{width:100%;border-collapse:collapse;font-size:14px;margin:16px 0;background:var(--bg2);border-radius:8px;overflow:hidden;border:1px solid var(--border);}
+.data-table th{background:var(--bg3);color:var(--muted);padding:10px 14px;text-align:left;font-family:'Space Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);}
+.data-table td{padding:10px 14px;border-bottom:1px solid rgba(48,54,61,.5);font-size:13px;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:rgba(255,255,255,.02);}
+.data-table td.desc{font-family:'Noto Sans KR',sans-serif;}
+.data-table td.code{font-family:'JetBrains Mono',monospace;}
+.data-table td.good{color:var(--accent2);font-weight:700;}
+.data-table td.bad{color:var(--accent3);font-weight:700;}
+
+.quiz-item{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:14px;}
+.quiz-q{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--text);line-height:1.6;}
+.qnum{display:inline-block;background:var(--accent2);color:var(--bg);font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:1px 8px;border-radius:3px;margin-right:8px;}
+.quiz-options{display:flex;flex-direction:column;gap:8px;}
+.quiz-option{padding:9px 14px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);font-size:13px;cursor:pointer;transition:all .15s;font-family:'JetBrains Mono',monospace;text-align:left;}
+.quiz-option:hover{border-color:var(--accent2);color:var(--accent2);}
+.quiz-option.correct{background:rgba(63,185,80,.15);border-color:var(--accent2);color:var(--accent2);}
+.quiz-option.wrong{background:rgba(247,129,102,.1);border-color:var(--accent3);color:var(--accent3);}
+.quiz-explain{display:none;margin-top:14px;padding:12px 16px;background:rgba(63,185,80,.07);border-radius:6px;border-left:3px solid var(--accent2);font-size:13px;color:#c9d1d9;line-height:1.7;}
+.quiz-explain.show{display:block;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:16px 0;}
+
+.subsec{margin:28px 0 12px;}
+.subsec h3{font-size:16px;font-weight:700;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.tag{font-size:10px;font-family:'Space Mono',monospace;background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:2px 8px;border-radius:3px;}
+
+.badge{display:inline-block;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;}
+.badge.lab{background:rgba(255,166,87,.2);color:var(--accent5);border:1px solid rgba(255,166,87,.3);}
+.badge.warn{background:rgba(247,129,102,.2);color:var(--accent3);border:1px solid rgba(247,129,102,.3);}
+.badge.good{background:rgba(63,185,80,.2);color:var(--accent2);border:1px solid rgba(63,185,80,.3);}
+
+.ic{font-family:'JetBrains Mono',monospace;font-size:13px;background:var(--bg3);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--accent2);}
+.demo-box{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 18px;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:13px;}
+.demo-box .label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-family:'Space Mono',monospace;}
+
+/* FLOWCHART */
+.flowchart{display:flex;flex-direction:column;align-items:center;gap:0;margin:16px auto;max-width:340px;}
+.fc-start,.fc-end{background:var(--bg3);border:2px solid var(--accent2);border-radius:30px;padding:8px 24px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2);text-align:center;}
+.fc-diamond{background:rgba(255,166,87,.1);border:2px solid var(--accent5);transform:rotate(0deg);padding:12px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent5);font-weight:700;text-align:center;border-radius:6px;position:relative;margin:4px 0;}
+.fc-box{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text);text-align:center;min-width:180px;}
+.fc-box.if-branch{border-color:rgba(63,185,80,.4);color:var(--accent2);}
+.fc-box.else-branch{border-color:rgba(247,129,102,.4);color:var(--accent3);}
+.fc-arrow{color:var(--muted);font-size:18px;line-height:1;margin:2px 0;}
+.fc-row{display:flex;align-items:flex-start;gap:20px;margin:4px 0;width:100%;}
+.fc-label{font-family:'Space Mono',monospace;font-size:10px;font-weight:700;margin-bottom:4px;}
+.fc-label.t{color:var(--accent2);}
+.fc-label.f{color:var(--accent3);}
+.fc-col{display:flex;flex-direction:column;align-items:center;flex:1;}
+
+/* COMPARISON TABLE */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0;}
+.compare-col{padding:0;}
+.compare-header{padding:10px 16px;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;text-align:center;}
+.compare-header.left{background:rgba(247,129,102,.1);color:var(--accent3);border-bottom:1px solid var(--border);}
+.compare-header.right{background:rgba(63,185,80,.1);color:var(--accent2);border-bottom:1px solid var(--border);border-left:1px solid var(--border);}
+.compare-body{padding:0;}
+.compare-body .code-block{border-radius:0;border:none;border-left:1px solid var(--border);margin:0;}
+.compare-body .code-block:first-child{border-left:none;}
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="course">C Programming</div>
+    <div class="title">조건문</div>
+    <div class="lec-num">LECTURE 04</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">목차</div>
+    <a class="nav-item" href="#control"><span class="dot"></span>프로그램 실행 제어 구조</a>
+    <a class="nav-item" href="#if"><span class="dot"></span>if 조건문</a>
+    <a class="nav-item" href="#ifelse"><span class="dot"></span>if-else 조건문</a>
+    <a class="nav-item" href="#elseif"><span class="dot"></span>if-else if-else</a>
+    <a class="nav-item" href="#guide"><span class="dot"></span>조건문 사용 가이드라인</a>
+    <a class="nav-item" href="#switch"><span class="dot"></span>switch 문</a>
+    <a class="nav-item" href="#compare"><span class="dot"></span>switch vs if-else</a>
+    <a class="nav-item" href="#quiz"><span class="dot"></span>Quiz</a>
+  </div>
+</nav>
+
+<main class="main">
+
+<div class="hero">
+  <div class="hero-tag">Lecture 04</div>
+  <h1>Conditional <span>Statement</span></h1>
+  <p class="hero-sub">조건문 — if / if-else / if-else if-else / switch 완전 정리</p>
+  <div class="hero-pills">
+    <span class="hero-pill">if statement</span>
+    <span class="hero-pill">if-else</span>
+    <span class="hero-pill">if-else if-else</span>
+    <span class="hero-pill">Nested if</span>
+    <span class="hero-pill">Dangling else</span>
+    <span class="hero-pill">switch-case</span>
+    <span class="hero-pill">fall-through</span>
+  </div>
+</div>
+<!-- ══ 01. 프로그램 실행 제어 구조 ══ -->
+<section class="section" id="control">
+  <div class="section-header">
+    <span class="section-num">01</span>
+    <h2>프로그램 실행 제어 구조</h2>
+  </div>
+
+  <div class="concept-card highlight">
+    <h3>🎛️ 제어문 (Control Statement)</h3>
+    <p>실행문들이 실행되는 순서를 제어하기 위해 부가적으로 사용하는 명령문</p>
+    <ul>
+      <li><strong>선택구조 (Selection)</strong>: 조건에 따라 다른 코드를 실행 → <span class="ic">if</span>, <span class="ic">switch</span></li>
+      <li><strong>반복구조 (Iteration)</strong>: 조건이 참인 동안 반복 실행 → <span class="ic">while</span>, <span class="ic">for</span>, <span class="ic">do-while</span></li>
+    </ul>
+  </div>
+
+  <!-- 세 가지 구조 시각화 -->
+  <div class="three-col" style="margin-top:20px">
+    <!-- 순차 구조 -->
+    <div class="concept-card" style="text-align:center">
+      <h3 style="justify-content:center">📋 순차 구조</h3>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 0">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;width:130px">statement 1</div>
+        <div style="color:var(--muted);font-size:18px">↓</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;width:130px">statement 2</div>
+        <div style="color:var(--muted);font-size:18px">↓</div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:8px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;width:130px">statement 3</div>
+      </div>
+      <p style="font-size:12px;color:var(--muted)">코드 순서대로 실행</p>
+    </div>
+    <!-- 선택 구조 -->
+    <div class="concept-card" style="border-color:rgba(63,185,80,.35);background:linear-gradient(135deg,var(--bg2),rgba(63,185,80,.04));text-align:center">
+      <h3 style="justify-content:center">🔀 선택 구조 <span class="badge good">이번 강의</span></h3>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0">
+        <div style="background:rgba(255,166,87,.12);border:2px solid var(--accent5);border-radius:6px;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent5)">조건식</div>
+        <div style="display:flex;gap:16px;align-items:flex-start;margin-top:4px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2)">참 (if)</span>
+            <div style="background:rgba(63,185,80,.1);border:1px solid rgba(63,185,80,.4);border-radius:6px;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2)">stmt 1</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent3)">거짓 (else)</span>
+            <div style="background:rgba(247,129,102,.1);border:1px solid rgba(247,129,102,.4);border-radius:6px;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3)">stmt 2</div>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted)">if / if-else / switch</p>
+    </div>
+    <!-- 반복 구조 -->
+    <div class="concept-card" style="text-align:center">
+      <h3 style="justify-content:center">🔁 반복 구조</h3>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 0">
+        <div style="background:rgba(255,166,87,.12);border:2px solid var(--accent5);border-radius:6px;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent5)">조건식</div>
+        <div style="display:flex;gap:16px;align-items:flex-start;margin-top:4px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent2)">참</span>
+            <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-family:'JetBrains Mono',monospace;font-size:11px">statement</div>
+            <span style="font-size:18px;color:var(--accent4)">↺</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--accent3)">거짓</span>
+            <span style="font-size:18px;color:var(--muted);margin-top:12px">→ 종료</span>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--muted)">while / for / do-while</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ 02. if 조건문 ══ -->
+<section class="section" id="if">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2>if 조건문 (if Statement)</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="concept-card highlight">
+      <h3>📐 if statement 구조</h3>
+      <div class="demo-box">
+        <div class="label">문법 (Syntax)</div>
+        <code style="font-family:'JetBrains Mono',monospace;color:var(--text)"><span class="kw">if</span> (<span style="color:var(--accent5)">조건식</span>) {
+    <span style="color:var(--accent)">statement 1;</span>
+    <span style="color:var(--muted)">...</span>
+}
+<span style="color:var(--muted)">external_statement;</span></code>
+      </div>
+      <ul>
+        <li>조건식이 <strong>참(Non-zero)</strong>이면 블록 내 문장 실행</li>
+        <li>조건식이 <strong>거짓(Zero)</strong>이면 블록 건너뜀</li>
+        <li>조건식에는 일반적으로 <strong>관계/논리 연산자</strong> 사용</li>
+        <li><code>external_statement</code>는 <strong>항상 실행</strong></li>
+      </ul>
+    </div>
+    <!-- 플로우차트 -->
+    <div class="concept-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;width:100%">
+        <div style="color:var(--muted);font-size:18px">↓</div>
+        <div style="background:rgba(255,166,87,.12);border:2px solid var(--accent5);border-radius:6px;padding:10px 24px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent5);font-weight:700">조건식 (Expression)</div>
+        <div style="display:flex;width:100%;justify-content:center;gap:0;margin-top:4px">
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+            <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--accent2)">True (Non-zero)</span>
+            <div style="color:var(--muted);font-size:16px">↓</div>
+            <div style="background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.4);border-radius:6px;padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent2);text-align:center">statement 1<br><span style="color:var(--muted)">...</span></div>
+            <div style="color:var(--muted);font-size:16px">↓</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;flex:1">
+            <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--accent3)">False (Zero)</span>
+            <div style="color:var(--muted);font-size:16px">↓</div>
+            <div style="height:54px"></div>
+            <div style="color:var(--muted);font-size:16px">↓</div>
+          </div>
+        </div>
+        <div style="background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.3);border-radius:6px;padding:8px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent)">external_statement</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>예시 코드</h3></div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">if 조건문 예시</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    </div>
+    <div class="code-body"><pre><span class="cm">// 예시 1: y가 0이 아닐 때만 나눗셈</span>
+<span class="kw">if</span> (y != <span class="nm">0.0</span>)
+    x /= y;
+
+<span class="cm">// 예시 2: 온도가 0 미만일 때만 출력</span>
+<span class="kw">if</span> (temperature &lt; <span class="nm">0</span>)
+    <span class="fn">printf</span>(<span class="st">"현재 영하입니다.\n"</span>);    <span class="cm">// 조건이 참일 때만 실행</span>
+
+<span class="fn">printf</span>(<span class="st">"현재 온도는 %d 도 입니다.\n"</span>, temperature); <span class="cm">// 항상 실행</span></pre></div>
+  </div>
+
+  <div class="subsec"><h3>복합문 (Compound Statement) — 블록 <span class="tag">중요!</span></h3></div>
+  <div class="concept-card">
+    <h3>📦 복합문 (Block)</h3>
+    <p>조건식이 참일 때 수행할 문장이 <strong>여러 개</strong>이면 <strong>중괄호 { }</strong>로 묶은 복합문(블록) 활용</p>
+    <ul>
+      <li>블록(block)이라고도 함 — 중괄호로 묶인 선언문과 실행문 그룹</li>
+      <li>블록에 포함된 문장들은 모두 <strong>적절한 들여쓰기(indentation) 필수!</strong></li>
+      <li><strong>Python과 다른 점</strong>: C언어는 들여쓰기만으로는 블록 범위 구분 안 됨 → 중괄호 필수!</li>
+    </ul>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-header left">❌ 잘못된 코드 (중괄호 없음)</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;margin:0">
+          <div class="code-body"><pre><span class="kw">if</span> (c == <span class="st">' '</span>)
+    ++blank_cnt;
+    <span class="fn">printf</span>(<span class="st">"공백을 찾았습니다\n"</span>);
+<span class="cm">// printf는 항상 실행됨!</span></pre></div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-header right">✅ 올바른 코드 (중괄호 사용)</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;border-left:1px solid var(--border);margin:0">
+          <div class="code-body"><pre><span class="kw">if</span> (c == <span class="st">' '</span>) {
+    ++blank_cnt;
+    <span class="fn">printf</span>(<span class="st">"공백을 찾았습니다\n"</span>);
+}
+<span class="cm">// 두 문장 모두 조건부 실행</span></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="callout warn">
+    <div class="callout-title">⚠️ Python과 다른 점!</div>
+    Python에서는 들여쓰기가 블록 범위를 결정하지만, C언어에서는 <strong>들여쓰기만으로는 부족</strong>합니다.
+    반드시 <strong>중괄호 { }</strong>로 블록 범위를 표시해야 합니다.
+  </div>
+</section>
+<!-- ══ 03. if-else 조건문 ══ -->
+<section class="section" id="ifelse">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2>if-else 조건문</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="concept-card highlight">
+      <h3>🔀 if-else statement 구조</h3>
+      <div class="demo-box">
+        <div class="label">문법 (Syntax)</div>
+        <code style="font-family:'JetBrains Mono',monospace"><span class="kw">if</span> (<span style="color:var(--accent5)">조건식</span>)
+    <span style="color:var(--accent2)">statement1;</span>  <span class="cm">// 참일 때</span>
+<span class="kw">else</span>
+    <span style="color:var(--accent3)">statement2;</span>  <span class="cm">// 거짓일 때</span></code>
+      </div>
+      <ul>
+        <li>조건식이 <strong>참(Non-zero)</strong> → statement1 실행</li>
+        <li>조건식이 <strong>거짓(Zero)</strong> → statement2 실행</li>
+        <li>두 경로 중 <strong>반드시 하나만</strong> 실행됨</li>
+      </ul>
+    </div>
+    <div class="concept-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:100%">
+        <div style="background:rgba(255,166,87,.12);border:2px solid var(--accent5);border-radius:6px;padding:10px 24px;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--accent5);font-weight:700">조건식</div>
+        <div style="display:flex;width:100%;margin-top:6px;gap:8px">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--accent2)">True</span>
+            <div style="color:var(--muted)">↓</div>
+            <div style="background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.4);border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent2);text-align:center;width:100%">statement 1</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+            <span style="font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:var(--accent3)">False</span>
+            <div style="color:var(--muted)">↓</div>
+            <div style="background:rgba(247,129,102,.08);border:1px solid rgba(247,129,102,.4);border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);text-align:center;width:100%">statement 2</div>
+          </div>
+        </div>
+        <div style="color:var(--muted);font-size:18px;margin-top:4px">↓</div>
+        <div style="background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.3);border-radius:6px;padding:6px 20px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)">계속 실행</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>예시 코드</h3></div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">if-else 예시</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    </div>
+    <div class="code-body"><pre><span class="cm">// 최솟값 구하기</span>
+<span class="kw">if</span> (x &lt; y)
+    min = x;   <span class="cm">// x &lt; y 일 때</span>
+<span class="kw">else</span>
+    min = y;   <span class="cm">// x >= y 일 때</span>
+
+<span class="cm">// 짝수/홀수 판별</span>
+<span class="kw">if</span> (number % <span class="nm">2</span> == <span class="nm">0</span>) {
+    <span class="fn">printf</span>(<span class="st">"입력된 정수는 짝수입니다.\n"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">printf</span>(<span class="st">"입력된 정수는 홀수입니다.\n"</span>);
+}
+
+<span class="cm">// 합격/불합격 (복합문)</span>
+<span class="kw">if</span> (score &gt;= <span class="nm">80</span>) {
+    <span class="fn">printf</span>(<span class="st">"합격입니다.\n"</span>);
+    <span class="fn">printf</span>(<span class="st">"장학금도 받을 수 있습니다.\n"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">printf</span>(<span class="st">"불합격입니다.\n"</span>);
+    <span class="fn">printf</span>(<span class="st">"다시 도전하세요.\n"</span>);
+}</pre></div>
+  </div>
+
+  <div class="callout tip">
+    <div class="callout-title">💡 조건 연산자 ?: 와의 관계</div>
+    간단한 if-else 구조는 조건 연산자로 대체 표현 가능 (코드 간결화, 복합문 대체에는 부적절):<br>
+    <code style="font-family:'JetBrains Mono',monospace">(score &gt;= 80) ? printf("합격\n") : printf("불합격\n");</code><br>
+    <code style="font-family:'JetBrains Mono',monospace">bonus = ((years &gt; 30) ? 500 : 300);</code>
+  </div>
+</section>
+
+<!-- ══ 04. if-else if-else ══ -->
+<section class="section" id="elseif">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2>if - else if - else 조건문</h2>
+  </div>
+
+  <div class="two-col">
+    <div class="concept-card highlight">
+      <h3>🪜 다중 조건 구조</h3>
+      <div class="demo-box">
+        <div class="label">문법 (Syntax)</div>
+        <code style="font-family:'JetBrains Mono',monospace"><span class="kw">if</span> (<span style="color:var(--accent5)">조건1</span>)
+    <span style="color:var(--accent2)">statement1;</span>
+<span class="kw">else if</span> (<span style="color:var(--accent5)">조건2</span>)
+    <span style="color:var(--accent)">statement2;</span>
+<span style="color:var(--muted)">...</span>
+<span class="kw">else</span>
+    <span style="color:var(--accent3)">statement_n;</span></code>
+      </div>
+      <ul>
+        <li>조건식을 <strong>차례로 검사</strong>하므로 이전 조건 검사 결과가 반영되어 있음</li>
+        <li>마지막 <span class="ic">else</span>는 <strong>모든 조건이 거짓일 때</strong> 실행</li>
+      </ul>
+    </div>
+    <!-- 플로우차트 -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px;background:var(--bg2);border:1px solid var(--border);border-radius:10px">
+      <div style="background:rgba(255,166,87,.12);border:2px solid var(--accent5);border-radius:6px;padding:8px 16px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent5)">조건1</div>
+      <div style="display:flex;gap:16px;margin:4px 0">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2)">True</span>
+          <div style="background:rgba(63,185,80,.08);border:1px solid rgba(63,185,80,.4);border-radius:4px;padding:5px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2)">stmt 1</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+          <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--accent3)">False</span>
+          <div style="background:rgba(255,166,87,.12);border:2px solid var(--accent5);border-radius:6px;padding:5px 12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent5)">조건2</div>
+          <div style="display:flex;gap:10px;margin-top:3px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+              <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--accent2)">T</span>
+              <div style="background:rgba(88,166,255,.08);border:1px solid rgba(88,166,255,.3);border-radius:4px;padding:5px 8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)">stmt 2</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+              <span style="font-family:'Space Mono',monospace;font-size:9px;color:var(--accent3)">F</span>
+              <div style="background:rgba(247,129,102,.08);border:1px solid rgba(247,129,102,.4);border-radius:4px;padding:5px 8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3)">stmt 3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>성적 등급 예시</h3></div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">성적 등급 계산</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    </div>
+    <div class="code-body"><pre><span class="kw">if</span> (score &gt;= <span class="nm">90</span>)
+    grade = <span class="st">'A'</span>;
+<span class="kw">else if</span> (score &gt;= <span class="nm">80</span>)   <span class="cm">// score는 90 미만이고, 80 이상일 때</span>
+    grade = <span class="st">'B'</span>;
+<span class="kw">else if</span> (score &gt;= <span class="nm">70</span>)   <span class="cm">// score는 80 미만이고, 70 이상일 때</span>
+    grade = <span class="st">'C'</span>;
+<span class="kw">else</span>                    <span class="cm">// 모든 조건이 거짓 (score가 70 미만)</span>
+    grade = <span class="st">'F'</span>;</pre></div>
+  </div>
+  <div class="callout info">
+    <div class="callout-title">ℹ️ 이전 조건 결과가 반영됨</div>
+    <code style="font-family:'JetBrains Mono',monospace">else if (score &gt;= 80)</code>은 위의 조건이 거짓(score &lt; 90)임이 이미 보장된 상태에서 검사됨.
+    즉, <strong>80 이상이고 90 미만</strong>인 경우를 자동으로 의미함.
+  </div>
+</section>
+<!-- ══ 05. 조건문 사용 가이드라인 ══ -->
+<section class="section" id="guide">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2>if 조건문 사용 가이드라인</h2>
+  </div>
+
+  <!-- True/False 간략화 -->
+  <div class="subsec"><h3>① C언어 True/False 정의에 따른 if 조건문 간략화</h3></div>
+  <table class="data-table">
+    <tr>
+      <th>표준적인 방법 (더 명확한 표현)</th>
+      <th>간략한 표현법</th>
+      <th>설명</th>
+    </tr>
+    <tr>
+      <td class="code"><span class="kw">if</span> (x != <span class="nm">0</span>) ...</td>
+      <td class="code"><span class="kw">if</span> (x) ...</td>
+      <td class="desc">x가 0이 아니면 (참)</td>
+    </tr>
+    <tr>
+      <td class="code"><span class="kw">if</span> (x == <span class="nm">0</span>) ...</td>
+      <td class="code"><span class="kw">if</span> (!x) ...</td>
+      <td class="desc">x가 0이면 (거짓)</td>
+    </tr>
+  </table>
+
+  <!-- 2개 if vs if-else -->
+  <div class="subsec"><h3>② 2개의 if 문 vs if-else 문</h3></div>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-header left">비효율적 — if 2개 사용</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;margin:0">
+          <div class="code-body"><pre><span class="kw">if</span> (number % <span class="nm">2</span> == <span class="nm">0</span>)
+    <span class="fn">printf</span>(<span class="st">"짝수입니다.\n"</span>);
+<span class="kw">if</span> (number % <span class="nm">2</span> == <span class="nm">1</span>)
+    <span class="fn">printf</span>(<span class="st">"홀수입니다.\n"</span>);
+<span class="cm">// 각각의 조건을 비교 → 비효율적</span></pre></div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-header right">권장 — if-else 사용</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;border-left:1px solid var(--border);margin:0">
+          <div class="code-body"><pre><span class="kw">if</span> (number % <span class="nm">2</span> == <span class="nm">0</span>)
+    <span class="fn">printf</span>(<span class="st">"짝수입니다.\n"</span>);
+<span class="kw">else</span>
+    <span class="fn">printf</span>(<span class="st">"홀수입니다.\n"</span>);
+<span class="cm">// 비교 연산 한 번만 → 더 효율적</span></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nested if -->
+  <div class="subsec"><h3>③ 중첩된 if 문 (Nested if Statement)</h3></div>
+  <div class="concept-card">
+    <h3>🪆 Nested if</h3>
+    <p>복잡한 조건의 표현 → 논리 연산자(&amp;&amp;, ||)를 사용하여 조건들을 연결하는 게 효율적</p>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-header left">중첩 if 사용</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;margin:0">
+          <div class="code-body"><pre><span class="kw">if</span> (a == <span class="nm">1</span>)
+    <span class="kw">if</span> (b == <span class="nm">2</span>)
+        <span class="fn">printf</span>(<span class="st">"***\n"</span>);</pre></div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-header right">논리 연산자 활용 (권장)</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;border-left:1px solid var(--border);margin:0">
+          <div class="code-body"><pre><span class="kw">if</span> (a == <span class="nm">1</span> &amp;&amp; b == <span class="nm">2</span>)
+    <span class="fn">printf</span>(<span class="st">"***\n"</span>);</pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="code-block" style="margin-top:8px">
+    <div class="code-header"><span class="code-filename">공백 문자 검사 — 논리 연산자 활용</span><span class="code-lang">C</span></div>
+    <div class="code-body"><pre><span class="kw">if</span> (ch == <span class="st">' '</span> || ch == <span class="st">'\n'</span> || ch == <span class="st">'\t'</span>)
+    white_space++;</pre></div>
+  </div>
+
+  <!-- Dangling else -->
+  <div class="subsec"><h3>④ Dangling else 문제 <span class="tag">⚠️ 주의!</span></h3></div>
+  <div class="concept-card" style="border-color:rgba(247,129,102,.35)">
+    <h3 style="color:var(--accent3)">⚠️ else는 가장 가까운 if와 짝을 이룸!</h3>
+    <p>중첩된 if 문에서 else가 어느 if와 짝인지 주의해야 함.</p>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-header left">코드 ① — else가 어느 if와 짝?</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;margin:0">
+          <div class="code-body"><pre><span class="kw">if</span> (a == <span class="nm">1</span>)
+    <span class="kw">if</span> (b == <span class="nm">2</span>)
+        <span class="fn">printf</span>(<span class="st">"***\n"</span>);
+<span class="kw">else</span>          <span class="cm">// 안쪽 if(b==2)와 짝!</span>
+    <span class="fn">printf</span>(<span class="st">"###\n"</span>);
+<span class="cm">// a가 1이 아니면 아무것도 출력 안 됨</span></pre></div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-header right">코드 ② — 의도가 명확한 버전</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;border-left:1px solid var(--border);margin:0">
+          <div class="code-body"><pre><span class="kw">if</span> (a == <span class="nm">1</span>) {
+    <span class="kw">if</span> (b == <span class="nm">2</span>)
+        <span class="fn">printf</span>(<span class="st">"***\n"</span>);
+} <span class="kw">else</span> {      <span class="cm">// 바깥 if(a==1)와 짝</span>
+    <span class="fn">printf</span>(<span class="st">"###\n"</span>);
+}
+<span class="cm">// 항상 무언가 출력됨</span></pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="callout warn">
+    <div class="callout-title">⚠️ Dangling else</div>
+    중첩된 if 문 구조가 프로그래머의 의도와 일치하는지 반드시 확인할 것.
+    중괄호를 사용하여 블록 범위를 명확히 하면 이런 문제를 예방할 수 있음.
+  </div>
+
+  <!-- Good Programming Tips -->
+  <div class="subsec"><h3>⑤ Good Programming Tips</h3></div>
+  <div class="concept-card" style="border-color:rgba(63,185,80,.35);background:linear-gradient(135deg,var(--bg2),rgba(63,185,80,.04))">
+    <h3>✅ 좋은 코딩 습관</h3>
+    <ul>
+      <li><strong>적절한 곳에 들여쓰기(indentation) 적용</strong> — 코드 가독성 향상</li>
+      <li><strong>연관된 블록을 명확하게 하도록 중괄호 사용</strong> — 항상 { }로 블록 감싸기</li>
+      <li>중첩 if 문 구조가 우리 의도와 일치하는지 확인할 것</li>
+      <li>복잡한 중첩 조건은 논리 연산자(&amp;&amp;, ||)로 단순화</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══ 06. switch 문 ══ -->
+<section class="section" id="switch">
+  <div class="section-header">
+    <span class="section-num">06</span>
+    <h2>switch 문 (switch Statement)</h2>
+  </div>
+
+  <div class="concept-card highlight">
+    <h3>🔧 switch statement 구조</h3>
+    <p>if-else if-...-else 구조를 대신해서 사용 가능. 하나의 변수/수식을 여러 값과 비교할 때 편리.</p>
+    <div class="demo-box" style="margin-top:12px">
+      <div class="label">문법 (Syntax)</div>
+      <code style="font-family:'JetBrains Mono',monospace"><span class="kw">switch</span> (<span style="color:var(--accent5)">control_expr</span>) {
+    <span class="kw">case</span> <span style="color:var(--accent)">label1</span>:
+        statement;
+        <span class="kw">break</span>;
+    <span class="kw">case</span> <span style="color:var(--accent)">label2</span>:
+        statement;
+        <span class="kw">break</span>;
+    <span class="kw">default</span>:
+        statement;
+        <span class="kw">break</span>;
+}</code>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>LAB: switchCntChars.c <span class="badge lab">LAB</span></h3></div>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">switchCntChars.c</span>
+      <div style="display:flex;gap:8px;align-items:center"><span class="code-lang">C</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    </div>
+    <div class="code-body"><pre><span class="kw">switch</span> (c) {
+    <span class="kw">case</span> <span class="st">'a'</span>:
+        ++a_cnt;
+        <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="st">'b'</span>:               <span class="cm">// 'b'이거나 'B'이거나</span>
+    <span class="kw">case</span> <span class="st">'B'</span>:               <span class="cm">// → break 없으면 다음 레이블로 fall through!</span>
+        ++b_cnt;
+        <span class="kw">break</span>;
+    <span class="kw">default</span>:
+        ++other_cnt;
+        <span class="cm">// default에서 break 생략 가능 (마지막이므로)</span>
+}</pre></div>
+  </div>
+
+  <div class="subsec"><h3>fall-through 동작 이해</h3></div>
+  <div class="concept-card" style="border-color:rgba(247,129,102,.3)">
+    <h3 style="color:var(--accent3)">⚠️ fall-through (폴스루)</h3>
+    <p><span class="ic">break</span> 문이 없으면 해당 case를 실행 후 <strong>다음 case로 계속 실행</strong>됨 (fall through)</p>
+    <div class="two-col" style="margin-top:12px">
+      <div class="demo-box">
+        <div class="label">의도적 fall-through (유용)</div>
+        <code style="font-family:'JetBrains Mono',monospace;font-size:12px"><span class="kw">case</span> <span class="st">'b'</span>:   <span class="cm">// 'b'와 'B' 모두</span>
+<span class="kw">case</span> <span class="st">'B'</span>:   <span class="cm">// 같은 동작</span>
+    ++b_cnt;
+    <span class="kw">break</span>;</code>
+        <p style="font-size:12px;color:var(--accent2);margin-top:6px">여러 값에 동일 동작 → 활용!</p>
+      </div>
+      <div class="demo-box">
+        <div class="label">실수로 break 빠뜨리면</div>
+        <code style="font-family:'JetBrains Mono',monospace;font-size:12px"><span class="kw">case</span> <span class="nm">1</span>:
+    do_something();
+    <span class="cm">// break 없음!</span>
+<span class="kw">case</span> <span class="nm">2</span>:        <span class="cm">// 여기도 실행됨</span>
+    do_other();</code>
+        <p style="font-size:12px;color:var(--accent3);margin-top:6px">오동작 버그 발생 주의!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="subsec"><h3>switch 문 사용시 주의사항</h3></div>
+  <div class="concept-card">
+    <h3>📋 Good Practice with switch-case</h3>
+    <ul>
+      <li>switch 문에서 검사할 변수가 <strong>적절한 값으로 초기화</strong>되었는지 꼭 확인</li>
+      <li><span class="ic">case</span>와 <span class="ic">break</span>를 먼저 적절한 위치에 써 놓고 시작하기</li>
+      <li>꼭 필요한 경우가 아니라면 여러 개의 case를 하나로 묶는 코드는 피할 것</li>
+      <li><span class="ic">default</span> 문을 꼭 써서 예상치 못한 입력 값에 대처할 수 있도록 준비하기</li>
+      <li>case 절에서 복합문 사용시 if 조건문과 달리 <strong>블록 범위 표시를 위한 중괄호 필요 없음</strong></li>
+    </ul>
+  </div>
+
+  <div class="callout warn">
+    <div class="callout-title">⚠️ case label은 정수형 상수만 가능!</div>
+    case 문에서 검사할 내용(label)은 <strong>정수형 상수(문자 상수 포함)만</strong> 가능합니다.
+    <table class="data-table" style="margin-top:10px">
+      <tr><th>case 레이블 종류</th><th>가능 여부</th><th>이유</th></tr>
+      <tr><td class="code">case x:</td><td class="bad">❌ 불가</td><td class="desc">변수는 사용할 수 없다</td></tr>
+      <tr><td class="code">case (x+2):</td><td class="bad">❌ 불가</td><td class="desc">변수가 들어간 수식 불가</td></tr>
+      <tr><td class="code">case 0.001:</td><td class="bad">❌ 불가</td><td class="desc">실수는 사용할 수 없다</td></tr>
+      <tr><td class="code">case "001":</td><td class="bad">❌ 불가</td><td class="desc">문자열은 사용할 수 없다</td></tr>
+      <tr><td class="code">case 'a':</td><td class="good">✅ 가능</td><td class="desc">문자 상수는 정수형 데이터이므로</td></tr>
+      <tr><td class="code">case 42:</td><td class="good">✅ 가능</td><td class="desc">정수 상수 사용 가능</td></tr>
+    </table>
+  </div>
+</section>
+<!-- ══ 07. switch vs if-else ══ -->
+<section class="section" id="compare">
+  <div class="section-header">
+    <span class="section-num">07</span>
+    <h2>switch 문과 if-else 조건문의 관계</h2>
+  </div>
+
+  <div class="callout info">
+    <div class="callout-title">ℹ️ 언제 switch를 쓰고 언제 if-else를 쓸까?</div>
+    switch문은 if-else if-...-else 구조를 대신할 수 있지만, 모든 경우에 상호 교체가 가능한 것은 아닙니다.
+  </div>
+
+  <!-- 예시 1: 숫자 → 한글 -->
+  <div class="subsec"><h3>예시 ① — 구분되는 조건이 많고 각각 실행문이 다를 때 <span class="tag">switch 유리</span></h3></div>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-header left">if-else if 방식</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;margin:0">
+          <div class="code-body"><pre><span class="kw">if</span> (number == <span class="nm">0</span>)
+    <span class="fn">printf</span>(<span class="st">"없음\n"</span>);
+<span class="kw">else if</span> (number == <span class="nm">1</span>)
+    <span class="fn">printf</span>(<span class="st">"하나\n"</span>);
+<span class="kw">else if</span> (number == <span class="nm">2</span>)
+    <span class="fn">printf</span>(<span class="st">"둘\n"</span>);
+<span class="kw">else</span>
+    <span class="fn">printf</span>(<span class="st">"많음\n"</span>);</pre></div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-header right">switch 방식 (더 명확)</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;border-left:1px solid var(--border);margin:0">
+          <div class="code-body"><pre><span class="kw">switch</span> (number) {
+    <span class="kw">case</span> <span class="nm">0</span>: <span class="fn">printf</span>(<span class="st">"없음\n"</span>); <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="nm">1</span>: <span class="fn">printf</span>(<span class="st">"하나\n"</span>); <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="nm">2</span>: <span class="fn">printf</span>(<span class="st">"둘\n"</span>);  <span class="kw">break</span>;
+    <span class="kw">default</span>: <span class="fn">printf</span>(<span class="st">"많음\n"</span>); <span class="kw">break</span>;
+}</pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 예시 2: 범위 조건 -->
+  <div class="subsec"><h3>예시 ② — 여러 개의 조건에 대한 실행문이 동일하고 범위로 조건 표현이 유리할 때 <span class="tag">if-else 유리</span></h3></div>
+  <div class="compare-grid">
+    <div class="compare-col">
+      <div class="compare-header right">if-else 방식 (간결)</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;margin:0">
+          <div class="code-body"><pre><span class="kw">if</span> (score &gt;= <span class="nm">90</span> &amp;&amp; score &lt;= <span class="nm">100</span>)
+    <span class="fn">printf</span>(<span class="st">"A학점입니다.\n"</span>);</pre></div>
+        </div>
+      </div>
+    </div>
+    <div class="compare-col">
+      <div class="compare-header left">switch 방식 (불편)</div>
+      <div class="compare-body">
+        <div class="code-block" style="border-radius:0;border:none;border-left:1px solid var(--border);margin:0">
+          <div class="code-body"><pre><span class="kw">switch</span>(score) {
+    <span class="kw">case</span> <span class="nm">100</span>: <span class="kw">case</span> <span class="nm">99</span>: <span class="kw">case</span> <span class="nm">98</span>:
+    <span class="cm">// ... case 91: case 90:</span>
+        <span class="fn">printf</span>(<span class="st">"A학점입니다.\n"</span>);
+        <span class="kw">break</span>;
+    <span class="cm">// ...</span>
+}</pre></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="concept-card" style="margin-top:16px">
+    <h3>📊 switch vs if-else 비교 요약</h3>
+    <table class="data-table" style="margin-top:10px">
+      <tr>
+        <th>비교 항목</th>
+        <th>switch</th>
+        <th>if-else</th>
+      </tr>
+      <tr>
+        <td class="desc">조건 표현</td>
+        <td class="desc">정수형 상수와의 동등 비교만 가능</td>
+        <td class="desc">범위, 복잡한 조건 모두 가능</td>
+      </tr>
+      <tr>
+        <td class="desc">가독성</td>
+        <td class="good">많은 이산값 비교 시 더 명확</td>
+        <td class="desc">범위 조건 시 더 간결</td>
+      </tr>
+      <tr>
+        <td class="desc">주의사항</td>
+        <td class="bad">break 빠뜨리면 fall-through 발생</td>
+        <td class="desc">Dangling else, 중괄호 생략 주의</td>
+      </tr>
+      <tr>
+        <td class="desc">범위 조건</td>
+        <td class="bad">❌ 모든 값 열거해야 함</td>
+        <td class="good">✅ 표현 가능</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══ QUIZ ══ -->
+<section class="section" id="quiz">
+  <div class="section-header">
+    <span class="section-num">Q</span>
+    <h2>Quiz</h2>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q1</span>
+      다음 코드의 실행 결과는? (<code style="font-family:'JetBrains Mono',monospace">int x = 5;</code>)
+      <div class="code-block" style="margin-top:10px">
+        <div class="code-body"><pre><span class="kw">if</span> (x &lt; <span class="nm">10</span>)
+    <span class="fn">printf</span>(<span class="st">"10보다 작음\n"</span>);
+<span class="kw">else if</span> (x == <span class="nm">5</span>)
+    <span class="fn">printf</span>(<span class="st">"5와 같음\n"</span>);
+<span class="kw">else</span>
+    <span class="fn">printf</span>(<span class="st">"5와 같지 않음\n"</span>);</pre></div>
+      </div>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,true)">① 10보다 작음</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">② 5와 같음</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">③ 5와 같지 않음</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">④ 10보다 작음 + 5와 같음 (두 줄 출력)</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>① "10보다 작음"</strong> 출력<br>
+      x=5 이므로 첫 번째 조건 <code>x &lt; 10</code>이 참 → 즉시 해당 블록 실행 후 전체 if-else if-else 구조를 빠져나감.
+      두 번째 조건 <code>x == 5</code>는 검사하지 않음. if-else if-else는 <strong>하나의 조건만 실행됨!</strong>
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q2</span>
+      다음 코드에서 <strong>잘못된 부분</strong>을 찾아 고치시오.<br>
+      <strong>(a)</strong> 청소년 나이 검사 코드
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-body"><pre><span class="kw">if</span> (<span class="nm">0</span> &lt; age &lt;= <span class="nm">18</span>)
+    <span class="fn">printf</span>(<span class="st">"청소년\n"</span>);</pre></div>
+      </div>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">문제없다. 정상적으로 동작한다.</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">C에서 0 &lt; age &lt;= 18 은 항상 참이 되는 버그가 있다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">age 변수 타입이 문제다</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>항상 참이 되는 버그!</strong><br>
+      C언어는 수학의 연쇄 부등식을 지원하지 않음. <br>
+      <code>0 &lt; age &lt;= 18</code>은 <code>(0 &lt; age) &lt;= 18</code>로 해석됨.<br>
+      <code>(0 &lt; age)</code>의 결과는 <code>0</code> 또는 <code>1</code> → 이 값은 항상 <code>&lt;= 18</code>이 참!<br><br>
+      <strong>올바른 코드:</strong> <code style="font-family:'JetBrains Mono',monospace">if (age &gt; 0 &amp;&amp; age &lt;= 18)</code>
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q3</span>
+      다음 코드에서 <strong>잘못된 부분</strong>을 찾아 고치시오.<br>
+      <strong>(b)</strong> x가 0인지 확인하는 코드
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-body"><pre><span class="kw">if</span> (x = <span class="nm">0</span>)
+    <span class="fn">printf</span>(<span class="st">"x는 0이다.\n"</span>);</pre></div>
+      </div>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">문제없다. x가 0이면 출력한다.</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">= 는 대입 연산자라 조건식이 항상 거짓(0)이 되어 printf가 실행되지 않는다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">printf 형식 문자열이 잘못됐다</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>대입 연산자 vs 동치 연산자 혼동 버그!</strong><br>
+      <code>if (x = 0)</code>에서 <code>=</code>는 <strong>대입 연산자</strong> → x에 0을 대입하고 결과값 0(거짓)을 조건식으로 사용.
+      결과: x는 항상 0이 되고, printf는 절대 실행되지 않음.<br><br>
+      <strong>올바른 코드:</strong> <code style="font-family:'JetBrains Mono',monospace">if (x == 0)</code> &nbsp;← 동치 연산자 <code>==</code> 사용
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q4</span>
+      다음 코드에서 else는 어느 if와 짝을 이루는가? (x=5, y=3일 때 출력 결과는?)
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-body"><pre><span class="ty">int</span> x = <span class="nm">5</span>, y = <span class="nm">3</span>;
+<span class="kw">if</span> (x &gt; <span class="nm">10</span>)
+    <span class="kw">if</span> (y &gt; <span class="nm">2</span>)
+        <span class="fn">printf</span>(<span class="st">"A\n"</span>);
+<span class="kw">else</span>
+    <span class="fn">printf</span>(<span class="st">"B\n"</span>);</pre></div>
+      </div>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">A 출력</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">B 출력 (else가 바깥 if와 짝)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">아무것도 출력되지 않음 (else가 안쪽 if와 짝)</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">A와 B 모두 출력</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>아무것도 출력되지 않음 — Dangling else!</strong><br>
+      else는 <strong>가장 가까운 if</strong>인 <code>if (y &gt; 2)</code>와 짝을 이룸.<br>
+      x=5이므로 <code>if (x &gt; 10)</code>이 거짓 → 안쪽 블록 전체(if(y&gt;2)~else 포함) 건너뜀 → 아무것도 출력 안 됨.<br><br>
+      만약 else를 바깥 if와 짝짓고 싶다면:<br>
+      <code style="font-family:'JetBrains Mono',monospace">if (x &gt; 10) { if (y &gt; 2) printf("A\n"); } else printf("B\n");</code>
+    </div>
+  </div>
+
+  <div class="quiz-item">
+    <div class="quiz-q"><span class="qnum">Q5</span>
+      switch 문에서 break를 모두 제거하면 어떻게 되는가? (<code style="font-family:'JetBrains Mono',monospace">c = 'a'</code>일 때)
+      <div class="code-block" style="margin-top:8px">
+        <div class="code-body"><pre><span class="kw">switch</span> (c) {
+    <span class="kw">case</span> <span class="st">'a'</span>: ++a_cnt;
+    <span class="kw">case</span> <span class="st">'b'</span>: ++b_cnt;
+    <span class="kw">default</span>: ++other_cnt;
+}</pre></div>
+      </div>
+    </div>
+    <div class="quiz-options">
+      <button class="quiz-option" onclick="answerQuiz(this,false)">a_cnt만 1 증가한다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">a_cnt와 b_cnt가 1씩 증가한다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,true)">a_cnt, b_cnt, other_cnt 모두 1씩 증가한다</button>
+      <button class="quiz-option" onclick="answerQuiz(this,false)">컴파일 에러가 발생한다</button>
+    </div>
+    <div class="quiz-explain">
+      ✅ <strong>a_cnt, b_cnt, other_cnt 모두 1씩 증가!</strong><br>
+      break가 없으면 매칭된 case부터 시작하여 switch 블록 끝까지 <strong>모든 case가 순차 실행</strong>됩니다 (fall-through).<br>
+      c='a'이므로 case 'a'에서 시작 → break 없음 → case 'b' 실행 → break 없음 → default 실행.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+function answerQuiz(btn, isCorrect) {
+  const item = btn.closest('.quiz-item');
+  const opts = item.querySelectorAll('.quiz-option');
+  const explain = item.querySelector('.quiz-explain');
+  opts.forEach(o => { o.disabled = true; o.style.cursor = 'default'; });
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (explain) explain.classList.add('show');
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre ? pre.innerText : '';
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.style.background = 'var(--accent2)';
+    btn.style.color = 'var(--bg)';
+    setTimeout(() => { btn.textContent = 'Copy'; btn.style.background = ''; btn.style.color = ''; }, 1800);
+  });
+}
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      navItems.forEach(n => n.classList.toggle('active', n.getAttribute('href') === '#' + id));
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

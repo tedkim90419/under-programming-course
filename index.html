@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>프로그래밍방법론 및 실습 | 서울시립대학교</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0d1117;
+  --bg2:    #161b22;
+  --bg3:    #21262d;
+  --border: #30363d;
+  --text:   #e6edf3;
+  --muted:  #8b949e;
+  --dim:    #484f58;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ── SUBTLE GRID BACKGROUND ── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(88,166,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(88,166,255,.025) 1px, transparent 1px);
+  background-size: 56px 56px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── GLOW ORBS ── */
+.orb { position: fixed; border-radius: 50%; filter: blur(140px); pointer-events: none; z-index: 0; }
+.orb-1 { width: 700px; height: 700px; background: rgba(88,166,255,.055); top: -250px; right: -150px; animation: drift 18s ease-in-out infinite alternate; }
+.orb-2 { width: 500px; height: 500px; background: rgba(232,121,249,.045); bottom: -150px; left: -100px; animation: drift 22s ease-in-out infinite alternate-reverse; }
+@keyframes drift { from { transform: translate(0,0); } to { transform: translate(30px, 20px); } }
+
+/* ── STICKY HEADER ── */
+header {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(13,17,23,.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner {
+  max-width: 1100px; margin: 0 auto; padding: 0 32px;
+  height: 58px; display: flex; align-items: center; justify-content: space-between;
+}
+.header-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.hl-badge {
+  font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  background: linear-gradient(135deg, #58a6ff, #e879f9);
+  color: #0d1117;
+}
+.hl-name { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+.header-right { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--dim); }
+
+/* ── MAIN WRAPPER ── */
+.wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 32px 100px; }
+
+/* ── HERO ── */
+.hero { padding: 80px 0 64px; position: relative; }
+
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+}
+.hero-tag {
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  padding: 4px 14px; border-radius: 20px;
+  background: rgba(88,166,255,.1); border: 1px solid rgba(88,166,255,.25);
+  color: #58a6ff;
+}
+.hero-line { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(88,166,255,.2), transparent); }
+
+.hero h1 {
+  font-size: clamp(30px, 5vw, 54px);
+  font-weight: 900; letter-spacing: -1.5px; line-height: 1.08;
+  margin-bottom: 14px;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(120deg, #58a6ff 0%, #e879f9 55%, #ffa657 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.hero-meta {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 14px; color: var(--muted); margin-bottom: 40px;
+}
+.hero-meta .sep { color: var(--dim); }
+.hero-meta strong { color: var(--text); font-weight: 500; }
+
+/* ── SECTION TITLE ── */
+.section-heading {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 24px;
+}
+.section-heading h2 { font-size: 18px; font-weight: 700; }
+.section-heading::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.section-badge {
+  font-family: 'Space Mono', monospace; font-size: 9px; font-weight: 700;
+  padding: 2px 8px; border-radius: 3px;
+  background: rgba(88,166,255,.1); color: #58a6ff; border: 1px solid rgba(88,166,255,.2);
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* ── LECTURE GRID ── */
+.lecture-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  margin-bottom: 64px;
+}
+
+/* ── LECTURE CARD ── */
+.lec-card {
+  position: relative;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-decoration: none;
+  color: var(--text);
+  display: flex; flex-direction: column; gap: 12px;
+  overflow: hidden;
+  transition: transform .2s, border-color .2s, box-shadow .2s;
+}
+.lec-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--card-color-a, transparent) 0%, transparent 60%);
+  opacity: 0; transition: opacity .3s;
+  pointer-events: none;
+}
+.lec-card:hover { transform: translateY(-3px); box-shadow: 0 8px 32px rgba(0,0,0,.4); }
+.lec-card:hover::before { opacity: 1; }
+.lec-card:hover { border-color: var(--card-accent); }
+
+/* accent strip on left */
+.lec-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--card-accent);
+  opacity: 0; transition: opacity .2s;
+}
+.lec-card:hover::after { opacity: 1; }
+
+.card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.card-lec-num {
+  font-family: 'Space Mono', monospace; font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 4px;
+  background: rgba(255,255,255,.06); color: var(--card-accent);
+  border: 1px solid rgba(255,255,255,.08);
+  flex-shrink: 0;
+}
+.card-arrow {
+  font-size: 16px; color: var(--dim); transition: color .2s, transform .2s;
+  flex-shrink: 0;
+}
+.lec-card:hover .card-arrow { color: var(--card-accent); transform: translateX(3px); }
+
+.card-title { font-size: 17px; font-weight: 700; line-height: 1.3; }
+.card-title-en { font-size: 12px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+
+.card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; flex: 1; }
+
+.card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+.card-tag {
+  font-family: 'Space Mono', monospace; font-size: 10px;
+  padding: 2px 8px; border-radius: 3px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  color: var(--muted); transition: all .15s;
+}
+.lec-card:hover .card-tag { border-color: rgba(255,255,255,.12); color: var(--text); }
+
+.card-num-bg {
+  position: absolute; bottom: -10px; right: 12px;
+  font-family: 'Space Mono', monospace; font-size: 80px; font-weight: 700;
+  color: var(--card-accent); opacity: .04; line-height: 1;
+  pointer-events: none; user-select: none;
+}
+
+/* ── INFO SECTION ── */
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 64px; }
+.info-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 24px;
+}
+.info-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--muted); font-family: 'Space Mono', monospace; text-transform: uppercase; letter-spacing: 1px; }
+
+.tool-list { display: flex; flex-direction: column; gap: 10px; }
+.tool-item { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+.tool-icon { font-size: 18px; flex-shrink: 0; }
+.tool-name { font-weight: 700; }
+.tool-desc { color: var(--muted); font-size: 12px; }
+
+.tips-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.tips-list li { font-size: 13px; color: var(--muted); padding-left: 16px; position: relative; line-height: 1.5; }
+.tips-list li::before { content: '▸'; position: absolute; left: 0; color: #58a6ff; }
+
+/* ── FOOTER ── */
+footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 32px;
+  text-align: center;
+}
+.footer-inner { max-width: 1100px; margin: 0 auto; }
+.footer-logo { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--dim); margin-bottom: 6px; }
+.footer-copy { font-size: 12px; color: var(--dim); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 700px) {
+  .wrap { padding: 0 20px 80px; }
+  .info-grid { grid-template-columns: 1fr; }
+  .header-right { display: none; }
+  .hero { padding: 48px 0 40px; }
+}
+
+/* ── FADE-IN ANIMATION ── */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.hero         { animation: fadeUp .6s ease both; }
+.section-heading { animation: fadeUp .6s .15s ease both; }
+.lec-card     { animation: fadeUp .5s ease both; }
+.lec-card:nth-child(1)  { animation-delay: .08s; }
+.lec-card:nth-child(2)  { animation-delay: .12s; }
+.lec-card:nth-child(3)  { animation-delay: .16s; }
+.lec-card:nth-child(4)  { animation-delay: .20s; }
+.lec-card:nth-child(5)  { animation-delay: .24s; }
+.lec-card:nth-child(6)  { animation-delay: .28s; }
+.lec-card:nth-child(7)  { animation-delay: .32s; }
+.lec-card:nth-child(8)  { animation-delay: .36s; }
+.lec-card:nth-child(9)  { animation-delay: .40s; }
+.lec-card:nth-child(10) { animation-delay: .44s; }
+.lec-card:nth-child(11) { animation-delay: .48s; }
+.lec-card:nth-child(12) { animation-delay: .52s; }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a class="header-logo" href="#">
+      <span class="hl-badge">UOS</span>
+      <span class="hl-name">프로그래밍방법론 및 실습</span>
+    </a>
+    <span class="header-right">기계정보공학과 · 김태현 교수</span>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">
+      <span class="hero-tag">Study Companion</span>
+      <div class="hero-line"></div>
+    </div>
+
+    <h1>C 프로그래밍<br><em>인터랙티브 학습 가이드</em></h1>
+
+    <div class="hero-meta">
+      <strong>프로그래밍방법론 및 실습</strong>
+      <span class="sep">·</span>
+      <span>서울시립대학교 기계정보공학과</span>
+      <span class="sep">·</span>
+      <span>김태현 교수</span>
+    </div>
+
+  </section>
+
+  <!-- LECTURE CARDS -->
+  <div class="section-heading">
+    <span class="section-badge">Lectures</span>
+    <h2>강의 목록</h2>
+  </div>
+
+  <div class="lecture-grid">
+
+    <!-- lec01 -->
+    <a class="lec-card" href="lec01_C언어소개.html"
+       style="--card-accent:#79c0ff; --card-color-a:rgba(121,192,255,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 01</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">C언어 소개</div>
+        <div class="card-title-en">Introduction to C</div>
+      </div>
+      <p class="card-desc">C 언어의 역사와 특징, 프로그램 개발 과정(편집→컴파일→링크→실행), 기본 입출력 구조와 첫 번째 C 프로그램 작성까지 다룹니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">Hello World</span>
+        <span class="card-tag">gcc</span>
+        <span class="card-tag">printf</span>
+        <span class="card-tag">scanf</span>
+      </div>
+      <div class="card-num-bg">01</div>
+    </a>
+
+    <!-- lec02 -->
+    <a class="lec-card" href="lec02_변수와자료형.html"
+       style="--card-accent:#58a6ff; --card-color-a:rgba(88,166,255,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 02</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">변수와 자료형</div>
+        <div class="card-title-en">Variables &amp; Data Types</div>
+      </div>
+      <p class="card-desc">변수 선언과 초기화, 정수형·부동소수점·문자형 자료형, sizeof 연산자, typedef, 오버플로우 개념을 메모리 시각화와 함께 학습합니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">int / float</span>
+        <span class="card-tag">char</span>
+        <span class="card-tag">sizeof</span>
+        <span class="card-tag">typedef</span>
+        <span class="card-tag">Overflow</span>
+      </div>
+      <div class="card-num-bg">02</div>
+    </a>
+
+    <!-- lec03 -->
+    <a class="lec-card" href="lec03_수식과연산자.html"
+       style="--card-accent:#ffa657; --card-color-a:rgba(255,166,87,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 03</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">수식과 연산자</div>
+        <div class="card-title-en">Expressions &amp; Operators</div>
+      </div>
+      <p class="card-desc">산술·증감·대입·관계·논리·비트 연산자의 동작 원리와 연산자 우선순위, 형 변환(묵시적·명시적)을 인터랙티브하게 정리합니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">Arithmetic</span>
+        <span class="card-tag">Bitwise</span>
+        <span class="card-tag">Precedence</span>
+        <span class="card-tag">Type Cast</span>
+      </div>
+      <div class="card-num-bg">03</div>
+    </a>
+
+    <!-- lec04 -->
+    <a class="lec-card" href="lec04_조건문.html"
+       style="--card-accent:#3fb950; --card-color-a:rgba(63,185,80,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 04</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">조건문</div>
+        <div class="card-title-en">Conditional Statement</div>
+      </div>
+      <p class="card-desc">if / if-else / if-else if-else / switch-case 구조의 동작 흐름을 플로우차트와 인터랙티브 시뮬레이터로 직관적으로 이해합니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">if-else</span>
+        <span class="card-tag">switch</span>
+        <span class="card-tag">Ternary ?:</span>
+        <span class="card-tag">Flowchart</span>
+      </div>
+      <div class="card-num-bg">04</div>
+    </a>
+
+    <!-- lec05 -->
+    <a class="lec-card" href="lec05_반복문.html"
+       style="--card-accent:#ffa657; --card-color-a:rgba(255,166,87,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 05</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">반복문</div>
+        <div class="card-title-en">Iteration Statement</div>
+      </div>
+      <p class="card-desc">while, do-while, for 루프의 동작 원리와 break/continue 제어 흐름, 중첩 반복문까지 인터랙티브 시뮬레이터로 학습합니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">while</span>
+        <span class="card-tag">for</span>
+        <span class="card-tag">do-while</span>
+        <span class="card-tag">break</span>
+        <span class="card-tag">continue</span>
+      </div>
+      <div class="card-num-bg">05</div>
+    </a>
+
+    <!-- lec06 -->
+    <a class="lec-card" href="lec06_배열.html"
+       style="--card-accent:#d2a8ff; --card-color-a:rgba(210,168,255,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 06</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">배열</div>
+        <div class="card-title-en">Array</div>
+      </div>
+      <p class="card-desc">1차원·다차원 배열의 선언, 초기화, 메모리 구조를 시각화하고 Row-major 저장 방식을 인터랙티브하게 탐색합니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">Declaration</span>
+        <span class="card-tag">Indexing</span>
+        <span class="card-tag">2D Array</span>
+        <span class="card-tag">Row-major</span>
+      </div>
+      <div class="card-num-bg">06</div>
+    </a>
+
+    <!-- lec07 -->
+    <a class="lec-card" href="lec07_함수.html"
+       style="--card-accent:#39d353; --card-color-a:rgba(57,211,83,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 07</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">함수</div>
+        <div class="card-title-en">Functions</div>
+      </div>
+      <p class="card-desc">함수 정의·호출·원형 선언부터 Scope, Storage Class, 재귀 함수까지. 콜스택 시뮬레이터로 재귀 호출 과정을 직접 확인합니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">Prototype</span>
+        <span class="card-tag">Scope</span>
+        <span class="card-tag">static</span>
+        <span class="card-tag">Recursion</span>
+      </div>
+      <div class="card-num-bg">07</div>
+    </a>
+
+    <!-- lec08 -->
+    <a class="lec-card" href="lec08_포인터.html"
+       style="--card-accent:#56cfe1; --card-color-a:rgba(86,207,225,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 08</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">포인터 &amp; 동적 메모리</div>
+        <div class="card-title-en">Pointers &amp; Dynamic Memory</div>
+      </div>
+      <p class="card-desc">주소 연산자, 역참조, 포인터 산술부터 malloc/free 동적 할당까지. 메모리 시각화와 Heap 시뮬레이터로 개념을 완전히 이해합니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">&amp; / *</span>
+        <span class="card-tag">Call-by-Ref</span>
+        <span class="card-tag">malloc</span>
+        <span class="card-tag">const</span>
+      </div>
+      <div class="card-num-bg">08</div>
+    </a>
+
+    <!-- lec09 -->
+    <a class="lec-card" href="lec09_문자열.html"
+       style="--card-accent:#f472b6; --card-color-a:rgba(244,114,182,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 09</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">문자열</div>
+        <div class="card-title-en">String</div>
+      </div>
+      <p class="card-desc">NULL 종료 문자열 구조, char 배열과 포인터의 차이, string.h 라이브러리 함수들을 인터랙티브 데모로 직접 실행해봅니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">strlen</span>
+        <span class="card-tag">strcpy</span>
+        <span class="card-tag">strcmp</span>
+        <span class="card-tag">atoi</span>
+      </div>
+      <div class="card-num-bg">09</div>
+    </a>
+
+    <!-- lec10 -->
+    <a class="lec-card" href="lec10_구조체.html"
+       style="--card-accent:#e3b341; --card-color-a:rgba(227,179,65,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 10</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">구조체 · 공용체 · 열거형</div>
+        <div class="card-title-en">Structure, Union &amp; Enum</div>
+      </div>
+      <p class="card-desc">사용자 정의 복합 타입 설계 방법을 배웁니다. . / -> 연산자 트레이너와 열거형 상수값 탐색기를 제공합니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">struct</span>
+        <span class="card-tag">typedef</span>
+        <span class="card-tag">union</span>
+        <span class="card-tag">enum</span>
+      </div>
+      <div class="card-num-bg">10</div>
+    </a>
+
+    <!-- lec11 -->
+    <a class="lec-card" href="lec11_파일입출력.html"
+       style="--card-accent:#4ade80; --card-color-a:rgba(74,222,128,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 11</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">파일 입출력</div>
+        <div class="card-title-en">File I/O</div>
+      </div>
+      <p class="card-desc">스트림 개념부터 텍스트·이진 파일 처리까지. fgetc 읽기 시뮬레이터와 fseek position 탐색기로 파일 포인터 동작을 직관적으로 이해합니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">fopen</span>
+        <span class="card-tag">fgetc/fputc</span>
+        <span class="card-tag">fread/fwrite</span>
+        <span class="card-tag">fseek</span>
+      </div>
+      <div class="card-num-bg">11</div>
+    </a>
+
+    <!-- lec12 -->
+    <a class="lec-card" href="lec12_preprocessor.html"
+       style="--card-accent:#e879f9; --card-color-a:rgba(232,121,249,.06)">
+      <div class="card-header">
+        <span class="card-lec-num">Lec 12</span>
+        <span class="card-arrow">→</span>
+      </div>
+      <div>
+        <div class="card-title">전처리기 지시어</div>
+        <div class="card-title-en">Preprocessor Directive</div>
+      </div>
+      <p class="card-desc">#include, #define 매크로, 조건부 컴파일까지. 매크로 확장 시뮬레이터와 조건부 컴파일 시각화로 전처리기의 동작을 명확히 이해합니다.</p>
+      <div class="card-tags">
+        <span class="card-tag">#include</span>
+        <span class="card-tag">#define</span>
+        <span class="card-tag">#ifdef</span>
+        <span class="card-tag">gcc -D</span>
+      </div>
+      <div class="card-num-bg">12</div>
+    </a>
+
+  </div>
+
+  <!-- INFO SECTION -->
+  <div class="section-heading">
+    <span class="section-badge">Guide</span>
+    <h2>학습 가이드</h2>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>페이지 구성</h3>
+      <div class="tool-list">
+        <div class="tool-item">
+          <span class="tool-icon">📖</span>
+          <div>
+            <div class="tool-name">개념 설명</div>
+            <div class="tool-desc">강의 슬라이드 내용을 시각화된 카드와 다이어그램으로 정리</div>
+          </div>
+        </div>
+        <div class="tool-item">
+          <span class="tool-icon">⚡</span>
+          <div>
+            <div class="tool-name">인터랙티브 데모</div>
+            <div class="tool-desc">직접 값을 입력하고 결과를 실시간으로 확인하는 시뮬레이터</div>
+          </div>
+        </div>
+        <div class="tool-item">
+          <span class="tool-icon">💻</span>
+          <div>
+            <div class="tool-name">코드 예제</div>
+            <div class="tool-desc">구문 강조 + 복사 버튼이 있는 LAB 예제 코드 전량 수록</div>
+          </div>
+        </div>
+        <div class="tool-item">
+          <span class="tool-icon">🎯</span>
+          <div>
+            <div class="tool-name">퀴즈</div>
+            <div class="tool-desc">각 강의 말미에 6문제 인터랙티브 퀴즈로 이해도 점검</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="info-card">
+      <h3>학습 팁</h3>
+      <ul class="tips-list">
+        <li>각 강의 페이지는 <strong>단일 HTML 파일</strong>로 인터넷 없이도 오프라인에서 열 수 있습니다.</li>
+        <li>왼쪽 사이드바 메뉴로 원하는 섹션으로 즉시 이동할 수 있습니다.</li>
+        <li>인터랙티브 데모는 직접 값을 바꾸며 결과를 확인하는 방식으로 활용하세요.</li>
+        <li>코드 블록 오른쪽 <strong>복사 버튼</strong>으로 예제를 편집기에 바로 붙여넣을 수 있습니다.</li>
+        <li>강의 순서대로 학습하면 개념이 자연스럽게 연결됩니다.</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">서울시립대학교 기계정보공학과 · 프로그래밍방법론 및 실습 · 김태현 교수</div>
+    <div class="footer-copy">인터랙티브 학습 자료 — C Programming Study Companion</div>
+  </div>
+</footer>
+
+</body>
+</html>

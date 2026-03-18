@@ -1,0 +1,1881 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 05 — 반복문 | C 프로그래밍</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent2: #3fb950;
+  --accent3: #f78166;
+  --accent4: #d2a8ff;
+  --accent5: #ffa657;
+  --yellow: #e3b341;
+  --teal: #39d353;
+  --code-bg: #0d1117;
+  --keyword: #ff7b72;
+  --type: #79c0ff;
+  --string: #a5d6ff;
+  --comment: #8b949e;
+  --number: #79c0ff;
+  --fn: #d2a8ff;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ── SIDEBAR NAV ── */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 240px;
+  height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 100;
+  padding: 0 0 40px;
+}
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .course {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.sidebar-logo .title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 4px;
+}
+.sidebar-logo .lec-num {
+  display: inline-block;
+  background: var(--accent5);
+  color: var(--bg);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-top: 8px;
+}
+.nav-section { padding: 16px 0 8px; }
+.nav-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  padding: 0 20px 8px;
+}
+.nav-item {
+  display: block;
+  padding: 7px 20px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+}
+.nav-item:hover, .nav-item.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(88,166,255,.08);
+}
+.nav-item .dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* ── MAIN CONTENT ── */
+.main {
+  margin-left: 240px;
+  padding: 40px 48px 80px;
+  max-width: 960px;
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #1a1a2e 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px 48px;
+  margin-bottom: 48px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,166,87,.12) 0%, transparent 70%);
+}
+.hero-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--accent5);
+  background: rgba(255,166,87,.1);
+  border: 1px solid rgba(255,166,87,.2);
+  padding: 3px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+.hero h1 {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+.hero h1 span { color: var(--accent5); }
+.hero-sub {
+  font-size: 16px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+.hero-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.hero-pill {
+  font-size: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+}
+
+/* ── SECTION ── */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.section-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--bg);
+  background: var(--accent5);
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+.section h2 { font-size: 20px; font-weight: 700; }
+
+/* ── CONCEPT CARD ── */
+.concept-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.concept-card.highlight {
+  border-color: rgba(255,166,87,.4);
+  background: linear-gradient(135deg, var(--bg2), rgba(255,166,87,.04));
+}
+.concept-card.highlight-blue {
+  border-color: rgba(88,166,255,.4);
+  background: linear-gradient(135deg, var(--bg2), rgba(88,166,255,.04));
+}
+.concept-card.highlight-green {
+  border-color: rgba(63,185,80,.4);
+  background: linear-gradient(135deg, var(--bg2), rgba(63,185,80,.04));
+}
+.concept-card.highlight-purple {
+  border-color: rgba(210,168,255,.4);
+  background: linear-gradient(135deg, var(--bg2), rgba(210,168,255,.04));
+}
+.concept-card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--accent5);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.concept-card h3 .icon { font-size: 16px; }
+.concept-card p {
+  color: #c9d1d9;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.concept-card ul { list-style: none; margin-top: 8px; }
+.concept-card ul li {
+  color: #c9d1d9;
+  font-size: 14px;
+  padding: 4px 0 4px 20px;
+  position: relative;
+}
+.concept-card ul li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--accent2);
+}
+
+/* ── CODE BLOCK ── */
+.code-block {
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+.code-header {
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.code-filename {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+.code-lang {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--bg);
+  background: var(--accent2);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.copy-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+.copy-btn.copied { color: var(--accent2); border-color: var(--accent2); }
+.code-body {
+  padding: 20px;
+  overflow-x: auto;
+}
+.code-body pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+}
+/* syntax colors */
+.kw { color: #ff7b72; }
+.ty { color: #79c0ff; }
+.cm { color: #8b949e; font-style: italic; }
+.nm { color: #ffa657; }
+.st { color: #a5d6ff; }
+.fn { color: #d2a8ff; }
+.op { color: #e6edf3; }
+.nb { color: #79c0ff; }
+
+/* ── OUTPUT BOX ── */
+.output-box {
+  background: #010409;
+  border: 1px solid var(--accent2);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--accent2);
+}
+.output-box::before { content: '$ '; color: var(--muted); }
+
+/* ── CALLOUT ── */
+.callout {
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 13px;
+  display: flex;
+  gap: 12px;
+}
+.callout.tip   { background: rgba(63,185,80,.08);  border: 1px solid rgba(63,185,80,.25);  }
+.callout.warn  { background: rgba(255,166,87,.08); border: 1px solid rgba(255,166,87,.3);  }
+.callout.info  { background: rgba(88,166,255,.08); border: 1px solid rgba(88,166,255,.25); }
+.callout.error { background: rgba(247,129,102,.08);border: 1px solid rgba(247,129,102,.3); }
+.callout-icon { font-size: 18px; flex-shrink: 0; }
+.callout-body { color: #c9d1d9; line-height: 1.6; }
+.callout-body strong { display: block; margin-bottom: 4px; }
+
+/* ── FLOWCHART / LOOP DIAGRAM ── */
+.flow-diagram {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  margin: 16px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.flow-code-col { flex: 1; min-width: 200px; }
+.flow-chart-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  min-width: 160px;
+}
+.flow-box {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  text-align: center;
+  min-width: 120px;
+  position: relative;
+}
+.flow-box.init   { border-color: var(--accent5); color: var(--accent5); background: rgba(255,166,87,.08); }
+.flow-box.cond   { border-color: var(--accent);  color: var(--accent);  background: rgba(88,166,255,.08); transform: rotate(0); }
+.flow-box.body   { border-color: var(--accent2); color: var(--accent2); background: rgba(63,185,80,.08); }
+.flow-box.incr   { border-color: var(--accent4); color: var(--accent4); background: rgba(210,168,255,.08); }
+.flow-box.exit   { border-color: var(--muted);   color: var(--muted); }
+.flow-arrow {
+  font-size: 16px;
+  color: var(--muted);
+  line-height: 1.4;
+  text-align: center;
+}
+.flow-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  text-align: center;
+  padding: 1px 0;
+}
+.flow-loop-back {
+  font-size: 10px;
+  color: var(--accent4);
+  font-family: 'Space Mono', monospace;
+  margin-top: 4px;
+  padding: 4px 8px;
+  border: 1px dashed rgba(210,168,255,.3);
+  border-radius: 4px;
+}
+
+/* ── COMPARE TABLE ── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+.compare-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+.compare-card .loop-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.compare-card p {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ── DATA TABLE ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 16px 0;
+}
+.data-table thead tr { background: var(--bg3); }
+.data-table th {
+  text-align: left;
+  padding: 10px 14px;
+  color: var(--muted);
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border);
+}
+.data-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.data-table tbody tr:hover { background: rgba(255,255,255,.02); }
+
+/* ── INTERACTIVE LOOP VISUALIZER ── */
+.loop-vis {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin: 16px 0;
+}
+.loop-vis-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--accent5);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.loop-vis-title::before { content: '▶'; font-size: 10px; }
+.loop-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.loop-controls label {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+.loop-controls input[type=number] {
+  width: 60px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-align: center;
+}
+.loop-btn {
+  background: var(--accent5);
+  color: var(--bg);
+  border: none;
+  padding: 6px 16px;
+  border-radius: 5px;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+}
+.loop-btn:hover { opacity: .85; }
+.loop-btn.reset {
+  background: var(--bg3);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.loop-trace {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 40px;
+  padding: 10px;
+  background: #010409;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+.loop-step {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: rgba(63,185,80,.15);
+  border: 1px solid rgba(63,185,80,.3);
+  color: var(--accent2);
+  animation: fadeIn .3s ease;
+}
+.loop-step.cond-true  { background: rgba(88,166,255,.15); border-color: rgba(88,166,255,.3); color: var(--accent); }
+.loop-step.cond-false { background: rgba(247,129,102,.15); border-color: rgba(247,129,102,.3); color: var(--accent3); }
+.loop-step.incr       { background: rgba(210,168,255,.15); border-color: rgba(210,168,255,.3); color: var(--accent4); }
+@keyframes fadeIn { from { opacity:0; transform: scale(.9); } to { opacity:1; transform: scale(1); } }
+
+/* ── NESTED LOOP VISUALIZER ── */
+.nested-grid {
+  display: inline-grid;
+  gap: 4px;
+  margin: 12px 0;
+  padding: 16px;
+  background: #010409;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.nested-cell {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  background: var(--bg2);
+  transition: all .2s;
+}
+.nested-cell.lit {
+  background: rgba(255,166,87,.2);
+  border-color: rgba(255,166,87,.5);
+  color: var(--accent5);
+}
+
+/* ── TABS ── */
+.tabs { margin: 16px 0; }
+.tab-bar { display: flex; border-bottom: 1px solid var(--border); }
+.tab-btn {
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+  position: relative;
+  bottom: -1px;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-panel { display: none; padding: 20px 0; }
+.tab-panel.active { display: block; }
+
+/* ── QUIZ ── */
+.quiz-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  margin-top: 32px;
+}
+.quiz-header { text-align: center; margin-bottom: 32px; }
+.quiz-header h2 { font-size: 22px; margin-bottom: 8px; }
+.quiz-header p  { color: var(--muted); font-size: 14px; }
+.quiz-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.quiz-card .q-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--accent5);
+  margin-bottom: 8px;
+}
+.quiz-card .q-text {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt {
+  padding: 10px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all .15s;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+}
+.quiz-opt:hover { border-color: var(--accent); background: rgba(88,166,255,.05); }
+.quiz-opt.correct { border-color: var(--accent2); background: rgba(63,185,80,.1); color: var(--accent2); }
+.quiz-opt.wrong   { border-color: var(--accent3); background: rgba(247,129,102,.1); color: var(--accent3); }
+.quiz-opt .opt-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.quiz-feedback {
+  margin-top: 10px;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: none;
+  line-height: 1.6;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: rgba(63,185,80,.1); color: var(--accent2); border: 1px solid rgba(63,185,80,.3); }
+.quiz-feedback.wrong   { background: rgba(247,129,102,.1); color: var(--accent3); border: 1px solid rgba(247,129,102,.3); }
+.quiz-score {
+  text-align: center;
+  padding: 24px;
+  background: var(--bg3);
+  border-radius: 8px;
+  margin-top: 20px;
+  display: none;
+}
+.quiz-score.show { display: block; }
+.score-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--accent5);
+  line-height: 1;
+}
+.score-label { color: var(--muted); font-size: 14px; margin-top: 8px; }
+.btn-primary {
+  background: var(--accent5);
+  color: var(--bg);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+  margin-top: 16px;
+}
+.btn-primary:hover { opacity: .85; }
+
+/* ── CARD GRID ── */
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 20px 20px 60px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .compare-grid { grid-template-columns: 1fr; }
+  .hero { padding: 24px; }
+}
+
+/* ── LOOP TYPE BADGE ── */
+.loop-badge {
+  display: inline-block;
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+.loop-badge.while-badge  { background: rgba(88,166,255,.15); color: var(--accent);  border: 1px solid rgba(88,166,255,.3); }
+.loop-badge.do-badge     { background: rgba(210,168,255,.15); color: var(--accent4); border: 1px solid rgba(210,168,255,.3); }
+.loop-badge.for-badge    { background: rgba(255,166,87,.15);  color: var(--accent5); border: 1px solid rgba(255,166,87,.3); }
+.loop-badge.break-badge  { background: rgba(247,129,102,.15); color: var(--accent3); border: 1px solid rgba(247,129,102,.3); }
+.loop-badge.cont-badge   { background: rgba(63,185,80,.15);   color: var(--accent2); border: 1px solid rgba(63,185,80,.3); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="course">C 프로그래밍 및 실습</div>
+    <div class="title">반복문</div>
+    <div class="lec-num">Lecture 05</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">목차</div>
+    <a class="nav-item active" href="#intro"><span class="dot"></span>반복문 개요</a>
+    <a class="nav-item" href="#while"><span class="dot"></span>while 문</a>
+    <a class="nav-item" href="#dowhile"><span class="dot"></span>do-while 문</a>
+    <a class="nav-item" href="#for"><span class="dot"></span>for 문</a>
+    <a class="nav-item" href="#nested"><span class="dot"></span>중첩 반복문</a>
+    <a class="nav-item" href="#goodpractice"><span class="dot"></span>Good Practice</a>
+    <a class="nav-item" href="#break"><span class="dot"></span>break 문</a>
+    <a class="nav-item" href="#continue"><span class="dot"></span>continue 문</a>
+    <a class="nav-item" href="#quiz"><span class="dot"></span>퀴즈 🎯</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Lecture 05</div>
+    <h1>Iteration Statement<br><span>반복문</span></h1>
+    <p class="hero-sub">프로그래밍방법론및실습 — 서울시립대학교 기계정보공학과</p>
+    <div class="hero-pills">
+      <span class="hero-pill">while</span>
+      <span class="hero-pill">do-while</span>
+      <span class="hero-pill">for</span>
+      <span class="hero-pill">Nested Loop</span>
+      <span class="hero-pill">break</span>
+      <span class="hero-pill">continue</span>
+      <span class="hero-pill">Infinite Loop</span>
+    </div>
+  </div>
+
+  <!-- ── SECTION 1: 반복문 개요 ── -->
+  <section class="section" id="intro">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>반복문 (Iteration / Loop) 개요</h2>
+    </div>
+
+    <div class="concept-card highlight">
+      <h3><span class="icon">🔁</span>반복문이란?</h3>
+      <p>같은 처리 과정을 여러 번 되풀이하는 것을 <strong style="color:var(--accent5)">간결하고 구조적</strong>으로 표현하는 제어 구조입니다.</p>
+      <ul>
+        <li>100명의 학생에 대해 평균 성적 구하기</li>
+        <li>1부터 n까지의 숫자 값 더하기</li>
+        <li>행렬 곱셈 등 반복 연산</li>
+      </ul>
+    </div>
+
+    <!-- 비교: 반복 없음 vs 반복 있음 -->
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent3)"><span class="icon">😓</span>반복문 없이 (비효율)</h3>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:12px 16px">
+<pre><span class="fn">printf</span>(<span class="st">"Hello World! \n"</span>);
+<span class="fn">printf</span>(<span class="st">"Hello World! \n"</span>);
+<span class="fn">printf</span>(<span class="st">"Hello World! \n"</span>);
+<span class="fn">printf</span>(<span class="st">"Hello World! \n"</span>);
+<span class="fn">printf</span>(<span class="st">"Hello World! \n"</span>);
+
+<span class="cm">// 100번이라면? 1000번이라면? 😱</span>
+<span class="nm">sum</span> = <span class="nb">1</span>+<span class="nb">2</span>+<span class="nb">3</span>+<span class="nb">4</span>+<span class="nb">5</span>+<span class="nb">6</span>+<span class="nb">7</span>+<span class="nb">8</span>+<span class="nb">9</span>+<span class="nb">10</span>;</pre>
+          </div>
+        </div>
+      </div>
+      <div class="concept-card highlight-green">
+        <h3 style="color:var(--accent2)"><span class="icon">✅</span>반복문 사용 (효율)</h3>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:12px 16px">
+<pre><span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt; <span class="nb">5</span>; <span class="nm">i</span>++)
+  <span class="fn">printf</span>(<span class="st">"Hello World! \n"</span>);
+
+<span class="nm">sum</span> = <span class="nb">0</span>;
+<span class="nm">i</span> = <span class="nb">1</span>;
+<span class="kw">while</span> (<span class="nm">i</span> &lt;= <span class="nb">10</span>) {
+  <span class="nm">sum</span> += <span class="nm">i</span>;
+  <span class="nm">i</span>++;
+}
+<span class="cm">// 깔끔하고 확장 가능! 🎉</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3가지 반복문 비교 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">주로 사용되는 반복문 구조</h3>
+    <div class="compare-grid">
+      <div class="compare-card">
+        <div class="loop-name"><span class="loop-badge while-badge">while</span></div>
+        <p>조건 검사 후 반복<br>조건이 처음부터 거짓이면 한 번도 실행 안 됨</p>
+      </div>
+      <div class="compare-card">
+        <div class="loop-name"><span class="loop-badge do-badge">do-while</span></div>
+        <p>실행 후 조건 검사<br>최소 한 번은 반드시 실행됨</p>
+      </div>
+      <div class="compare-card">
+        <div class="loop-name"><span class="loop-badge for-badge">for</span></div>
+        <p>초기식 · 조건 · 증감 일체형<br>반복 횟수가 명확할 때 주로 사용</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: while ── -->
+  <section class="section" id="while">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>while Statement <span class="loop-badge while-badge" style="font-size:12px;vertical-align:middle">while</span></h2>
+    </div>
+
+    <div class="concept-card highlight-blue">
+      <h3 style="color:var(--accent)"><span class="icon">📌</span>while 문 구조</h3>
+      <p>조건식을 먼저 검사한 후 참(True)이면 루프 body를 실행하고, 다시 조건식으로 돌아갑니다.</p>
+    </div>
+
+    <!-- while 구조 + 플로우차트 -->
+    <div class="flow-diagram">
+      <div class="flow-code-col">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">while 문법</span>
+            <span class="code-lang">C</span>
+          </div>
+          <div class="code-body">
+<pre><span class="kw">while</span> (<span class="cm">조건식</span>) {
+  statement 1;
+  <span class="cm">…</span>
+  statement n;
+}
+external_statement;</pre>
+          </div>
+        </div>
+        <div class="callout info" style="margin-top:12px">
+          <span class="callout-icon">💡</span>
+          <div class="callout-body">
+            <strong>핵심 특징</strong>
+            조건식의 첫 번째 검사 결과가 0이면, while 루프의 body 부분은 <strong style="color:var(--accent)">한 번도 실행되지 않을 수 있음</strong>. (조건이 만족될 때만 반복)
+          </div>
+        </div>
+      </div>
+      <div class="flow-chart-col">
+        <div class="flow-box cond">조건식</div>
+        <div style="display:flex;width:100%;position:relative">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+            <div class="flow-arrow">↓</div>
+            <div class="flow-label" style="color:var(--accent2)">True</div>
+            <div class="flow-box body" style="min-width:90px">Loop Body<br><small>statement 1..n</small></div>
+            <div class="flow-arrow">↑</div>
+            <div class="flow-loop-back">← 다시 조건 검사</div>
+          </div>
+        </div>
+        <div class="flow-arrow" style="margin-top:8px">↓</div>
+        <div class="flow-label" style="color:var(--accent3)">False</div>
+        <div class="flow-box exit">external_statement</div>
+      </div>
+    </div>
+
+    <!-- while 주의사항 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">⚠️ while 루프 사용 시 주의할 점</h3>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>무한 루프 (Infinite Loop) 주의!</strong>
+        "의도하지 않은" 무한 루프에 빠지지 않도록 탈출 조건을 잘 정해야 합니다. 탈출 조건식에 사용되는 변수의 <strong style="color:var(--accent5)">초기 값은 while 루프 바깥</strong>에서 미리 설정하세요!
+      </div>
+    </div>
+
+    <!-- 잘못된 예시들 -->
+    <div class="tabs">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab(this,'wb1')">❌ 들여쓰기 함정</button>
+        <button class="tab-btn" onclick="switchTab(this,'wb2')">❌ 등가연산자 위험</button>
+        <button class="tab-btn" onclick="switchTab(this,'wb3')">✅ 올바른 패턴</button>
+        <button class="tab-btn" onclick="switchTab(this,'wb4')">💡 n-- 패턴</button>
+      </div>
+      <div class="tab-panel active" id="wb1">
+        <div class="card-grid">
+          <div class="concept-card">
+            <h3 style="color:var(--accent3)"><span class="icon">❌</span>잘못된 코드</h3>
+            <div class="code-block">
+              <div class="code-body" style="padding:12px 16px">
+<pre><span class="ty">int</span> <span class="nm">i</span> = <span class="nb">0</span>;
+<span class="kw">while</span> (<span class="nm">i</span> &lt; <span class="nb">3</span>)
+  <span class="fn">printf</span>(<span class="st">"반복중입니다.\n"</span>);
+  <span class="nm">i</span>++;  <span class="cm">// ← 루프 밖에 있음!</span></pre>
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--accent3);margin-top:8px">들여쓰기는 컴파일러와 무관 — i++은 while 내부가 아님 → 무한 루프!</p>
+          </div>
+          <div class="concept-card highlight-green">
+            <h3 style="color:var(--accent2)"><span class="icon">✅</span>올바른 코드</h3>
+            <div class="code-block">
+              <div class="code-body" style="padding:12px 16px">
+<pre><span class="ty">int</span> <span class="nm">i</span> = <span class="nb">0</span>;
+<span class="kw">while</span> (<span class="nm">i</span> &lt; <span class="nb">3</span>) {
+  <span class="fn">printf</span>(<span class="st">"반복중입니다.\n"</span>);
+  <span class="nm">i</span>++;  <span class="cm">// ← 중괄호 안에!</span>
+}</pre>
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--accent2);margin-top:8px">항상 중괄호 {}로 루프 body를 명확히 표시합시다!</p>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="wb2">
+        <div class="card-grid">
+          <div class="concept-card">
+            <h3 style="color:var(--accent3)"><span class="icon">❌</span>등가연산자 사용 (위험)</h3>
+            <div class="code-block">
+              <div class="code-body" style="padding:12px 16px">
+<pre><span class="ty">int</span> <span class="nm">i</span> = <span class="nb">0</span>;
+<span class="kw">while</span> (<span class="nm">i</span> != <span class="nb">9</span>)  <span class="cm">// 위험!</span>
+  <span class="nm">i</span> += <span class="nb">2</span>;
+<span class="cm">// i: 0,2,4,6,8,10,12,... → 9를 건너뜀!</span>
+<span class="cm">// → 무한 루프!</span></pre>
+              </div>
+            </div>
+          </div>
+          <div class="concept-card highlight-green">
+            <h3 style="color:var(--accent2)"><span class="icon">✅</span>비교연산자 사용 (안전)</h3>
+            <div class="code-block">
+              <div class="code-body" style="padding:12px 16px">
+<pre><span class="ty">int</span> <span class="nm">i</span> = <span class="nb">0</span>;
+<span class="kw">while</span> (<span class="nm">i</span> &lt; <span class="nb">9</span>)  <span class="cm">// 안전!</span>
+  <span class="nm">i</span> += <span class="nb">2</span>;
+<span class="cm">// i: 0,2,4,6,8 → 조건 거짓 → 탈출!</span></pre>
+              </div>
+            </div>
+            <p style="font-size:12px;color:var(--accent2);margin-top:8px">탈출 조건식에는 등가연산자보다 <strong>비교연산자(관계연산자)</strong>를 사용하세요!</p>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="wb3">
+        <div class="card-grid">
+          <div class="concept-card">
+            <h3 style="color:var(--accent3)"><span class="icon">❌</span>음수 입력 시 위험</h3>
+            <div class="code-block">
+              <div class="code-body" style="padding:12px 16px">
+<pre><span class="fn">scanf</span>(<span class="st">"%d"</span>, &<span class="nm">n</span>);
+<span class="kw">while</span> (<span class="nm">n</span>--) {
+  <span class="cm">/* do something */</span>
+}
+<span class="cm">// 음수 입력 → n--는 항상 참 → 무한 루프!</span></pre>
+              </div>
+            </div>
+          </div>
+          <div class="concept-card highlight-green">
+            <h3 style="color:var(--accent2)"><span class="icon">✅</span>명시적 조건 사용</h3>
+            <div class="code-block">
+              <div class="code-body" style="padding:12px 16px">
+<pre><span class="fn">scanf</span>(<span class="st">"%d"</span>, &<span class="nm">n</span>);
+<span class="kw">while</span> (<span class="nm">n</span> &gt; <span class="nb">0</span>) {
+  <span class="cm">/* do something */</span>
+  <span class="nm">n</span>--;
+}
+<span class="cm">// 양수만 반복 → 명확!</span></pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-panel" id="wb4">
+        <div class="concept-card highlight-blue">
+          <h3 style="color:var(--accent)"><span class="icon">💡</span>n-- 패턴</h3>
+          <div class="code-block" style="margin-top:12px">
+            <div class="code-header">
+              <span class="code-filename">n-- 루프 패턴</span>
+              <span class="code-lang">C</span>
+            </div>
+            <div class="code-body">
+<pre><span class="fn">printf</span>(<span class="st">"Input an integer: "</span>);
+<span class="fn">scanf</span>(<span class="st">"%d"</span>, &<span class="nm">n</span>); <span class="cm">// 반복 횟수 입력</span>
+<span class="kw">while</span> (<span class="nm">n</span>--) {
+  <span class="cm">/* do something */</span>
+}</pre>
+            </div>
+          </div>
+          <p style="margin-top:12px;font-size:13px;color:#c9d1d9"><code style="color:var(--accent5)">n--</code>은 <em>후위 감소</em>: 조건 평가 후 n을 줄임. n이 양수일 때만 안전. 음수 입력이 들어올 수 있다면 명시적 조건 검사를 권장합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: do-while ── -->
+  <section class="section" id="dowhile">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>do-while Statement <span class="loop-badge do-badge" style="font-size:12px;vertical-align:middle">do-while</span></h2>
+    </div>
+
+    <div class="concept-card highlight-purple">
+      <h3 style="color:var(--accent4)"><span class="icon">🔄</span>do-while 문 구조</h3>
+      <p>루프 body를 <strong style="color:var(--accent4)">먼저 실행한 후</strong> 조건식을 검사합니다. 따라서 루프 body는 <strong style="color:var(--accent5)">최소 한 번</strong>은 반드시 실행됩니다.</p>
+      <ul>
+        <li>루프 body가 최소 한 번은 실행되어야 하는 경우에 적용</li>
+        <li>끝에 세미콜론(<code style="color:var(--accent5)">;</code>)이 필수!</li>
+      </ul>
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-code-col">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">do-while 문법</span>
+            <span class="code-lang">C</span>
+          </div>
+          <div class="code-body">
+<pre><span class="kw">do</span> {
+  statement 1;
+  <span class="cm">…</span>
+} <span class="kw">while</span> (<span class="cm">조건식</span>);  <span class="cm">// ← ; 필수!</span>
+external_statement;</pre>
+          </div>
+        </div>
+        <!-- 동작 방식 -->
+        <div class="concept-card" style="margin-top:12px;padding:16px">
+          <h3 style="color:var(--accent4)"><span class="icon">📋</span>동작 방식</h3>
+          <ul style="margin-top:0">
+            <li><strong style="color:var(--accent5)">Step 1.</strong> 루프 블록 내 실행문 먼저 실행</li>
+            <li><strong style="color:var(--accent5)">Step 2.</strong> 조건식 검사</li>
+            <li>&nbsp;&nbsp;• True → 다시 루프 블록 첫 번째 실행문으로 이동</li>
+            <li>&nbsp;&nbsp;• False → 루프 탈출</li>
+          </ul>
+        </div>
+      </div>
+      <div class="flow-chart-col">
+        <div class="flow-box body" style="min-width:110px">Loop Body<br><small>statement 1..n</small></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box cond">조건식</div>
+        <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
+          <div style="display:flex;flex-direction:column;align-items:center">
+            <div class="flow-label" style="color:var(--accent3)">False</div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-box exit">external</div>
+          </div>
+        </div>
+        <div class="flow-loop-back" style="margin-top:8px;color:var(--accent4)">True → 다시 body 실행 ↑</div>
+      </div>
+    </div>
+
+    <!-- while vs do-while 비교 -->
+    <div class="callout info">
+      <span class="callout-icon">⚖️</span>
+      <div class="callout-body">
+        <strong>while vs do-while 핵심 차이</strong>
+        <code style="color:var(--accent)">while</code>: 조건이 처음부터 거짓이면 <strong style="color:var(--accent3)">0번</strong> 실행 가능<br>
+        <code style="color:var(--accent4)">do-while</code>: 조건과 무관하게 <strong style="color:var(--accent2)">최소 1번</strong> 실행 보장<br>
+        → 사용자 입력 메뉴, 입력 검증 등에 do-while이 자연스러움
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 4: for ── -->
+  <section class="section" id="for">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>for Statement <span class="loop-badge for-badge" style="font-size:12px;vertical-align:middle">for</span></h2>
+    </div>
+
+    <div class="concept-card highlight">
+      <h3><span class="icon">⚙️</span>for 문 구조</h3>
+      <p><strong style="color:var(--accent5)">초기식 · 조건식 · 증감식</strong>을 한 줄에 명시하는 가장 정형화된 반복문 구조입니다.</p>
+    </div>
+
+    <div class="flow-diagram">
+      <div class="flow-code-col">
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">for 문법</span>
+            <span class="code-lang">C</span>
+          </div>
+          <div class="code-body">
+<pre><span class="kw">for</span> ( <span class="nm">초기식</span> ; <span class="cm">조건식</span> ; <span class="nm">증감식</span> ) {
+  statement;
+  <span class="cm">…</span>
+}
+external_statement;</pre>
+          </div>
+        </div>
+        <div class="concept-card" style="margin-top:12px;padding:16px">
+          <h3 style="color:var(--accent5)"><span class="icon">📋</span>실행 순서</h3>
+          <ul style="margin-top:0">
+            <li><strong style="color:var(--accent5)">Step 1.</strong> 초기식 실행 (딱 한 번)</li>
+            <li><strong style="color:var(--accent5)">Step 2.</strong> 조건식 검사</li>
+            <li><strong style="color:var(--accent5)">Step 3-1 (True).</strong> 실행문 → 증감식 → Step 2</li>
+            <li><strong style="color:var(--accent5)">Step 3-2 (False).</strong> 루프 탈출</li>
+          </ul>
+        </div>
+      </div>
+      <div class="flow-chart-col">
+        <div class="flow-box init">초기식</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box cond">조건식</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-label" style="color:var(--accent2)">True</div>
+        <div class="flow-box body">Loop Body</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-box incr">증감식</div>
+        <div class="flow-loop-back" style="color:var(--accent4)">↑ 조건식으로 돌아감</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-label" style="color:var(--accent3)">False</div>
+        <div class="flow-box exit">external</div>
+      </div>
+    </div>
+
+    <!-- while ↔ for 관계 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">while 루프와 for 루프의 관계</h3>
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent)"><span class="icon">🔄</span>while 버전</h3>
+        <div class="code-block">
+          <div class="code-body" style="padding:12px 16px">
+<pre><span class="nm">sum</span> = <span class="nb">0</span>;
+<span class="nm">i</span> = <span class="nb">1</span>;  <span class="cm">// expr1</span>
+<span class="kw">while</span> (<span class="nm">i</span> &lt;= <span class="nb">10</span>) {  <span class="cm">// expr2</span>
+  <span class="nm">sum</span> += <span class="nm">i</span>;
+  <span class="nm">i</span>++;  <span class="cm">// expr3</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+      <div class="concept-card highlight">
+        <h3 style="color:var(--accent5)"><span class="icon">⚡</span>for 버전 (동일 동작)</h3>
+        <div class="code-block">
+          <div class="code-body" style="padding:12px 16px">
+<pre><span class="nm">sum</span> = <span class="nb">0</span>;
+<span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">1</span>; <span class="nm">i</span> &lt;= <span class="nb">10</span>; <span class="nm">i</span>++) {
+  <span class="nm">sum</span> += <span class="nm">i</span>;
+}
+<span class="cm">// expr1 ; expr2 ; expr3 으로 압축!</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- for 다양한 표현 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">for 루프의 다양한 표현 형태</h3>
+    <div class="concept-card">
+      <h3 style="color:var(--accent)"><span class="icon">🧩</span>초기식·조건식·증감식 생략 가능</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">for 변형 예시</span>
+          <span class="code-lang">C</span>
+        </div>
+        <div class="code-body">
+<pre><span class="cm">// 기본형</span>
+<span class="nm">sum</span> = <span class="nb">0</span>;
+<span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">1</span>; <span class="nm">i</span> &lt;= <span class="nm">n</span>; ++<span class="nm">i</span>)
+  <span class="nm">sum</span> += <span class="nm">i</span>;
+
+<span class="cm">// 초기식 생략 (i가 이미 초기화된 경우)</span>
+<span class="nm">i</span> = <span class="nb">1</span>;
+<span class="kw">for</span> ( ; <span class="nm">i</span> &lt;= <span class="nm">n</span>; ++<span class="nm">i</span>)
+  <span class="nm">sum</span> += <span class="nm">i</span>;
+
+<span class="cm">// 초기식·증감식 생략 (증감을 body에서 처리)</span>
+<span class="nm">i</span> = <span class="nb">1</span>;
+<span class="kw">for</span> ( ; <span class="nm">i</span> &lt;= <span class="nm">n</span>; ) {
+  <span class="nm">sum</span> += <span class="nm">i</span>;
+  ++<span class="nm">i</span>;
+}
+
+<span class="cm">// 다중 초기식 (쉼표 사용)</span>
+<span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">1</span>, <span class="nm">sum</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt;= <span class="nm">n</span>; ++<span class="nm">i</span>)
+  <span class="nm">sum</span> += <span class="nm">i</span>;
+
+<span class="cm">// 모두 생략 = 무한 루프 (while(1)과 동일)</span>
+<span class="kw">for</span> ( ; ; ) {
+  <span class="nm">sum</span> += <span class="nm">i</span>;
+  ++<span class="nm">i</span>;
+  <span class="kw">if</span> (<span class="nm">i</span> &gt; <span class="nm">n</span>) <span class="kw">break</span>;  <span class="cm">// 탈출 조건 필수!</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>세미콜론 2개는 필수!</strong>
+        초기식, 조건식, 증감식은 모두 생략 가능하지만, <strong style="color:var(--accent5)">두 개의 세미콜론(;;)</strong>은 반드시 있어야 합니다. 조건식을 생략하면 항상 True로 평가되어 무한 루프가 됩니다.
+      </div>
+    </div>
+
+    <!-- 인터랙티브 for 루프 시뮬레이터 -->
+    <div class="loop-vis">
+      <div class="loop-vis-title">인터랙티브 for 루프 시뮬레이터</div>
+      <div class="loop-controls">
+        <label>시작 (i=)</label>
+        <input type="number" id="sim-start" value="1" min="0" max="20">
+        <label>종료 (i≤)</label>
+        <input type="number" id="sim-end" value="5" min="1" max="20">
+        <label>증감 (+)</label>
+        <input type="number" id="sim-step" value="1" min="1" max="5">
+        <button class="loop-btn" onclick="runSimulator()">▶ 실행</button>
+        <button class="loop-btn reset" onclick="resetSimulator()">↺ 초기화</button>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-bottom:8px" id="sim-code-display">
+        for (i = 1; i &lt;= 5; i++) { printf("%d", i); }
+      </div>
+      <div class="loop-trace" id="sim-trace">
+        <span style="color:var(--muted);font-size:12px;font-family:'Space Mono',monospace">▶ 실행 버튼을 눌러보세요</span>
+      </div>
+      <div style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:12px" id="sim-output"></div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: 중첩 반복문 ── -->
+  <section class="section" id="nested">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>Nested Loop (중첩 반복문)</h2>
+    </div>
+
+    <div class="concept-card highlight">
+      <h3><span class="icon">🔲</span>중첩 반복문이란?</h3>
+      <p>반복문 안에 다른 반복문이 포함된 형태입니다.</p>
+      <ul>
+        <li><strong style="color:var(--accent5)">외부 반복문 (outer loop)</strong>이 한 번 반복될 때마다 내부 반복문이 새롭게 초기화되어 처음부터 실행됨</li>
+        <li>각각의 반복문을 제어하는 변수가 달라야 함 (예: x, y)</li>
+        <li>행렬 연산 등에 매우 유용 (배열과 함께 더욱 강력)</li>
+      </ul>
+    </div>
+
+    <!-- LAB: nestedLoop.c -->
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">LAB: nestedLoop.c — * 사각형 출력</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="cm">// 중첩 for 문을 이용하여 * 기호를 사각형 모양으로 출력</span>
+<span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>)
+{
+  <span class="ty">int</span> <span class="nm">x</span>, <span class="nm">y</span>;
+
+  <span class="kw">for</span> (<span class="nm">y</span> = <span class="nb">0</span>; <span class="nm">y</span> &lt; <span class="nb">3</span>; <span class="nm">y</span>++) {      <span class="cm">// outer loop (행)</span>
+    <span class="kw">for</span> (<span class="nm">x</span> = <span class="nb">0</span>; <span class="nm">x</span> &lt; <span class="nb">5</span>; <span class="nm">x</span>++)  <span class="cm">// inner loop (열)</span>
+      <span class="fn">printf</span>(<span class="st">"*"</span>);
+    <span class="fn">printf</span>(<span class="st">"\n"</span>);
+  }
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+      </div>
+    </div>
+
+    <!-- 실행 흐름 시각화 -->
+    <div class="concept-card">
+      <h3 style="color:var(--accent2)"><span class="icon">📊</span>실행 흐름 테이블</h3>
+      <table class="data-table" style="margin-top:12px">
+        <thead>
+          <tr>
+            <th>y (outer)</th>
+            <th>x (inner)</th>
+            <th>printf("*") 횟수</th>
+            <th>printf("\n")</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>0</td><td>0, 1, 2, 3, 4</td><td>5번</td><td>1번</td></tr>
+          <tr><td>1</td><td>0, 1, 2, 3, 4</td><td>5번</td><td>1번</td></tr>
+          <tr><td>2</td><td>0, 1, 2, 3, 4</td><td>5번</td><td>1번</td></tr>
+          <tr style="background:rgba(255,166,87,.05)"><td colspan="2"><strong>합계</strong></td><td><strong>15번</strong></td><td><strong>3번</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 인터랙티브 별 그리기 -->
+    <div class="loop-vis">
+      <div class="loop-vis-title">인터랙티브 중첩 루프 — * 그리기</div>
+      <div class="loop-controls">
+        <label>행 (rows):</label>
+        <input type="number" id="nest-rows" value="3" min="1" max="8">
+        <label>열 (cols):</label>
+        <input type="number" id="nest-cols" value="5" min="1" max="12">
+        <button class="loop-btn" onclick="drawNestedLoop()">▶ 그리기</button>
+      </div>
+      <div id="nested-output" style="padding:12px;background:#010409;border:1px solid var(--border);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--accent5);min-height:40px;letter-spacing:2px"></div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>중첩 루프의 총 반복 횟수</strong>
+        outer loop 반복 횟수 × inner loop 반복 횟수 = 총 inner loop 실행 횟수<br>
+        예: rows=3, cols=5 → 3 × 5 = <strong style="color:var(--accent5)">15번</strong>의 printf("*") 실행
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 6: Good Practice ── -->
+  <section class="section" id="goodpractice">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>Good Practice for Loop Control</h2>
+    </div>
+
+    <div class="concept-card highlight">
+      <h3><span class="icon">🎯</span>루프 제어에서 등가연산자 vs 관계연산자</h3>
+      <p>루프 제어 수식에서 <strong style="color:var(--accent3)">등가연산자(==, !=)를 쓰는 것보다</strong> <strong style="color:var(--accent2)">관계연산자(&lt;, &gt;, &lt;=, &gt;=)를 사용하는 것</strong>이 더 안전합니다.</p>
+      <ul>
+        <li>특히 비교 수식에 사용되는 변수 타입이 <strong style="color:var(--accent4)">실수형 (float 또는 double)</strong>일 때 매우 위험</li>
+      </ul>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">float_loop_danger.c — 부동소수점 루프 위험</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>)
+{
+  <span class="ty">int</span>    <span class="nm">cnt</span> = <span class="nb">0</span>;
+  <span class="ty">double</span> <span class="nm">sum</span> = <span class="nb">0.0</span>, <span class="nm">x</span>;
+
+  <span class="kw">for</span> (<span class="nm">x</span> = <span class="nb">0.0</span>; <span class="nm">x</span> != <span class="nb">9.9</span>; <span class="nm">x</span> += <span class="nb">0.1</span>) {  <span class="cm">/* ❌ trouble! */</span>
+    <span class="nm">sum</span> += <span class="nm">x</span>;
+    <span class="fn">printf</span>(<span class="st">"cnt = %5d\n"</span>, ++<span class="nm">cnt</span>);
+  }
+  <span class="fn">printf</span>(<span class="st">"sum = %f\n"</span>, <span class="nm">sum</span>);
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+      </div>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <strong>왜 위험한가?</strong>
+        컴퓨터 내부 저장 방식의 특징(이진수 표현과 precision 한계)으로 <code style="color:var(--accent5)">0.1</code>을 이진수로 정확히 표현할 수 없어 오차가 누적됩니다. <code style="color:var(--accent3)">x += 0.1</code>을 99번 반복해도 <code style="color:var(--accent3)">x == 9.9</code>가 정확히 성립하지 않을 수 있습니다!
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <strong>해결책: 관계연산자 사용</strong>
+        <code style="color:var(--accent3)">x != 9.9</code> 대신 <code style="color:var(--accent2)">x &lt; 9.9</code>를 사용하세요. 관계연산자는 오차가 있어도 안전하게 루프를 탈출합니다.
+      </div>
+    </div>
+
+    <div class="concept-card">
+      <h3 style="color:var(--accent2)"><span class="icon">📏</span>루프 제어 Best Practices 요약</h3>
+      <table class="data-table" style="margin-top:8px">
+        <thead>
+          <tr>
+            <th>상황</th>
+            <th>❌ 피해야 할 방식</th>
+            <th>✅ 권장 방식</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>정수 루프</td>
+            <td><code style="color:var(--accent3)">i != 10</code></td>
+            <td><code style="color:var(--accent2)">i &lt; 10</code></td>
+          </tr>
+          <tr>
+            <td>실수 루프</td>
+            <td><code style="color:var(--accent3)">x != 9.9</code></td>
+            <td><code style="color:var(--accent2)">x &lt; 9.9</code></td>
+          </tr>
+          <tr>
+            <td>탈출 조건</td>
+            <td>등가연산자 ==, !=</td>
+            <td>비교연산자 &lt;, &gt;, &lt;=, &gt;=</td>
+          </tr>
+          <tr>
+            <td>변수 초기화</td>
+            <td>루프 내부에서 초기화</td>
+            <td>루프 시작 전에 초기화</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── SECTION 7: break ── -->
+  <section class="section" id="break">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>break Statement <span class="loop-badge break-badge" style="font-size:12px;vertical-align:middle">break</span></h2>
+    </div>
+
+    <div class="concept-card highlight">
+      <h3 style="color:var(--accent3)"><span class="icon">🚪</span>break 문의 효과</h3>
+      <ul>
+        <li><strong style="color:var(--accent5)">(1) 루프에서 빠져나오기</strong> — 현재 실행 중인 반복문을 즉시 종료</li>
+        <li><strong style="color:var(--accent5)">(2) switch statement</strong>와 함께 사용하여 조건문 전체에서 빠져나오기</li>
+      </ul>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>중첩 반복문에서 주의!</strong>
+        중첩 반복문에서는 <code style="color:var(--accent3)">break</code>가 사용된 <strong style="color:var(--accent5)">가장 안쪽 루프에서만</strong> 빠져나옵니다. 모든 루프를 탈출하려면 추가 로직이 필요합니다.
+      </div>
+    </div>
+
+    <!-- break 예제 -->
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">break_sqrt.c — 무한루프 탈출에 break 사용</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+<span class="kw">#include</span> <span class="st">&lt;math.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>)
+{
+  <span class="ty">double</span> <span class="nm">v</span>;
+
+  <span class="kw">while</span>(<span class="nb">1</span>) {                          <span class="cm">// 의도적 무한 루프</span>
+    <span class="fn">printf</span>(<span class="st">"실수값을 입력하시오: "</span>);
+    <span class="fn">scanf</span>(<span class="st">" %lf"</span>, &<span class="nm">v</span>);
+
+    <span class="kw">if</span> (<span class="nm">v</span> &lt; <span class="nb">0.0</span>)  <span class="cm">// 음수 입력 시 탈출</span>
+      <span class="kw">break</span>;       <span class="cm">// ← 이 while 루프를 탈출</span>
+
+    <span class="fn">printf</span>(<span class="st">"v=%f의 제곱근은 %f입니다.\n"</span>, <span class="nm">v</span>, <span class="fn">sqrt</span>(<span class="nm">v</span>));
+  }
+  <span class="cm">// break jumps to here</span>
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+      </div>
+    </div>
+
+    <div class="concept-card" style="padding:16px">
+      <h3 style="color:var(--accent3)"><span class="icon">🔁</span>실행 흐름</h3>
+      <p style="font-size:13px">양수/0 입력 → 제곱근 출력 → 다시 while(1) 반복<br>
+      음수 입력 → <code style="color:var(--accent3)">if(v &lt; 0)</code> 조건 참 → <code style="color:var(--accent3)">break</code> → 루프 탈출 → <code style="color:var(--accent2)">return 0</code></p>
+    </div>
+  </section>
+
+  <!-- ── SECTION 8: continue ── -->
+  <section class="section" id="continue">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <h2>continue Statement <span class="loop-badge cont-badge" style="font-size:12px;vertical-align:middle">continue</span></h2>
+    </div>
+
+    <div class="concept-card highlight-green">
+      <h3 style="color:var(--accent2)"><span class="icon">⏭️</span>continue 문의 효과</h3>
+      <p>현재 실행하고 있는 반복 과정의 <strong style="color:var(--accent2)">나머지를 생략</strong>하고 다음 반복을 시작하게 합니다.</p>
+      <ul>
+        <li><code style="color:var(--accent2)">continue</code>는 <code style="color:var(--accent)">for</code>, <code style="color:var(--accent)">while</code>, <code style="color:var(--accent4)">do-while</code> 문에서만 사용 가능</li>
+        <li>break와 달리 루프를 탈출하지 않고 <strong style="color:var(--accent5)">다음 반복 사이클</strong>로 건너뜀</li>
+      </ul>
+    </div>
+
+    <!-- continue 예제 -->
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">continue_skip.c — 3의 배수 건너뛰기</span>
+        <div style="display:flex;gap:8px">
+          <button class="copy-btn" onclick="copyCode(this)">복사</button>
+          <span class="code-lang">C</span>
+        </div>
+      </div>
+      <div class="code-body">
+<pre><span class="kw">#include</span> <span class="st">&lt;stdio.h&gt;</span>
+
+<span class="ty">int</span> <span class="fn">main</span>(<span class="ty">void</span>)
+{
+  <span class="ty">int</span> <span class="nm">i</span>;
+
+  <span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">0</span>; <span class="nm">i</span> &lt; <span class="nb">10</span>; <span class="nm">i</span>++) {
+    <span class="kw">if</span> (<span class="nm">i</span> % <span class="nb">3</span> == <span class="nb">0</span>)   <span class="cm">// 3의 배수이면</span>
+      <span class="kw">continue</span>;      <span class="cm">// ← printf 건너뜀, 다음 반복으로</span>
+    <span class="fn">printf</span>(<span class="st">"%d "</span>, <span class="nm">i</span>); <span class="cm">// 3의 배수가 아닌 것만 출력</span>
+  }
+  <span class="kw">return</span> <span class="nb">0</span>;
+}</pre>
+        </div>
+    </div>
+    <div class="output-box">출력: 1 2 4 5 7 8</div>
+
+    <!-- break vs continue 비교 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">break vs continue 비교</h3>
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent3)"><span class="icon">🚪</span>break</h3>
+        <ul>
+          <li>루프를 <strong style="color:var(--accent3)">완전히 종료</strong></li>
+          <li>루프 바깥 코드로 이동</li>
+          <li>for, while, do-while, switch에서 사용</li>
+        </ul>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:10px 12px">
+<pre><span class="kw">for</span>(...) {
+  <span class="kw">if</span>(조건) <span class="kw">break</span>; <span class="cm">// ← 루프 탈출</span>
+  printf(...);
+}
+<span class="cm">// ← break 시 여기로</span></pre>
+          </div>
+        </div>
+      </div>
+      <div class="concept-card">
+        <h3 style="color:var(--accent2)"><span class="icon">⏭️</span>continue</h3>
+        <ul>
+          <li>현재 반복만 <strong style="color:var(--accent2)">건너뜀</strong>, 루프는 계속</li>
+          <li>다음 반복 사이클로 점프</li>
+          <li>for, while, do-while에서만 사용</li>
+        </ul>
+        <div class="code-block" style="margin-top:8px">
+          <div class="code-body" style="padding:10px 12px">
+<pre><span class="kw">for</span>(...) {
+  <span class="kw">if</span>(조건) <span class="kw">continue</span>; <span class="cm">// ← 건너뜀</span>
+  printf(...); <span class="cm">// 건너뜀</span>
+}
+<span class="cm">// continue 시 다음 반복 계속</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 각 반복문에서 continue 동작 -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">각 반복문에서 continue 동작</h3>
+    <div class="concept-card">
+      <h3 style="color:var(--accent)"><span class="icon">🔍</span>continue의 점프 위치</h3>
+      <div class="code-block" style="margin-top:12px">
+        <div class="code-header"><span class="code-filename">continue jump 위치</span><span class="code-lang">C</span></div>
+        <div class="code-body">
+<pre><span class="cm">// while: 조건식으로 점프</span>
+<span class="kw">while</span> (<span class="cm">expr</span>) {
+  <span class="cm">…</span>
+  <span class="kw">continue</span>;  <span class="cm">// → while(expr) 조건 검사로 이동</span>
+  <span class="cm">…</span>
+}
+
+<span class="cm">// do-while: 조건식으로 점프</span>
+<span class="kw">do</span> {
+  <span class="cm">…</span>
+  <span class="kw">continue</span>;  <span class="cm">// → while(expr) 조건 검사로 이동</span>
+  <span class="cm">…</span>
+} <span class="kw">while</span>(<span class="cm">expr</span>);
+
+<span class="cm">// for: 증감식으로 점프 (조건 검사 전)</span>
+<span class="kw">for</span> (<span class="cm">expr1</span>; <span class="cm">expr2</span>; <span class="cm">expr3</span>) {
+  <span class="cm">…</span>
+  <span class="kw">continue</span>;  <span class="cm">// → expr3 (증감식) 실행 후 expr2 조건 검사</span>
+  <span class="cm">…</span>
+}</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 9: 퀴즈 ── -->
+  <section class="section" id="quiz">
+    <div class="quiz-section">
+      <div class="quiz-header">
+        <h2>🎯 퀴즈</h2>
+        <p>반복문 개념을 확인해봅시다. 클릭하여 정답을 확인하세요!</p>
+      </div>
+
+      <!-- Q1: 컴파일 에러 -->
+      <div class="quiz-card" id="qcard1">
+        <div class="q-num">QUIZ 01 / 05</div>
+        <div class="q-text">다음 반복문 구조 중 <strong style="color:var(--accent3)">컴파일 에러가 발생하는 것</strong>을 모두 고르시오.</div>
+        <div style="margin-bottom:14px">
+          <div class="code-block"><div class="code-body" style="padding:10px 14px"><pre><span class="ty">int</span> <span class="nm">i</span>, <span class="nm">j</span>, <span class="nm">k</span>;
+① <span class="kw">for</span> (<span class="nm">i</span>=<span class="nb">0</span>; <span class="nm">i</span>&lt;<span class="nb">10</span>; <span class="nm">i</span>+=<span class="nb">2</span>);
+② <span class="kw">for</span> (<span class="nm">i</span>=<span class="nb">0</span>,<span class="nm">j</span>=<span class="nb">0</span>,<span class="nm">k</span>=<span class="nb">0</span>; <span class="nm">i</span>&lt;<span class="nb">10</span>; <span class="nm">i</span>++,<span class="nm">j</span>++,<span class="nm">k</span>+=<span class="nb">2</span>) <span class="fn">printf</span>(<span class="st">"%d,%d,%d\n"</span>,<span class="nm">i</span>,<span class="nm">j</span>,<span class="nm">k</span>);
+③ <span class="ty">int</span> <span class="nm">i</span>=<span class="nb">1</span>; <span class="kw">for</span> ( ; ; ) <span class="fn">printf</span>(<span class="st">"i=%d\n"</span>,<span class="nm">i</span>++);
+④ <span class="kw">while</span>( ) <span class="fn">printf</span>(<span class="st">"i=%d\n"</span>,<span class="nm">i</span>++);
+⑤ <span class="ty">int</span> <span class="nm">i</span>=<span class="nb">1</span>; <span class="kw">do</span> <span class="fn">printf</span>(<span class="st">"i=%d\n"</span>,<span class="nm">i</span>++); <span class="kw">while</span> (<span class="nm">i</span>&lt;<span class="nb">10</span>)</pre></div></div>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">A</span> ①만 에러</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'correct')"><span class="opt-label">B</span> ④와 ⑤에서 에러</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">C</span> ②와 ③에서 에러</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">D</span> ③과 ④에서 에러</div>
+        </div>
+        <div class="quiz-feedback" id="qf1">
+          ✅ <strong>정답: B — ④와 ⑤</strong><br>
+          <strong>④</strong> <code>while( )</code>: while 조건식이 비어 있으면 컴파일 에러 (조건식은 필수).<br>
+          <strong>⑤</strong> <code>while (i&lt;10)</code> 뒤에 세미콜론(<code>;</code>)이 없어서 컴파일 에러.<br>
+          ① 빈 루프 body (세미콜론만), ② 다중 초기식/증감식, ③ for(;;) 무한루프는 모두 문법적으로 유효합니다.
+        </div>
+      </div>
+
+      <!-- Q2: printf 실행 횟수 -->
+      <div class="quiz-card" id="qcard2">
+        <div class="q-num">QUIZ 02 / 05</div>
+        <div class="q-text">다음 for 루프 안의 <code>printf()</code>는 몇 번 실행될까요?</div>
+        <div class="code-block" style="margin-bottom:14px">
+          <div class="code-body" style="padding:10px 14px">
+<pre><span class="ty">short</span> <span class="nm">i</span>;
+<span class="kw">for</span> (<span class="nm">i</span> = <span class="nb">1</span>; <span class="nm">i</span> &gt;= <span class="nb">0</span>; <span class="nm">i</span>++)
+  <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="nm">i</span>);</pre>
+          </div>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">A</span> 0번 (처음부터 조건 거짓)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">B</span> 1번</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">C</span> 32767번</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2,'correct')"><span class="opt-label">D</span> 무한히 실행 (무한 루프)</div>
+        </div>
+        <div class="quiz-feedback" id="qf2">
+          ✅ <strong>정답: D — 무한 루프</strong><br>
+          <code>short</code>의 최대값은 <strong>32767</strong>입니다. i가 32767에서 i++를 하면 <strong>오버플로우</strong>가 발생하여 -32768로 돌아갑니다. 즉 i는 항상 음수 → 0 → 양수 → 32767 → -32768을 순환하므로 <code>i &gt;= 0</code>이 항상 참이 되는 구간이 반복됩니다. 결과적으로 프로그램이 종료되지 않습니다!
+        </div>
+      </div>
+
+      <!-- Q3: 키워드 매칭 -->
+      <div class="quiz-card" id="qcard3">
+        <div class="q-num">QUIZ 03 / 05</div>
+        <div class="q-text">분기문 또는 조건문에서 쓰이는 C 키워드들의 이름과 역할이 <strong>올바르게 짝지어진 것</strong>을 고르시오.</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">①</span> continue — 함수를 호출한 곳으로 돌아간다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">②</span> return — 특정 레이블 위치로 이동한다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'correct')"><span class="opt-label">③</span> break — 루프나 조건문을 빠져나온다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">④</span> switch — 루프의 시작 부분으로 돌아간다.</div>
+        </div>
+        <div class="quiz-feedback" id="qf3">
+          ✅ <strong>정답: ③ break — 루프나 조건문을 빠져나온다.</strong><br>
+          ① <code>continue</code>: 현재 반복 나머지를 생략하고 다음 반복으로 이동<br>
+          ② <code>return</code>: 함수를 호출한 곳으로 돌아감 (레이블 이동은 goto)<br>
+          ④ <code>switch</code>: 다중 조건 분기문 (루프 시작으로 돌아가는 건 continue)
+        </div>
+      </div>
+
+      <!-- Q4: do-while vs while -->
+      <div class="quiz-card" id="qcard4">
+        <div class="q-num">QUIZ 04 / 05</div>
+        <div class="q-text">다음 중 <code>do-while</code> 문을 사용하기에 가장 적합한 상황은?</div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">A</span> 반복 횟수를 미리 알 수 있는 경우 (예: 100번 반복)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">B</span> 조건에 따라 한 번도 실행되지 않아도 되는 경우</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'correct')"><span class="opt-label">C</span> 사용자 입력을 최소 한 번 받아야 하는 메뉴 선택</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">D</span> 배열 원소를 순서대로 처리하는 경우</div>
+        </div>
+        <div class="quiz-feedback" id="qf4">
+          ✅ <strong>정답: C</strong><br>
+          <code>do-while</code>의 핵심 특징은 루프 body가 <strong>최소 1번 실행 보장</strong>입니다. 사용자에게 메뉴를 보여주고 입력을 받는 상황처럼, "일단 실행하고 결과에 따라 반복 여부를 결정"하는 경우에 가장 자연스럽습니다.
+        </div>
+      </div>
+
+      <!-- Q5: continue 출력 -->
+      <div class="quiz-card" id="qcard5">
+        <div class="q-num">QUIZ 05 / 05</div>
+        <div class="q-text">다음 코드의 출력 결과는?</div>
+        <div class="code-block" style="margin-bottom:14px">
+          <div class="code-body" style="padding:10px 14px">
+<pre><span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span>=<span class="nb">1</span>; <span class="nm">i</span>&lt;=<span class="nb">10</span>; <span class="nm">i</span>++) {
+  <span class="kw">if</span> (<span class="nm">i</span>%<span class="nb">2</span>==<span class="nb">0</span>) <span class="kw">continue</span>;
+  <span class="kw">if</span> (<span class="nm">i</span>==<span class="nb">7</span>)   <span class="kw">break</span>;
+  <span class="fn">printf</span>(<span class="st">"%d "</span>, <span class="nm">i</span>);
+}</pre>
+          </div>
+        </div>
+        <div class="quiz-options">
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">A</span> 1 2 3 4 5 6</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'correct')"><span class="opt-label">B</span> 1 3 5</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">C</span> 1 3 5 7</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">D</span> 1 3 5 9</div>
+        </div>
+        <div class="quiz-feedback" id="qf5">
+          ✅ <strong>정답: B — 1 3 5</strong><br>
+          짝수(i%2==0)는 <code>continue</code>로 건너뜁니다 (2,4,6,8,10 건너뜀).<br>
+          i=7일 때 <code>break</code>로 루프 탈출합니다.<br>
+          따라서 printf가 실행되는 것은 i=1, 3, 5 (홀수이면서 7 미만)입니다.
+        </div>
+      </div>
+
+      <!-- Score -->
+      <div style="text-align:center">
+        <button class="btn-primary" onclick="showScore()">결과 확인</button>
+      </div>
+      <div class="quiz-score" id="quiz-score">
+        <div class="score-num" id="score-display">0/5</div>
+        <div class="score-label" id="score-msg">결과를 확인하세요!</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+// ── TAB SWITCHER ──
+function switchTab(btn, panelId) {
+  const tabs = btn.closest('.tabs');
+  tabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  tabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(panelId).classList.add('active');
+}
+
+// ── COPY BUTTON ──
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ 복사됨';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '복사'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── FOR LOOP SIMULATOR ──
+function updateSimCode() {
+  const s = parseInt(document.getElementById('sim-start').value)||0;
+  const e = parseInt(document.getElementById('sim-end').value)||5;
+  const st = parseInt(document.getElementById('sim-step').value)||1;
+  document.getElementById('sim-code-display').innerHTML =
+    `for (i = ${s}; i &lt;= ${e}; i += ${st}) { printf("%d", i); }`;
+}
+document.getElementById('sim-start').addEventListener('input', updateSimCode);
+document.getElementById('sim-end').addEventListener('input', updateSimCode);
+document.getElementById('sim-step').addEventListener('input', updateSimCode);
+
+function runSimulator() {
+  const s  = parseInt(document.getElementById('sim-start').value)||0;
+  const e  = parseInt(document.getElementById('sim-end').value)||5;
+  const st = parseInt(document.getElementById('sim-step').value)||1;
+  const trace = document.getElementById('sim-trace');
+  const out   = document.getElementById('sim-output');
+  trace.innerHTML = '';
+  out.innerHTML = '';
+
+  const steps = [];
+  let iter = 0;
+  for (let i = s; i <= e; i += st) {
+    if (iter > 50) { steps.push({t:'exit', v:'... (truncated)'}); break; }
+    steps.push({t:'cond-true', v:`i=${i} ✓`});
+    steps.push({t:'body', v:`print ${i}`});
+    steps.push({t:'incr', v:`i+=${st}`});
+    iter++;
+  }
+  steps.push({t:'cond-false', v:`i=${s + iter*st} ✗ → exit`});
+
+  let outputNums = [];
+  let idx = 0;
+  function step() {
+    if (idx >= steps.length) {
+      out.innerHTML = `<span style="color:var(--muted);font-size:11px;font-family:'Space Mono',monospace">출력: </span><span style="color:var(--accent2)">${outputNums.join(' ')}</span>`;
+      return;
+    }
+    const sp = steps[idx++];
+    const el = document.createElement('span');
+    el.className = 'loop-step ' + sp.t;
+    el.textContent = sp.v;
+    trace.appendChild(el);
+    if (sp.t === 'body') outputNums.push(sp.v.replace('print ',''));
+    setTimeout(step, 120);
+  }
+  step();
+}
+
+function resetSimulator() {
+  document.getElementById('sim-trace').innerHTML = '<span style="color:var(--muted);font-size:12px;font-family:\'Space Mono\',monospace">▶ 실행 버튼을 눌러보세요</span>';
+  document.getElementById('sim-output').innerHTML = '';
+}
+
+// ── NESTED LOOP DRAWER ──
+function drawNestedLoop() {
+  const rows = Math.min(parseInt(document.getElementById('nest-rows').value)||3, 8);
+  const cols = Math.min(parseInt(document.getElementById('nest-cols').value)||5, 12);
+  const out = document.getElementById('nested-output');
+  out.innerHTML = '';
+  let r = 0;
+  function drawRow() {
+    if (r >= rows) return;
+    let line = '';
+    for (let c = 0; c < cols; c++) line += '* ';
+    const div = document.createElement('div');
+    div.textContent = line.trim();
+    div.style.opacity = '0';
+    div.style.transition = 'opacity .3s';
+    out.appendChild(div);
+    setTimeout(() => div.style.opacity = '1', 30);
+    r++;
+    setTimeout(drawRow, 200);
+  }
+  drawRow();
+}
+// initial draw
+drawNestedLoop();
+
+// ── QUIZ ──
+const answers = {};
+function checkQuiz(opt, qNum, result) {
+  const card = document.getElementById('qcard' + qNum);
+  const fb   = document.getElementById('qf' + qNum);
+  if (card.dataset.answered) return;
+  card.dataset.answered = 'true';
+  answers[qNum] = result;
+
+  card.querySelectorAll('.quiz-opt').forEach(o => o.style.pointerEvents = 'none');
+  opt.classList.add(result);
+  if (result === 'wrong') {
+    card.querySelectorAll('.quiz-opt').forEach(o => {
+      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct');
+    });
+  }
+  fb.className = 'quiz-feedback show ' + result;
+}
+
+function showScore() {
+  const total = 5;
+  const correct = Object.values(answers).filter(v => v === 'correct').length;
+  const score = document.getElementById('quiz-score');
+  const disp = document.getElementById('score-display');
+  const msg = document.getElementById('score-msg');
+  disp.textContent = correct + '/' + total;
+  const pct = correct / total;
+  msg.textContent = pct === 1 ? '🎉 완벽합니다! 반복문 마스터!' :
+                    pct >= .8 ? '👍 훌륭해요! 거의 다 맞혔습니다!' :
+                    pct >= .6 ? '🙂 잘 했어요! 틀린 부분을 복습해봐요.' :
+                                '📚 반복문 개념을 다시 한 번 살펴봐요!';
+  score.classList.add('show');
+}
+
+// ── ACTIVE NAV ──
+const sections = document.querySelectorAll('.section');
+const navItems = document.querySelectorAll('.nav-item');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navItems.forEach(n => {
+        n.classList.toggle('active', n.getAttribute('href') === '#' + e.target.id);
+      });
+    }
+  });
+}, { threshold: 0.3 });
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

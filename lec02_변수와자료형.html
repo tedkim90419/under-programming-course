@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture 02 — 변수와 자료형 | C 프로그래밍</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --accent2: #3fb950;
+  --accent3: #f78166;
+  --accent4: #d2a8ff;
+  --accent5: #ffa657;
+  --yellow: #e3b341;
+  --teal: #39d353;
+  --code-bg: #0d1117;
+  --keyword: #ff7b72;
+  --type: #79c0ff;
+  --string: #a5d6ff;
+  --comment: #8b949e;
+  --number: #79c0ff;
+  --fn: #d2a8ff;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* ── SIDEBAR NAV ── */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: 240px;
+  height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 100;
+  padding: 0 0 40px;
+}
+
+.sidebar-logo {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo .course {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sidebar-logo .title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+.sidebar-logo .lec-num {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-top: 8px;
+}
+
+.nav-section {
+  padding: 16px 0 8px;
+}
+
+.nav-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  padding: 0 20px 8px;
+}
+
+.nav-item {
+  display: block;
+  padding: 7px 20px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+}
+
+.nav-item:hover, .nav-item.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(88,166,255,.08);
+}
+
+.nav-item .dot {
+  display: inline-block;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+/* ── MAIN CONTENT ── */
+.main {
+  margin-left: 240px;
+  padding: 40px 48px 80px;
+  max-width: 960px;
+}
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d2444 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px 48px;
+  margin-bottom: 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(88,166,255,.15) 0%, transparent 70%);
+}
+
+.hero-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  background: rgba(88,166,255,.1);
+  border: 1px solid rgba(88,166,255,.2);
+  padding: 3px 12px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.hero h1 {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.hero h1 span {
+  color: var(--accent);
+}
+
+.hero-sub {
+  font-size: 16px;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.hero-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hero-pill {
+  font-size: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: 'Space Mono', monospace;
+}
+
+/* ── SECTION ── */
+.section {
+  margin-bottom: 56px;
+  scroll-margin-top: 24px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  color: var(--bg);
+  background: var(--accent);
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.section h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ── CONCEPT CARD ── */
+.concept-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.concept-card.highlight {
+  border-color: rgba(88,166,255,.4);
+  background: linear-gradient(135deg, var(--bg2), rgba(88,166,255,.04));
+}
+
+.concept-card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.concept-card h3 .icon {
+  font-size: 16px;
+}
+
+.concept-card p {
+  color: #c9d1d9;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.concept-card ul {
+  list-style: none;
+  margin-top: 8px;
+}
+
+.concept-card ul li {
+  color: #c9d1d9;
+  font-size: 14px;
+  padding: 4px 0 4px 20px;
+  position: relative;
+}
+
+.concept-card ul li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--accent2);
+}
+
+/* ── MEMORY VISUAL ── */
+.memory-visual {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 16px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+}
+
+.mem-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.mem-label {
+  color: var(--muted);
+  width: 60px;
+  text-align: right;
+  font-size: 11px;
+}
+
+.mem-cells {
+  display: flex;
+  gap: 2px;
+}
+
+.mem-cell {
+  width: 32px; height: 32px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 3px;
+  transition: all .3s;
+}
+
+.mem-cell.filled { background: rgba(88,166,255,.15); border-color: rgba(88,166,255,.4); color: var(--accent); }
+.mem-cell.empty  { background: var(--bg2); color: var(--muted); }
+.mem-cell.warn   { background: rgba(247,129,102,.15); border-color: rgba(247,129,102,.4); color: var(--accent3); }
+
+.mem-varname {
+  color: var(--accent2);
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.mem-info {
+  color: var(--muted);
+  font-size: 11px;
+  margin-left: 4px;
+}
+
+/* ── CODE BLOCK ── */
+.code-block {
+  background: #010409;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+
+.code-header {
+  background: var(--bg3);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.code-filename {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.code-lang {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--bg);
+  background: var(--accent2);
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.code-body {
+  padding: 20px;
+  overflow-x: auto;
+}
+
+.code-body pre {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.kw { color: #ff7b72; }
+.ty { color: #79c0ff; }
+.cm { color: #8b949e; font-style: italic; }
+.nm { color: #ffa657; }
+.st { color: #a5d6ff; }
+.fn { color: #d2a8ff; }
+.op { color: #e6edf3; }
+.nb { color: #79c0ff; }
+
+/* ── OUTPUT BOX ── */
+.output-box {
+  background: #010409;
+  border: 1px solid var(--accent2);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--accent2);
+}
+
+.output-box::before {
+  content: '$ ';
+  color: var(--muted);
+}
+
+/* ── DATA TABLE ── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 16px 0;
+}
+
+.data-table thead tr {
+  background: var(--bg3);
+}
+
+.data-table th {
+  text-align: left;
+  padding: 10px 14px;
+  color: var(--muted);
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--border);
+}
+
+.data-table td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover { background: rgba(255,255,255,.02); }
+
+.data-table .type-name {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--type);
+  font-weight: 700;
+}
+
+.data-table .size-badge {
+  display: inline-block;
+  background: rgba(88,166,255,.1);
+  border: 1px solid rgba(88,166,255,.2);
+  color: var(--accent);
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 3px;
+}
+
+.data-table .range { color: #c9d1d9; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+
+/* ── CALLOUT ── */
+.callout {
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 16px 0;
+  font-size: 13px;
+  display: flex;
+  gap: 12px;
+}
+
+.callout.tip   { background: rgba(63,185,80,.08);  border: 1px solid rgba(63,185,80,.25);  }
+.callout.warn  { background: rgba(255,166,87,.08); border: 1px solid rgba(255,166,87,.3);  }
+.callout.info  { background: rgba(88,166,255,.08); border: 1px solid rgba(88,166,255,.25); }
+.callout.error { background: rgba(247,129,102,.08);border: 1px solid rgba(247,129,102,.3); }
+
+.callout-icon { font-size: 18px; flex-shrink: 0; }
+.callout-body { color: #c9d1d9; line-height: 1.6; }
+.callout-body strong { display: block; margin-bottom: 4px; }
+
+/* ── TABS ── */
+.tabs { margin: 16px 0; }
+.tab-bar { display: flex; border-bottom: 1px solid var(--border); }
+.tab-btn {
+  padding: 8px 20px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  border-bottom: 2px solid transparent;
+  transition: all .2s;
+  position: relative;
+  bottom: -1px;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-panel { display: none; padding: 20px 0; }
+.tab-panel.active { display: block; }
+
+/* ── INTERACTIVE DEMO ── */
+.demo-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  margin: 16px 0;
+}
+
+.demo-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 12px;
+  color: var(--accent5);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.demo-title::before {
+  content: '▶';
+  font-size: 10px;
+}
+
+.overflow-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.overflow-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.overflow-row label {
+  width: 140px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--type);
+  flex-shrink: 0;
+}
+
+.gauge-wrap {
+  flex: 1;
+  min-width: 200px;
+}
+
+.gauge-bg {
+  height: 8px;
+  background: var(--bg3);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width .6s ease;
+}
+
+.gauge-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+input[type=range] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.demo-val-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  margin: 12px 0;
+  padding: 12px;
+  background: var(--bg3);
+  border-radius: 6px;
+  color: var(--accent2);
+  transition: color .3s;
+}
+
+.demo-val-display.overflow-state { color: var(--accent3); }
+
+/* ── ASCII TABLE ── */
+.ascii-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 4px;
+  margin: 12px 0;
+}
+
+.ascii-cell {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.ascii-cell:hover {
+  background: rgba(88,166,255,.1);
+  border-color: var(--accent);
+}
+
+.ascii-cell .char {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.ascii-cell .dec {
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.ascii-cell.group-upper .char { color: var(--accent2); }
+.ascii-cell.group-lower .char { color: var(--accent4); }
+.ascii-cell.group-digit .char { color: var(--accent5); }
+.ascii-cell.group-special .char { color: var(--accent3); }
+
+/* ── QUIZ ── */
+.quiz-section {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  margin-top: 32px;
+}
+
+.quiz-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.quiz-header h2 { font-size: 22px; margin-bottom: 8px; }
+.quiz-header p  { color: var(--muted); font-size: 14px; }
+
+.quiz-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.quiz-card .q-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.quiz-card .q-text {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quiz-opt {
+  padding: 10px 16px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.quiz-opt:hover { border-color: var(--accent); background: rgba(88,166,255,.05); }
+.quiz-opt.correct { border-color: var(--accent2); background: rgba(63,185,80,.1); color: var(--accent2); }
+.quiz-opt.wrong   { border-color: var(--accent3); background: rgba(247,129,102,.1); color: var(--accent3); }
+
+.quiz-opt .opt-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quiz-feedback {
+  margin-top: 10px;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  display: none;
+}
+
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: rgba(63,185,80,.1); color: var(--accent2); border: 1px solid rgba(63,185,80,.3); }
+.quiz-feedback.wrong   { background: rgba(247,129,102,.1); color: var(--accent3); border: 1px solid rgba(247,129,102,.3); }
+
+.quiz-score {
+  text-align: center;
+  padding: 24px;
+  background: var(--bg3);
+  border-radius: 8px;
+  margin-top: 20px;
+  display: none;
+}
+
+.quiz-score.show { display: block; }
+
+.score-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.score-label { color: var(--muted); font-size: 14px; margin-top: 8px; }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.btn-primary:hover { background: #79c0ff; }
+
+/* ── GRID LAYOUT ── */
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ── ESCAPE TABLE ── */
+.escape-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.escape-item {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.escape-seq {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent3);
+  margin-bottom: 4px;
+}
+
+.escape-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.escape-desc {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 20px 20px 60px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .hero { padding: 24px; }
+}
+
+.tag-signed   { background: rgba(88,166,255,.1); color: var(--accent);  border: 1px solid rgba(88,166,255,.3); padding: 1px 8px; border-radius: 3px; font-size: 11px; font-family: 'Space Mono', monospace; }
+.tag-unsigned { background: rgba(63,185,80,.1); color: var(--accent2); border: 1px solid rgba(63,185,80,.3);  padding: 1px 8px; border-radius: 3px; font-size: 11px; font-family: 'Space Mono', monospace; }
+.tag-float    { background: rgba(210,168,255,.1); color: var(--accent4); border: 1px solid rgba(210,168,255,.3); padding: 1px 8px; border-radius: 3px; font-size: 11px; font-family: 'Space Mono', monospace; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="course">C 프로그래밍 및 실습</div>
+    <div class="title">변수와 자료형</div>
+    <div class="lec-num">Lecture 02</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">목차</div>
+    <a class="nav-item active" href="#variable"><span class="dot"></span>변수 (Variable)</a>
+    <a class="nav-item" href="#constant"><span class="dot"></span>상수 (Constant)</a>
+    <a class="nav-item" href="#integer"><span class="dot"></span>정수형 (Integer)</a>
+    <a class="nav-item" href="#float"><span class="dot"></span>부동소수점형</a>
+    <a class="nav-item" href="#char"><span class="dot"></span>문자형 (Character)</a>
+    <a class="nav-item" href="#sizeof"><span class="dot"></span>sizeof 연산자</a>
+    <a class="nav-item" href="#typedef"><span class="dot"></span>typedef</a>
+    <a class="nav-item" href="#quiz"><span class="dot"></span>퀴즈 🎯</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-tag">Lecture 02</div>
+    <h1>Variables &amp; <span>Data Types</span><br>변수와 자료형</h1>
+    <p class="hero-sub">프로그래밍방법론및실습 — 서울시립대학교 기계정보공학과</p>
+    <div class="hero-pills">
+      <span class="hero-pill">Variable</span>
+      <span class="hero-pill">Constant</span>
+      <span class="hero-pill">int / float / char</span>
+      <span class="hero-pill">sizeof</span>
+      <span class="hero-pill">typedef</span>
+      <span class="hero-pill">Overflow</span>
+      <span class="hero-pill">ASCII</span>
+    </div>
+  </div>
+
+  <!-- ── SECTION 1: 변수 ── -->
+  <section class="section" id="variable">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>변수 (Variable)</h2>
+    </div>
+
+    <div class="concept-card highlight">
+      <h3><span class="icon">💡</span>변수란?</h3>
+      <p>프로그램이 실행되는 동안 <strong style="color:var(--accent)">값이 변경될 수 있는</strong> 데이터 저장 공간입니다. 데이터는 메모리에 저장되며, 각 변수는 <em>이름(식별자)</em>으로 구분됩니다.</p>
+      <ul>
+        <li>변수명은 데이터가 저장된 메모리 주소를 대신함</li>
+        <li>모든 변수는 특정한 <strong style="color:var(--accent4)">자료형(data type)</strong>을 가짐</li>
+        <li>사용 전에 반드시 <strong style="color:var(--accent3)">선언(declare)</strong>되어야 함 → 컴파일 에러 방지</li>
+      </ul>
+    </div>
+
+    <!-- 선언 문법 -->
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">변수 선언 문법</span>
+        <span class="code-lang">C</span>
+      </div>
+      <div class="code-body">
+<pre><span class="ty">int</span>   value;            <span class="cm">// 정수형 변수 선언</span>
+<span class="ty">float</span> x, y, z;         <span class="cm">// 같은 자료형은 한 줄에 선언 가능</span>
+<span class="ty">int</span>   sum = <span class="nb">0</span>;         <span class="cm">// 선언과 동시에 초기화 (권장!)</span>
+<span class="ty">int</span>   width = <span class="nb">100</span>;
+<span class="ty">int</span>   area  = width * <span class="nb">200</span>;</pre>
+      </div>
+    </div>
+
+    <!-- 메모리 시각화 -->
+    <div class="memory-visual">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">▸ int value; 선언 시 메모리 (4 bytes = 32 bits)</div>
+      <div class="mem-row">
+        <span class="mem-label">0x1000</span>
+        <div class="mem-cells">
+          <div class="mem-cell filled">0</div>
+          <div class="mem-cell filled">0</div>
+          <div class="mem-cell filled">0</div>
+          <div class="mem-cell filled">7</div>
+        </div>
+        <span class="mem-varname">← value (int, 4 bytes)</span>
+        <span class="mem-info">= 7</span>
+      </div>
+      <div class="mem-row">
+        <span class="mem-label">0x1004</span>
+        <div class="mem-cells">
+          <div class="mem-cell warn">X</div>
+          <div class="mem-cell warn">X</div>
+          <div class="mem-cell warn">X</div>
+          <div class="mem-cell warn">X</div>
+        </div>
+        <span class="mem-varname">← 초기화 안된 변수</span>
+        <span class="mem-info" style="color:var(--accent3)">⚠ 쓰레기값!</span>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>초기화 주의</strong>
+        적절한 초기값을 대입하지 않으면 실행 결과가 예측 불가능합니다. 변수를 선언할 때 항상 초기값을 지정하는 습관을 기릅시다.
+      </div>
+    </div>
+
+    <!-- 변수 vs 없는 경우 비교 -->
+    <div class="card-grid">
+      <div class="code-block" style="margin:0">
+        <div class="code-header">
+          <span class="code-filename">❌ 변수 미사용</span>
+        </div>
+        <div class="code-body">
+<pre><span class="cm">// 크기가 100×200인 사각형의 면적</span>
+area = <span class="nb">100</span> * <span class="nb">200</span>;
+
+<span class="cm">// 크기 변경 시 두 곳 수정해야 함</span></pre>
+        </div>
+      </div>
+      <div class="code-block" style="margin:0">
+        <div class="code-header">
+          <span class="code-filename">✅ 변수 사용</span>
+        </div>
+        <div class="code-body">
+<pre><span class="ty">int</span> width  = <span class="nb">100</span>;
+<span class="ty">int</span> height = <span class="nb">200</span>;
+area = width * height;
+
+<span class="cm">// 코드 재사용성 향상 ✓</span></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 2: 상수 ── -->
+  <section class="section" id="constant">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>상수 (Constant)</h2>
+    </div>
+
+    <div class="concept-card">
+      <h3><span class="icon">🔒</span>상수란?</h3>
+      <p>값이 한 번 정해지면 프로그램 실행 중 <strong style="color:var(--accent)">변하지 않는</strong> 데이터입니다.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent5)">리터럴 상수 (Literal)</h3>
+        <p>단순하게 값만 표시. 일회성 사용에 적합합니다.</p>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-body" style="padding:12px">
+<pre>radius = <span class="nb">12</span>;
+area   = <span class="nb">3.14</span> * r * r;
+grade  = <span class="st">'A'</span>;</pre>
+          </div>
+        </div>
+      </div>
+      <div class="concept-card">
+        <h3 style="color:var(--accent4)">기호 상수 (Symbolic)</h3>
+        <p>여러 번 재사용, 특정 의미 부여가 필요할 때. <code style="color:var(--keyword)">#define</code> 전처리문 사용.</p>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-body" style="padding:12px">
+<pre><span class="kw">#define</span> <span class="nm">PI</span>      <span class="nb">3.141592</span>
+<span class="kw">#define</span> <span class="nm">EX_RATE</span> <span class="nb">1319</span>
+
+area = <span class="nm">PI</span> * r * r;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>상수도 자료형을 가집니다</strong>
+        코드에서 명시하지 않더라도 <code>100</code>은 <code>int</code>, <code>3.14</code>는 <code>double</code>, <code>'A'</code>는 <code>char</code>로 처리됩니다. 컴퓨터 내부에서 올바른 연산을 위해 자료형이 필요합니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 3: 정수형 ── -->
+  <section class="section" id="integer">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>정수형 (Integer Type)</h2>
+    </div>
+
+    <!-- 타입별 탭 -->
+    <div class="tabs">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('int-tab','types-tab')">자료형 크기·범위</button>
+        <button class="tab-btn" onclick="switchTab('int-tab','2s-tab')">2의 보수</button>
+        <button class="tab-btn" onclick="switchTab('int-tab','suffix-tab')">상수 Suffix</button>
+        <button class="tab-btn" onclick="switchTab('int-tab','base-tab')">진법 표현</button>
+      </div>
+
+      <!-- 자료형 크기 -->
+      <div class="tab-panel active" id="types-tab">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>구분</th>
+              <th>자료형</th>
+              <th>크기</th>
+              <th>표현 범위</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td rowspan="5"><span class="tag-signed">signed</span></td>
+              <td class="type-name">char</td>
+              <td><span class="size-badge">8 bit</span></td>
+              <td class="range">-128 ~ 127</td>
+            </tr>
+            <tr>
+              <td class="type-name">short</td>
+              <td><span class="size-badge">16 bit</span></td>
+              <td class="range">-32,768 ~ 32,767</td>
+            </tr>
+            <tr>
+              <td class="type-name">int</td>
+              <td><span class="size-badge">32 bit</span></td>
+              <td class="range">-2,147,483,648 ~ 2,147,483,647</td>
+            </tr>
+            <tr>
+              <td class="type-name">long</td>
+              <td><span class="size-badge">32/64 bit</span></td>
+              <td class="range">시스템에 따라 다름</td>
+            </tr>
+            <tr>
+              <td class="type-name">long long</td>
+              <td><span class="size-badge">64 bit</span></td>
+              <td class="range">−9.2×10¹⁸ ~ 9.2×10¹⁸</td>
+            </tr>
+            <tr>
+              <td rowspan="5"><span class="tag-unsigned">unsigned</span></td>
+              <td class="type-name">unsigned char</td>
+              <td><span class="size-badge">8 bit</span></td>
+              <td class="range">0 ~ 255</td>
+            </tr>
+            <tr>
+              <td class="type-name">unsigned short</td>
+              <td><span class="size-badge">16 bit</span></td>
+              <td class="range">0 ~ 65,535</td>
+            </tr>
+            <tr>
+              <td class="type-name">unsigned int</td>
+              <td><span class="size-badge">32 bit</span></td>
+              <td class="range">0 ~ 4,294,967,295</td>
+            </tr>
+            <tr>
+              <td class="type-name">unsigned long</td>
+              <td><span class="size-badge">32/64 bit</span></td>
+              <td class="range">시스템에 따라 다름</td>
+            </tr>
+            <tr>
+              <td class="type-name">unsigned long long</td>
+              <td><span class="size-badge">64 bit</span></td>
+              <td class="range">0 ~ 1.8×10¹⁹</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout tip">
+          <span class="callout-icon">💡</span>
+          <div class="callout-body">
+            <strong>프로그래밍 팁</strong>
+            큰 값 → <code>long</code> | 작은 값 → <code>char</code>/<code>short</code> (메모리 절약) | 음수 불필요 → <code>unsigned</code> 선택
+          </div>
+        </div>
+      </div>
+
+      <!-- 2의 보수 -->
+      <div class="tab-panel" id="2s-tab">
+        <div class="concept-card">
+          <h3>2의 보수 (2's Complement)</h3>
+          <p>부호 있는 정수에서 음수를 표현하는 방법. MSB(최상위 비트)가 부호 역할: <code>0</code>이면 양수, <code>1</code>이면 음수.</p>
+        </div>
+        <div class="memory-visual">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">+3 → -3 변환 과정 (8비트 예시)</div>
+          <div class="mem-row" style="margin-bottom:16px">
+            <span class="mem-label" style="color:var(--accent2)">+3</span>
+            <div class="mem-cells">
+              <div class="mem-cell empty">0</div>
+              <div class="mem-cell empty">0</div>
+              <div class="mem-cell empty">0</div>
+              <div class="mem-cell empty">0</div>
+              <div class="mem-cell empty">0</div>
+              <div class="mem-cell empty">0</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell filled">1</div>
+            </div>
+          </div>
+          <div style="text-align:center;color:var(--muted);font-size:12px;margin:4px 0 4px 70px">↓ Bitwise complement (1의 보수: 1→0, 0→1)</div>
+          <div class="mem-row" style="margin-bottom:16px">
+            <span class="mem-label" style="color:var(--yellow)">1의 보수</span>
+            <div class="mem-cells">
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell empty">0</div>
+              <div class="mem-cell empty">0</div>
+            </div>
+          </div>
+          <div style="text-align:center;color:var(--muted);font-size:12px;margin:4px 0 4px 70px">↓ +1 (2의 보수)</div>
+          <div class="mem-row">
+            <span class="mem-label" style="color:var(--accent3)">-3</span>
+            <div class="mem-cells">
+              <div class="mem-cell warn">1</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell filled">1</div>
+              <div class="mem-cell empty">0</div>
+              <div class="mem-cell filled">1</div>
+            </div>
+            <span class="mem-info" style="color:var(--accent3)">← MSB=1: 음수</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suffix -->
+      <div class="tab-panel" id="suffix-tab">
+        <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">정수 상수는 기본적으로 <code style="color:var(--type)">int</code>형으로 처리됩니다. 다른 타입을 명시하려면 숫자 뒤에 suffix를 붙입니다.</p>
+        <table class="data-table">
+          <thead>
+            <tr><th>Suffix</th><th>Data Type</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="type-name">(없음)</td>
+              <td>int</td>
+              <td style="font-family:'JetBrains Mono',monospace;color:var(--accent)">123</td>
+            </tr>
+            <tr>
+              <td class="type-name">u / U</td>
+              <td>unsigned int</td>
+              <td style="font-family:'JetBrains Mono',monospace;color:var(--accent)">123<span style="color:var(--accent3)">u</span> 또는 123<span style="color:var(--accent3)">U</span></td>
+            </tr>
+            <tr>
+              <td class="type-name">l / L</td>
+              <td>long</td>
+              <td style="font-family:'JetBrains Mono',monospace;color:var(--accent)">123<span style="color:var(--accent3)">l</span> 또는 123<span style="color:var(--accent3)">L</span></td>
+            </tr>
+            <tr>
+              <td class="type-name">ul / UL</td>
+              <td>unsigned long</td>
+              <td style="font-family:'JetBrains Mono',monospace;color:var(--accent)">123<span style="color:var(--accent3)">ul</span> 또는 123<span style="color:var(--accent3)">UL</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 진법 -->
+      <div class="tab-panel" id="base-tab">
+        <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">C 언어는 10진수, 8진수, 16진수로 상수를 표현할 수 있습니다 (2진수 표현은 없음!).</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-filename">intConst.c</span><span class="code-lang">LAB</span></div>
+          <div class="code-body">
+<pre><span class="fn">printf</span>(<span class="st">"%d %x %o\n"</span>, <span class="nb">19</span>, <span class="nb">19</span>, <span class="nb">19</span>);       <span class="cm">// 10진: 19, 16진: 13, 8진: 23</span>
+<span class="fn">printf</span>(<span class="st">"%d %x %o\n"</span>, <span class="nb">0x1c</span>, <span class="nb">0x1c</span>, <span class="nb">0x1c</span>); <span class="cm">// 0x1c = 28</span>
+<span class="fn">printf</span>(<span class="st">"%d %x %o\n"</span>, <span class="nb">017</span>, <span class="nb">017</span>, <span class="nb">017</span>);     <span class="cm">// 017(8진) = 15</span>
+<span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="nb">11</span> + <span class="nb">0x11</span> + <span class="nb">011</span>);         <span class="cm">// 11+17+9 = 37</span></pre>
+          </div>
+        </div>
+        <table class="data-table" style="margin-top:16px">
+          <thead><tr><th>진법</th><th>표기법</th><th>예시</th><th>10진수 값</th></tr></thead>
+          <tbody>
+            <tr><td>10진수</td><td>그대로</td><td class="type-name">123</td><td>123</td></tr>
+            <tr><td>8진수</td><td><code>'0'</code>으로 시작</td><td class="type-name">0123</td><td>83</td></tr>
+            <tr><td>16진수</td><td><code>'0x'</code>로 시작</td><td class="type-name">0x7B</td><td>123</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Overflow 인터랙티브 데모 -->
+    <div class="demo-box">
+      <div class="demo-title">Overflow (오버플로우) 인터랙티브 데모</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">슬라이더를 움직여 <code style="color:var(--type)">short</code>형 변수의 오버플로우를 확인하세요.</p>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <span style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">+1씩 더하기:</span>
+        <input type="range" min="32760" max="32775" value="32760" id="overflow-slider" style="flex:1" oninput="updateOverflow(this.value)">
+      </div>
+      <div class="demo-val-display" id="overflow-display">32760</div>
+      <div style="font-size:12px;color:var(--muted);text-align:center" id="overflow-note">정상 범위: [-32768, 32767]</div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 4: 부동소수점 ── -->
+  <section class="section" id="float">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>부동소수점형 (Floating-point Type)</h2>
+    </div>
+
+    <div class="card-grid">
+      <div class="concept-card">
+        <h3 style="color:var(--accent4)">float</h3>
+        <ul>
+          <li>32비트 (단정밀도)</li>
+          <li>유효 숫자 약 6자리</li>
+          <li>범위: 10⁻³⁸ ~ 10⁺³⁸</li>
+        </ul>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-body" style="padding:10px">
+<pre><span class="ty">float</span> pi = <span class="nb">3.14159</span><span class="kw">f</span>;</pre>
+          </div>
+        </div>
+      </div>
+      <div class="concept-card">
+        <h3 style="color:var(--accent4)">double</h3>
+        <ul>
+          <li>64비트 (배정밀도)</li>
+          <li>유효 숫자 약 16자리</li>
+          <li>범위: 10⁻³⁰⁸ ~ 10⁺³⁰⁸</li>
+        </ul>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-body" style="padding:10px">
+<pre><span class="ty">double</span> pi = <span class="nb">3.141592653</span>;</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IEEE 754 구조 시각화 -->
+    <div class="memory-visual">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">▸ float (32비트) 내부 구조 — IEEE 754 표준</div>
+      <div style="display:flex;gap:2px;font-family:'JetBrains Mono',monospace;font-size:12px;">
+        <div style="background:rgba(247,129,102,.2);border:1px solid rgba(247,129,102,.4);border-radius:4px;padding:8px 12px;text-align:center;">
+          <div style="color:var(--accent3);font-weight:700">S</div>
+          <div style="color:var(--muted);font-size:10px">부호<br>1 bit</div>
+        </div>
+        <div style="background:rgba(88,166,255,.2);border:1px solid rgba(88,166,255,.4);border-radius:4px;padding:8px 20px;text-align:center;flex:1">
+          <div style="color:var(--accent);font-weight:700">Exponent (지수)</div>
+          <div style="color:var(--muted);font-size:10px">8 bits</div>
+        </div>
+        <div style="background:rgba(63,185,80,.2);border:1px solid rgba(63,185,80,.4);border-radius:4px;padding:8px 20px;text-align:center;flex:3">
+          <div style="color:var(--accent2);font-weight:700">Fraction (가수 / Mantissa)</div>
+          <div style="color:var(--muted);font-size:10px">23 bits</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px;">예) ±1.49598 × 10⁸ → 부호(±), 가수(1.49598), 지수(10⁸)</div>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>실수 연산 오차 주의</strong>
+        컴퓨터는 모든 실수를 정확하게 표현할 수 없습니다. <code>(1.0e20 + 5.0) - 1.0e20</code>의 결과가 <code>0.000000</code>이 됩니다. 연산 순서를 주의 깊게 고려하고, 정밀도가 필요할 때는 <code>double</code> 타입을 사용하세요.
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">floating_error.c</span><span class="code-lang">LAB</span></div>
+      <div class="code-body">
+<pre><span class="ty">double</span> x;
+x = (<span class="nb">1.0e20</span> + <span class="nb">5.0</span>) - <span class="nb">1.0e20</span>;
+<span class="fn">printf</span>(<span class="st">"%f\n"</span>, x);  <span class="cm">// 기대: 5.0,  실제: 0.000000</span>
+
+<span class="cm">// 원인: 1.0e20 + 5.0 연산 시 지수를 큰 쪽으로 맞추면서</span>
+<span class="cm">//       5.0의 유효숫자가 표현 범위를 벗어나 손실됨</span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 5: 문자형 ── -->
+  <section class="section" id="char">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>문자형 (Character Type)</h2>
+    </div>
+
+    <div class="concept-card highlight">
+      <h3><span class="icon">🔤</span>char 타입</h3>
+      <p><code>char</code>는 1바이트(8비트) 크기로, 문자를 <strong style="color:var(--accent)">숫자(ASCII 코드)</strong>로 저장합니다. signed char는 -128~127, unsigned char는 0~255 범위를 표현합니다.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">charConst.c</span><span class="code-lang">LAB</span></div>
+      <div class="code-body">
+<pre><span class="ty">char</span> code = <span class="st">'A'</span>;   <span class="cm">// 'A'의 ASCII 값 = 65</span>
+<span class="ty">char</span> code = <span class="nb">65</span>;    <span class="cm">// 위와 동일!</span>
+
+<span class="fn">printf</span>(<span class="st">"%d %d %d\n"</span>, code, code+<span class="nb">1</span>, code+<span class="nb">2</span>);  <span class="cm">// 65 66 67</span>
+<span class="fn">printf</span>(<span class="st">"%c %c %c\n"</span>, code, code+<span class="nb">1</span>, code+<span class="nb">2</span>);  <span class="cm">// A  B  C</span>
+
+<span class="cm">// 주의: '2' ≠ 2  ('2'의 ASCII 값은 50)</span></pre>
+      </div>
+    </div>
+
+    <!-- ASCII 인터랙티브 테이블 -->
+    <div class="demo-box">
+      <div class="demo-title">ASCII 코드 인터랙티브 차트 — 클릭하면 값을 확인하세요</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;"><span style="width:10px;height:10px;background:rgba(88,166,255,.2);border:1px solid rgba(88,166,255,.4);display:inline-block;border-radius:2px"></span><span style="color:var(--muted)">숫자 '0'~'9'</span></span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;"><span style="width:10px;height:10px;background:rgba(63,185,80,.2);border:1px solid rgba(63,185,80,.4);display:inline-block;border-radius:2px"></span><span style="color:var(--muted)">대문자 A-Z</span></span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;"><span style="width:10px;height:10px;background:rgba(210,168,255,.2);border:1px solid rgba(210,168,255,.4);display:inline-block;border-radius:2px"></span><span style="color:var(--muted)">소문자 a-z</span></span>
+        <span style="display:flex;align-items:center;gap:4px;font-size:11px;"><span style="width:10px;height:10px;background:rgba(247,129,102,.2);border:1px solid rgba(247,129,102,.4);display:inline-block;border-radius:2px"></span><span style="color:var(--muted)">특수문자</span></span>
+      </div>
+      <div class="ascii-grid" id="ascii-grid"></div>
+      <div id="ascii-info" style="margin-top:12px;padding:10px;background:var(--bg3);border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);text-align:center;">문자를 클릭하면 상세 정보가 표시됩니다</div>
+    </div>
+
+    <!-- Escape sequences -->
+    <h3 style="font-size:15px;font-weight:700;margin:24px 0 12px;color:var(--text)">Escape Sequence</h3>
+    <div class="escape-grid">
+      <div class="escape-item"><div class="escape-seq">\n</div><div class="escape-name">New line</div><div class="escape-desc">다음 줄로 이동 (ASCII 10)</div></div>
+      <div class="escape-item"><div class="escape-seq">\t</div><div class="escape-name">Tab</div><div class="escape-desc">수평 탭 (ASCII 9)</div></div>
+      <div class="escape-item"><div class="escape-seq">\r</div><div class="escape-name">Carriage return</div><div class="escape-desc">현재 줄 처음으로 (ASCII 13)</div></div>
+      <div class="escape-item"><div class="escape-seq">\\</div><div class="escape-name">Backslash</div><div class="escape-desc">\ 문자 출력 (ASCII 92)</div></div>
+      <div class="escape-item"><div class="escape-seq">\'</div><div class="escape-name">Single quote</div><div class="escape-desc">작은따옴표 출력 (ASCII 39)</div></div>
+      <div class="escape-item"><div class="escape-seq">\"</div><div class="escape-name">Double quote</div><div class="escape-desc">큰따옴표 출력 (ASCII 34)</div></div>
+      <div class="escape-item"><div class="escape-seq">\0</div><div class="escape-name">NULL</div><div class="escape-desc">문자열 끝 표시 (ASCII 0)</div></div>
+      <div class="escape-item"><div class="escape-seq">\a</div><div class="escape-name">Bell (Alarm)</div><div class="escape-desc">경고음 (ASCII 7)</div></div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 6: sizeof ── -->
+  <section class="section" id="sizeof">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>sizeof 연산자</h2>
+    </div>
+
+    <div class="concept-card">
+      <h3><span class="icon">📏</span>sizeof(객체)</h3>
+      <p>특정 객체(변수, 상수, 자료형)를 메모리에 저장하기 위해 필요한 <strong style="color:var(--accent)">바이트 수</strong>를 반환합니다. 시스템마다 실제 크기가 다를 수 있어 이식성 높은 코드 작성에 필수적입니다.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">sizeof 연산자 사용 예시</span><span class="code-lang">C</span></div>
+      <div class="code-body">
+<pre><span class="fn">printf</span>(<span class="st">"%zu\n"</span>, <span class="kw">sizeof</span>(<span class="ty">char</span>));        <span class="cm">// 1 (항상 1)</span>
+<span class="fn">printf</span>(<span class="st">"%zu\n"</span>, <span class="kw">sizeof</span>(<span class="ty">short</span>));       <span class="cm">// 2</span>
+<span class="fn">printf</span>(<span class="st">"%zu\n"</span>, <span class="kw">sizeof</span>(<span class="ty">int</span>));         <span class="cm">// 4</span>
+<span class="fn">printf</span>(<span class="st">"%zu\n"</span>, <span class="kw">sizeof</span>(<span class="ty">long</span>));        <span class="cm">// 4 또는 8</span>
+<span class="fn">printf</span>(<span class="st">"%zu\n"</span>, <span class="kw">sizeof</span>(<span class="ty">float</span>));       <span class="cm">// 4</span>
+<span class="fn">printf</span>(<span class="st">"%zu\n"</span>, <span class="kw">sizeof</span>(<span class="ty">double</span>));      <span class="cm">// 8</span>
+<span class="fn">printf</span>(<span class="st">"%zu\n"</span>, <span class="kw">sizeof</span>(<span class="st">'+'</span>));         <span class="cm">// 4 (char 상수는 int로 처리)</span>
+<span class="fn">printf</span>(<span class="st">"%zu\n"</span>, <span class="kw">sizeof</span>(<span class="nb">3.14159</span>));     <span class="cm">// 8 (부동소수점 상수는 double)</span>
+<span class="fn">printf</span>(<span class="st">"%zu\n"</span>, <span class="kw">sizeof</span>(<span class="nb">3.14159f</span>));    <span class="cm">// 4 (float)</span></pre>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="callout-icon">ℹ️</span>
+      <div class="callout-body">
+        <strong>크기 관계 (C 표준 보장)</strong>
+        <code>sizeof(char) = 1</code> &nbsp;|&nbsp;
+        <code>sizeof(short) ≤ sizeof(int) ≤ sizeof(long)</code> &nbsp;|&nbsp;
+        <code>sizeof(float) ≤ sizeof(double) ≤ sizeof(long double)</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── SECTION 7: typedef ── -->
+  <section class="section" id="typedef">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>typedef 키워드</h2>
+    </div>
+
+    <div class="concept-card">
+      <h3><span class="icon">🏷️</span>사용자 정의 자료형</h3>
+      <p>기본 자료형을 토대로 <strong style="color:var(--accent)">새로운 이름(alias)</strong>을 붙여 사용할 수 있습니다. 코드 가독성 향상 및 이식성에 유리합니다.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-filename">typedef 사용 예시</span><span class="code-lang">C</span></div>
+      <div class="code-body">
+<pre><span class="cm">// 기본 문법</span>
+<span class="kw">typedef</span> <span class="ty">기본자료형</span>  <span class="nm">새로운_이름</span>;
+
+<span class="cm">// 실제 사용 예</span>
+<span class="kw">typedef</span> <span class="ty">unsigned char</span>  <span class="nm">BYTE</span>;    <span class="cm">// 임베디드에서 자주 사용</span>
+<span class="kw">typedef</span> <span class="ty">int</span>            <span class="nm">INT32</span>;   <span class="cm">// 32비트 정수임을 명시</span>
+<span class="kw">typedef</span> <span class="ty">short</span>          <span class="nm">INT16</span>;   <span class="cm">// 16비트 정수임을 명시</span>
+
+<span class="cm">// 이제 새 이름으로 변수 선언 가능</span>
+<span class="nm">BYTE</span>  index = <span class="nb">0</span>;
+<span class="nm">INT32</span> counter = <span class="nb">0</span>;
+<span class="nm">INT16</span> sensor_value = <span class="nb">0</span>;</pre>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>임베디드 시스템에서의 typedef</strong>
+        임베디드 프로그래밍에서는 <code>uint8_t</code>, <code>int16_t</code>, <code>uint32_t</code> 등의 이름을 자주 사용합니다. 이들은 <code>&lt;stdint.h&gt;</code>에 <code>typedef</code>로 정의되어 있습니다.
+      </div>
+    </div>
+  </section>
+
+  <!-- ── QUIZ ── -->
+  <div class="quiz-section" id="quiz">
+    <div class="quiz-header">
+      <h2>🎯 Quiz Time!</h2>
+      <p>배운 내용을 확인해 봅시다. 각 문제를 풀고 점수를 확인하세요.</p>
+    </div>
+
+    <!-- Q1 -->
+    <div class="quiz-card" data-answer="3">
+      <div class="q-num">Q1</div>
+      <div class="q-text">변수에 대한 설명 중 <strong>잘못된</strong> 것은?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answerQuiz(this,1,3)"><span class="opt-label">①</span>변수는 메모리 공간에 할당된다</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,2,3)"><span class="opt-label">②</span>변수는 선언할 때 초기화도 같이 할 수 있다</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,3,3)"><span class="opt-label">③</span>변수는 프로그램에서 값이 변경되지 않는 요소이다</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,4,3)"><span class="opt-label">④</span>변수의 이름도 식별자이다</div>
+      </div>
+      <div class="quiz-feedback" id="fb-1">✅ 정답! ③은 <strong>상수(Constant)</strong>에 대한 설명입니다. 변수는 프로그램 실행 중 값이 변경될 수 있습니다.</div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-card" data-answer="3">
+      <div class="q-num">Q2</div>
+      <div class="q-text">다음 중 상수의 데이터 타입이 <strong>잘못 연결</strong>된 것은?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answerQuiz(this,1,3)"><span class="opt-label">①</span><code>'\0'</code> → char</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,2,3)"><span class="opt-label">②</span><code>123u</code> → unsigned int</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,3,3)"><span class="opt-label">③</span><code>3.14F</code> → double</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,4,3)"><span class="opt-label">④</span><code>123456L</code> → long</div>
+      </div>
+      <div class="quiz-feedback" id="fb-2">✅ 정답! <code>3.14F</code>에서 suffix <strong>F(또는 f)</strong>는 <strong>float</strong> 타입을 의미합니다. double은 suffix 없이 <code>3.14</code>만 쓸 때 해당합니다.</div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-card" data-answer="4">
+      <div class="q-num">Q3</div>
+      <div class="q-text">32비트 플랫폼에서 데이터 타입과 크기가 <strong>올바르게 연결</strong>된 것은?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answerQuiz(this,1,4)"><span class="opt-label">①</span>char — 2 바이트</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,2,4)"><span class="opt-label">②</span>short — 4 바이트</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,3,4)"><span class="opt-label">③</span>float — 8 바이트</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,4,4)"><span class="opt-label">④</span>int — 4 바이트</div>
+      </div>
+      <div class="quiz-feedback" id="fb-3">✅ 정답! <code>char</code>=1바이트, <code>short</code>=2바이트, <code>int</code>=4바이트, <code>float</code>=4바이트입니다.</div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-card" data-answer="2">
+      <div class="q-num">Q4</div>
+      <div class="q-text">다음 코드의 실행 결과는?<br><code style="font-size:13px;color:var(--accent)">short s = 32767; s = s + 1; printf("%d", s);</code></div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answerQuiz(this,1,2)"><span class="opt-label">①</span>32768</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,2,2)"><span class="opt-label">②</span>-32768</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,3,2)"><span class="opt-label">③</span>0</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,4,2)"><span class="opt-label">④</span>컴파일 에러</div>
+      </div>
+      <div class="quiz-feedback" id="fb-4">✅ 정답! <strong>오버플로우(Overflow)</strong>가 발생합니다. short의 최대값 32767을 넘으면 최솟값 -32768로 순환됩니다. (2의 보수 표현의 특성)</div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-card" data-answer="3">
+      <div class="q-num">Q5</div>
+      <div class="q-text"><code>'A'</code>의 ASCII 코드 값은 65입니다. 그렇다면 <code>'a' - 'A'</code>의 값은?</div>
+      <div class="quiz-options">
+        <div class="quiz-opt" onclick="answerQuiz(this,1,3)"><span class="opt-label">①</span>0</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,2,3)"><span class="opt-label">②</span>26</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,3,3)"><span class="opt-label">③</span>32</div>
+        <div class="quiz-opt" onclick="answerQuiz(this,4,3)"><span class="opt-label">④</span>-32</div>
+      </div>
+      <div class="quiz-feedback" id="fb-5">✅ 정답! <code>'a'</code>=97, <code>'A'</code>=65이므로 97-65=<strong>32</strong>. 소문자와 대문자의 ASCII 차이는 항상 32입니다. 이를 이용해 대소문자 변환을 쉽게 할 수 있습니다!</div>
+    </div>
+
+    <div style="text-align:center;margin-top:24px">
+      <button class="btn-primary" onclick="showScore()">결과 확인하기</button>
+    </div>
+
+    <div class="quiz-score" id="quiz-score">
+      <div class="score-num" id="score-num">0/5</div>
+      <div class="score-label" id="score-label">점수를 계산 중...</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// Tab switching
+const tabGroups = {};
+function switchTab(groupId, tabId) {
+  const parent = event.currentTarget.closest('.tabs');
+  parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  parent.querySelector('#' + tabId).classList.add('active');
+}
+
+// Overflow demo
+function updateOverflow(val) {
+  val = parseInt(val);
+  let display = document.getElementById('overflow-display');
+  let note = document.getElementById('overflow-note');
+  let result = val;
+  if (val > 32767) {
+    result = val - 65536;
+    display.classList.add('overflow-state');
+    note.innerHTML = '<span style="color:var(--accent3)">⚠ 오버플로우 발생! ' + val + ' → ' + result + '</span>';
+  } else {
+    display.classList.remove('overflow-state');
+    note.textContent = '정상 범위: [-32768, 32767]';
+  }
+  display.textContent = result;
+}
+
+// ASCII Grid
+const asciiGrid = document.getElementById('ascii-grid');
+for (let i = 33; i <= 126; i++) {
+  const ch = String.fromCharCode(i);
+  const cell = document.createElement('div');
+  cell.className = 'ascii-cell';
+  if (i >= 48 && i <= 57)  cell.className += ' group-digit';
+  else if (i >= 65 && i <= 90)  cell.className += ' group-upper';
+  else if (i >= 97 && i <= 122) cell.className += ' group-lower';
+  else cell.className += ' group-special';
+  cell.innerHTML = `<div class="char">${ch}</div><div class="dec">${i} / 0x${i.toString(16).toUpperCase()}</div>`;
+  cell.onclick = () => {
+    let group = '';
+    if (i >= 48 && i <= 57) group = '숫자';
+    else if (i >= 65 && i <= 90) group = '영어 대문자';
+    else if (i >= 97 && i <= 122) group = '영어 소문자';
+    else group = '특수문자';
+    document.getElementById('ascii-info').innerHTML =
+      `<span style="color:var(--accent);font-size:20px">'${ch}'</span>&nbsp;&nbsp;` +
+      `Dec: <span style="color:var(--accent2)">${i}</span>&nbsp;&nbsp;` +
+      `Hex: <span style="color:var(--accent4)">0x${i.toString(16).toUpperCase()}</span>&nbsp;&nbsp;` +
+      `Oct: <span style="color:var(--accent5)">0${i.toString(8)}</span>&nbsp;&nbsp;` +
+      `분류: <span style="color:var(--muted)">${group}</span>`;
+  };
+  asciiGrid.appendChild(cell);
+}
+
+// Quiz
+let answers = {};
+let total = 5;
+
+function answerQuiz(el, selected, correct) {
+  const card = el.closest('.quiz-card');
+  const qNum = Array.from(document.querySelectorAll('.quiz-card')).indexOf(card) + 1;
+  if (answers[qNum] !== undefined) return;
+
+  answers[qNum] = selected;
+  const opts = card.querySelectorAll('.quiz-opt');
+  opts.forEach((o, i) => {
+    if (i + 1 === correct) o.classList.add('correct');
+    else if (i + 1 === selected && selected !== correct) o.classList.add('wrong');
+  });
+  const fb = document.getElementById('fb-' + qNum);
+  if (selected === correct) {
+    fb.className = 'quiz-feedback show correct';
+  } else {
+    fb.className = 'quiz-feedback show wrong';
+    fb.textContent = '❌ 틀렸습니다. ' + fb.textContent.replace('✅ 정답! ','정답: ');
+  }
+}
+
+function showScore() {
+  const correct = Object.entries(answers).filter(([q, a]) => {
+    const cards = document.querySelectorAll('.quiz-card');
+    const card = cards[parseInt(q) - 1];
+    return parseInt(a) === parseInt(card.dataset.answer);
+  }).length;
+  const score = document.getElementById('quiz-score');
+  const sNum = document.getElementById('score-num');
+  const sLabel = document.getElementById('score-label');
+  sNum.textContent = correct + '/' + total;
+  if (correct === total) sLabel.innerHTML = '🎉 완벽합니다! 이번 강의를 완전히 이해했습니다.';
+  else if (correct >= 4) sLabel.innerHTML = '👍 잘 했습니다! 틀린 문제를 다시 확인해 보세요.';
+  else if (correct >= 3) sLabel.innerHTML = '😊 절반 이상 맞췄습니다. 강의 내용을 복습해 보세요.';
+  else sLabel.innerHTML = '📚 이번 강의를 다시 복습하고 도전해 봅시다!';
+  score.classList.add('show');
+}
+
+// Active nav highlight on scroll
+const sections = document.querySelectorAll('section[id], .quiz-section[id]');
+const navItems = document.querySelectorAll('.nav-item');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 60) current = s.id;
+  });
+  navItems.forEach(n => {
+    n.classList.toggle('active', n.getAttribute('href') === '#' + current);
+  });
+});
+</script>
+</body>
+</html>

@@ -376,7 +376,7 @@ body {
   overflow-x: auto;
 }
 
-.code-body pre {
+.code-body pre { min-width: max-content;
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   line-height: 1.7;
@@ -810,8 +810,28 @@ input[type=range] {
 .tag-unsigned { background: rgba(63,185,80,.1); color: var(--accent2); border: 1px solid rgba(63,185,80,.3);  padding: 1px 8px; border-radius: 3px; font-size: 11px; font-family: 'Space Mono', monospace; }
 .tag-float    { background: rgba(210,168,255,.1); color: var(--accent4); border: 1px solid rgba(210,168,255,.3); padding: 1px 8px; border-radius: 3px; font-size: 11px; font-family: 'Space Mono', monospace; }
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+    <a class="nav-item" href="#variable" onclick="closeDrawer()"><span class="dot"></span>변수 (Variable)</a>
+    <a class="nav-item" href="#constant" onclick="closeDrawer()"><span class="dot"></span>상수 (Constant)</a>
+    <a class="nav-item" href="#integer" onclick="closeDrawer()"><span class="dot"></span>정수형 (Integer)</a>
+    <a class="nav-item" href="#float" onclick="closeDrawer()"><span class="dot"></span>부동소수점형</a>
+    <a class="nav-item" href="#char" onclick="closeDrawer()"><span class="dot"></span>문자형 (Character)</a>
+    <a class="nav-item" href="#sizeof" onclick="closeDrawer()"><span class="dot"></span>sizeof 연산자</a>
+    <a class="nav-item" href="#typedef" onclick="closeDrawer()"><span class="dot"></span>typedef</a>
+    <a class="nav-item" href="#quiz" onclick="closeDrawer()"><span class="dot"></span>퀴즈 🎯</a>
+</div>
+
+
 
 <!-- SIDEBAR -->
 <nav class="sidebar">
@@ -886,6 +906,7 @@ input[type=range] {
 
     <!-- 메모리 시각화 -->
     <div class="memory-visual">
+  <div class="memory-visual-inner">
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">▸ int value; 선언 시 메모리 (4 bytes = 32 bits)</div>
       <div class="mem-row">
         <span class="mem-label">0x1000</span>
@@ -909,7 +930,8 @@ input[type=range] {
         <span class="mem-varname">← 초기화 안된 변수</span>
         <span class="mem-info" style="color:var(--accent3)">⚠ 쓰레기값!</span>
       </div>
-    </div>
+      </div>
+</div>
 
     <div class="callout warn">
       <span class="callout-icon">⚠️</span>
@@ -1012,7 +1034,8 @@ area = <span class="nm">PI</span> * r * r;</pre>
 
       <!-- 자료형 크기 -->
       <div class="tab-panel active" id="types-tab">
-        <table class="data-table">
+        <div class="table-scroll">
+<table class="data-table">
           <thead>
             <tr>
               <th>구분</th>
@@ -1076,6 +1099,7 @@ area = <span class="nm">PI</span> * r * r;</pre>
             </tr>
           </tbody>
         </table>
+</div>
         <div class="callout tip">
           <span class="callout-icon">💡</span>
           <div class="callout-body">
@@ -1092,6 +1116,7 @@ area = <span class="nm">PI</span> * r * r;</pre>
           <p>부호 있는 정수에서 음수를 표현하는 방법. MSB(최상위 비트)가 부호 역할: <code>0</code>이면 양수, <code>1</code>이면 음수.</p>
         </div>
         <div class="memory-visual">
+  <div class="memory-visual-inner">
           <div style="font-size:11px;color:var(--muted);margin-bottom:16px;">+3 → -3 변환 과정 (8비트 예시)</div>
           <div class="mem-row" style="margin-bottom:16px">
             <span class="mem-label" style="color:var(--accent2)">+3</span>
@@ -1135,13 +1160,15 @@ area = <span class="nm">PI</span> * r * r;</pre>
             </div>
             <span class="mem-info" style="color:var(--accent3)">← MSB=1: 음수</span>
           </div>
-        </div>
+          </div>
+</div>
       </div>
 
       <!-- Suffix -->
       <div class="tab-panel" id="suffix-tab">
         <p style="color:var(--muted);font-size:14px;margin-bottom:16px;">정수 상수는 기본적으로 <code style="color:var(--type)">int</code>형으로 처리됩니다. 다른 타입을 명시하려면 숫자 뒤에 suffix를 붙입니다.</p>
-        <table class="data-table">
+        <div class="table-scroll">
+<table class="data-table">
           <thead>
             <tr><th>Suffix</th><th>Data Type</th><th>Example</th></tr>
           </thead>
@@ -1168,6 +1195,7 @@ area = <span class="nm">PI</span> * r * r;</pre>
             </tr>
           </tbody>
         </table>
+</div>
       </div>
 
       <!-- 진법 -->
@@ -1182,7 +1210,8 @@ area = <span class="nm">PI</span> * r * r;</pre>
 <span class="fn">printf</span>(<span class="st">"%d\n"</span>, <span class="nb">11</span> + <span class="nb">0x11</span> + <span class="nb">011</span>);         <span class="cm">// 11+17+9 = 37</span></pre>
           </div>
         </div>
-        <table class="data-table" style="margin-top:16px">
+        <div class="table-scroll">
+<table class="data-table" style="margin-top:16px">
           <thead><tr><th>진법</th><th>표기법</th><th>예시</th><th>10진수 값</th></tr></thead>
           <tbody>
             <tr><td>10진수</td><td>그대로</td><td class="type-name">123</td><td>123</td></tr>
@@ -1190,6 +1219,7 @@ area = <span class="nm">PI</span> * r * r;</pre>
             <tr><td>16진수</td><td><code>'0x'</code>로 시작</td><td class="type-name">0x7B</td><td>123</td></tr>
           </tbody>
         </table>
+</div>
       </div>
     </div>
 
@@ -1244,6 +1274,7 @@ area = <span class="nm">PI</span> * r * r;</pre>
 
     <!-- IEEE 754 구조 시각화 -->
     <div class="memory-visual">
+  <div class="memory-visual-inner">
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">▸ float (32비트) 내부 구조 — IEEE 754 표준</div>
       <div style="display:flex;gap:2px;font-family:'JetBrains Mono',monospace;font-size:12px;">
         <div style="background:rgba(247,129,102,.2);border:1px solid rgba(247,129,102,.4);border-radius:4px;padding:8px 12px;text-align:center;">
@@ -1260,7 +1291,8 @@ area = <span class="nm">PI</span> * r * r;</pre>
         </div>
       </div>
       <div style="font-size:11px;color:var(--muted);margin-top:10px;">예) ±1.49598 × 10⁸ → 부호(±), 가수(1.49598), 지수(10⁸)</div>
-    </div>
+      </div>
+</div>
 
     <div class="callout error">
       <span class="callout-icon">⚠️</span>
@@ -1604,6 +1636,50 @@ window.addEventListener('scroll', () => {
     n.classList.toggle('active', n.getAttribute('href') === '#' + current);
   });
 });
+</script>
+<script>
+// ── Hamburger Drawer (auto-injected by patch_html.py) ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+
+  function open() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : open()
+  );
+  overlay.addEventListener('click', closeDrawer);
+
+  // 스크롤 활성 섹션 표시
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.drawer .nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
 </script>
 </body>
 </html>

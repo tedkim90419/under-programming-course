@@ -163,8 +163,33 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .bit-cell.shifted{background:rgba(255,166,87,.15);border-color:rgba(255,166,87,.4);color:var(--accent5);}
 .bit-lbl{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;min-width:55px;}
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+    <a class="nav-item" href="#intro" onclick="closeDrawer()"><span class="dot"></span>수식과 연산 개념</a>
+    <a class="nav-item" href="#arithmetic" onclick="closeDrawer()"><span class="dot"></span>산술 연산자</a>
+    <a class="nav-item" href="#incr" onclick="closeDrawer()"><span class="dot"></span>증감 연산자</a>
+    <a class="nav-item" href="#assign" onclick="closeDrawer()"><span class="dot"></span>대입 연산자</a>
+    <a class="nav-item" href="#prec1" onclick="closeDrawer()"><span class="dot"></span>우선순위와 결합규칙</a>
+    <a class="nav-item" href="#typeconv" onclick="closeDrawer()"><span class="dot"></span>형 변환</a>
+    <a class="nav-item" href="#quiz1" onclick="closeDrawer()"><span class="dot"></span>Quiz — Part I</a>
+    <a class="nav-item" href="#relational" onclick="closeDrawer()"><span class="dot"></span>관계/동치 연산자</a>
+    <a class="nav-item" href="#logical" onclick="closeDrawer()"><span class="dot"></span>논리 연산자</a>
+    <a class="nav-item" href="#conditional" onclick="closeDrawer()"><span class="dot"></span>조건/콤마 연산자</a>
+    <a class="nav-item" href="#bitwise" onclick="closeDrawer()"><span class="dot"></span>비트 연산자</a>
+    <a class="nav-item" href="#prec2" onclick="closeDrawer()"><span class="dot"></span>전체 우선순위 표</a>
+    <a class="nav-item" href="#quiz2" onclick="closeDrawer()"><span class="dot"></span>Quiz — Part II</a>
+</div>
+
+
 <!-- SIDEBAR -->
 <nav class="sidebar">
   <div class="sidebar-logo">
@@ -250,7 +275,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   <div class="two-col">
     <div>
       <p style="font-size:13px;color:var(--muted);margin-bottom:8px">① 기능에 따른 분류</p>
-      <table class="data-table">
+      <div class="table-scroll">
+<table class="data-table">
         <tr><th>기능</th><th style="text-align:center">기호</th></tr>
         <tr><td class="desc">증감</td><td class="op-cell">++ &nbsp;--</td></tr>
         <tr><td class="desc">산술</td><td class="op-cell">+ &nbsp;- &nbsp;* &nbsp;/ &nbsp;%</td></tr>
@@ -260,10 +286,12 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         <tr><td class="desc">비트</td><td class="op-cell">~ &amp; | ^ &lt;&lt; &gt;&gt;</td></tr>
         <tr><td class="desc">조건</td><td class="op-cell">? :</td></tr>
       </table>
+</div>
     </div>
     <div>
       <p style="font-size:13px;color:var(--muted);margin-bottom:8px">② 피연산자 수에 따른 분류</p>
-      <table class="data-table">
+      <div class="table-scroll">
+<table class="data-table">
         <tr><th>분류</th><th>피연산자</th><th>예시</th></tr>
         <tr>
           <td class="hi">단항 Unary</td><td>1개</td>
@@ -278,6 +306,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
           <td style="font-family:'JetBrains Mono',monospace;color:var(--accent4)">a?b:c</td>
         </tr>
       </table>
+</div>
     </div>
   </div>
 </section>
@@ -288,7 +317,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
     <h2>산술 연산자 (Arithmetic Operator)</h2>
   </div>
 
-  <table class="data-table">
+  <div class="table-scroll">
+<table class="data-table">
     <tr><th>이름</th><th style="text-align:center">기호</th><th>사용 예</th><th>결과</th><th>설명</th></tr>
     <tr><td class="desc">덧셈 Addition</td><td class="op-cell">+</td><td><span class="ic">7 + 4</span></td><td class="result">11</td><td class="desc">두 값의 합</td></tr>
     <tr><td class="desc">뺄셈 Subtraction</td><td class="op-cell">-</td><td><span class="ic">7 - 4</span></td><td class="result">3</td><td class="desc">두 값의 차</td></tr>
@@ -296,6 +326,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
     <tr><td class="desc">나눗셈 Division</td><td class="op-cell">/</td><td><span class="ic">7 / 4</span></td><td class="result">1</td><td class="desc">정수÷정수 → 몫만 (소수점 버림)</td></tr>
     <tr><td class="desc">나머지 Modulus</td><td class="op-cell">%</td><td><span class="ic">7 % 4</span></td><td class="result">3</td><td class="desc">정수에만 적용 가능</td></tr>
   </table>
+</div>
 
   <div class="two-col">
     <div class="callout warn">
@@ -394,7 +425,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
     </ul>
   </div>
 
-  <table class="data-table">
+  <div class="table-scroll">
+<table class="data-table">
     <tr><th>형태</th><th style="text-align:center">기호</th><th>실행 방식</th><th>예시 (x=10일 때)</th></tr>
     <tr>
       <td style="color:var(--accent);font-weight:700">전위 Prefix</td>
@@ -421,6 +453,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
       <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent5)">y=x--; <span style="color:var(--muted)">// y=10, x=9</span></td>
     </tr>
   </table>
+</div>
 
   <div class="two-col">
     <div class="demo-box">
@@ -474,7 +507,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
     </div>
     <div class="concept-card">
       <h3>⚡ 복합 대입 연산자</h3>
-      <table class="data-table" style="margin-top:10px">
+      <div class="table-scroll">
+<table class="data-table" style="margin-top:10px">
         <tr><th>복합 대입</th><th>동일 표현</th></tr>
         <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--accent5)">y += expr</td><td style="font-family:'JetBrains Mono',monospace;color:var(--muted)">y = y + (expr)</td></tr>
         <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--accent5)">y -= expr</td><td style="font-family:'JetBrains Mono',monospace;color:var(--muted)">y = y - (expr)</td></tr>
@@ -482,6 +516,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--accent5)">y /= expr</td><td style="font-family:'JetBrains Mono',monospace;color:var(--muted)">y = y / (expr)</td></tr>
         <tr><td style="font-family:'JetBrains Mono',monospace;color:var(--accent5)">y %= expr</td><td style="font-family:'JetBrains Mono',monospace;color:var(--muted)">y = y % (expr)</td></tr>
       </table>
+</div>
       <p style="font-size:12px;color:var(--muted);margin-top:6px">기타: &gt;&gt;= &nbsp;&lt;&lt;= &nbsp;&amp;= &nbsp;^= &nbsp;|=</p>
     </div>
   </div>
@@ -661,7 +696,8 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
     <div class="callout-title">선언</div>
     <code style="font-family:'JetBrains Mono',monospace">char c; &nbsp;short s; &nbsp;int i; &nbsp;long l; &nbsp;unsigned u; &nbsp;unsigned long ul; &nbsp;float f; &nbsp;double d; &nbsp;long double ld;</code>
   </div>
-  <table class="data-table">
+  <div class="table-scroll">
+<table class="data-table">
     <tr><th>Expression</th><th>결과 Type</th><th>Expression</th><th>결과 Type</th></tr>
     <tr><td><code>c - s / i</code></td><td class="result">int</td><td><code>u * 7 - i</code></td><td class="result">unsigned int</td></tr>
     <tr><td><code>u * 2.0 - i</code></td><td class="result">double</td><td><code>f * 7 - i</code></td><td class="result">float</td></tr>
@@ -670,6 +706,7 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
     <tr><td><code>d + s</code></td><td class="result">double</td><td><code>u - ul</code></td><td class="result">unsigned long</td></tr>
     <tr><td><code>2 * i / l</code></td><td class="result">long</td><td><code>u - l</code></td><td class="result">unsigned long</td></tr>
   </table>
+</div>
 </section>
 <!-- ══ QUIZ 1 ══ -->
 <section class="section" id="quiz1">
@@ -821,7 +858,8 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
   </div>
 
   <div class="subsec"><h3>관계 연산자 활용 예시</h3></div>
-  <table class="data-table">
+  <div class="table-scroll">
+<table class="data-table">
     <tr><th colspan="3">char c='w'; int i=1,j=2,k=-7; double x=7e+33,y=0.001;</th></tr>
     <tr><th>Expression</th><th>Equivalent expression</th><th>Value</th></tr>
     <tr><td><code>'a' + 1 &lt; c</code></td><td><code>('a' + 1) &lt; c</code></td><td class="result">1 (T)</td></tr>
@@ -829,6 +867,7 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
     <tr><td><code>3 &lt; j &lt; 5</code></td><td><code>(3 &lt; j) &lt; 5 &nbsp;<span style="color:var(--comment)">// 주의!</span></code></td><td class="result">1 (T)</td></tr>
     <tr><td><code>x &lt; x + y</code></td><td><code>x &lt; (x + y)</code></td><td class="warn-cell">부동소수점 오차 주의</td></tr>
   </table>
+</div>
 </section>
 <!-- ══ 08. 논리 연산자 ══ -->
 <section class="section" id="logical">
@@ -918,7 +957,8 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
   </div>
 
   <div class="subsec"><h3>논리 연산자 활용 예시</h3></div>
-  <table class="data-table">
+  <div class="table-scroll">
+<table class="data-table">
     <tr><th colspan="3">char c='B'; int i=3,j=3,k=3; double x=0.0,y=2.3;</th></tr>
     <tr><th>Expression</th><th>Equivalent expression</th><th>Value</th></tr>
     <tr><td><code>i &amp;&amp; j &amp;&amp; k</code></td><td><code>(i &amp;&amp; j) &amp;&amp; k</code></td><td class="result">1</td></tr>
@@ -927,6 +967,7 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
     <tr><td><code>'A'&lt;=c &amp;&amp; c&lt;='Z'</code></td><td><code>('A'&lt;=c) &amp;&amp; (c&lt;='Z')</code></td><td class="result">1</td></tr>
     <tr><td><code>c-1=='A' || c+1=='Z'</code></td><td><code>((c-1)=='A') || ((c+1)=='Z')</code></td><td class="result">1</td></tr>
   </table>
+</div>
   <div class="callout info">
     <div class="callout-title">ℹ️ 우선순위</div>
     <code>&amp;&amp;</code>의 우선순위가 <code>||</code>보다 높음. 그러나 둘 모두 단항·산술·관계 연산자보다 낮음.
@@ -968,7 +1009,8 @@ min_value      <span class="op">=</span> (x <span class="op">&lt;</span> y) ? x 
 (age <span class="op">&gt;=</span> <span class="nm">19</span>) ? <span class="fn">printf</span>(<span class="st">"성인\n"</span>) : <span class="fn">printf</span>(<span class="st">"청소년\n"</span>);</pre></div>
   </div>
 
-  <table class="data-table">
+  <div class="table-scroll">
+<table class="data-table">
     <tr><th colspan="4">char a='a',b='b'; int i=1,j=2; double x=7.07;</th></tr>
     <tr><th>Expression</th><th>Equivalent</th><th>Value</th><th>Type</th></tr>
     <tr>
@@ -987,6 +1029,7 @@ min_value      <span class="op">=</span> (x <span class="op">&lt;</span> y) ? x 
       <td class="result">5.0</td><td><code>double</code></td>
     </tr>
   </table>
+</div>
 
   <div class="subsec"><h3>콤마 연산자 (,) <span class="tag">가장 낮은 우선순위</span></h3></div>
   <div class="concept-card">
@@ -1041,7 +1084,8 @@ x <span class="op">=</span> (<span class="nm">2</span><span class="op">+</span><
       </ul>
     </div>
   </div>
-  <table class="data-table">
+  <div class="table-scroll">
+<table class="data-table">
     <tr><th>N</th><th>이진수 표현 (16-bit)</th><th>1의 보수</th><th>2의 보수 (-N)</th><th>값</th></tr>
     <tr>
       <td class="hi">7</td>
@@ -1065,11 +1109,13 @@ x <span class="op">=</span> (<span class="nm">2</span><span class="op">+</span><
       <td class="result">7</td>
     </tr>
   </table>
+</div>
 
   <!-- 연산자 종류 -->
   <div class="subsec"><h3>비트 연산자 종류</h3></div>
   <div class="two-col">
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <tr><th>분류</th><th style="text-align:center">기호</th><th>이름</th></tr>
       <tr>
         <td rowspan="4" style="color:var(--accent);font-weight:700;text-align:center;font-size:12px">Logical<br>ops</td>
@@ -1084,6 +1130,7 @@ x <span class="op">=</span> (<span class="nm">2</span><span class="op">+</span><
       </tr>
       <tr><td class="op-cell">&gt;&gt;</td><td class="desc">right shift</td></tr>
     </table>
+</div>
     <div class="callout warn" style="align-self:start">
       <div class="callout-title">⚠️ 중요</div>
       비트 연산자는 <strong>"정수 타입" 피연산자에만</strong> 적용 가능.<br>
@@ -1433,6 +1480,50 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.3 });
 sections.forEach(s => observer.observe(s));
+</script>
+<script>
+// ── Hamburger Drawer (auto-injected by patch_html.py) ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+
+  function open() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : open()
+  );
+  overlay.addEventListener('click', closeDrawer);
+
+  // 스크롤 활성 섹션 표시
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.drawer .nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
 </script>
 </body>
 </html>

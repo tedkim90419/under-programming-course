@@ -130,8 +130,28 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .compare-body .code-block{border-radius:0;border:none;border-left:1px solid var(--border);margin:0;}
 .compare-body .code-block:first-child{border-left:none;}
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+    <a class="nav-item" href="#control" onclick="closeDrawer()"><span class="dot"></span>프로그램 실행 제어 구조</a>
+    <a class="nav-item" href="#if" onclick="closeDrawer()"><span class="dot"></span>if 조건문</a>
+    <a class="nav-item" href="#ifelse" onclick="closeDrawer()"><span class="dot"></span>if-else 조건문</a>
+    <a class="nav-item" href="#elseif" onclick="closeDrawer()"><span class="dot"></span>if-else if-else</a>
+    <a class="nav-item" href="#guide" onclick="closeDrawer()"><span class="dot"></span>조건문 사용 가이드라인</a>
+    <a class="nav-item" href="#switch" onclick="closeDrawer()"><span class="dot"></span>switch 문</a>
+    <a class="nav-item" href="#compare" onclick="closeDrawer()"><span class="dot"></span>switch vs if-else</a>
+    <a class="nav-item" href="#quiz" onclick="closeDrawer()"><span class="dot"></span>Quiz</a>
+</div>
+
+
 
 <nav class="sidebar">
   <div class="sidebar-logo">
@@ -508,7 +528,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 
   <!-- True/False 간략화 -->
   <div class="subsec"><h3>① C언어 True/False 정의에 따른 if 조건문 간략화</h3></div>
-  <table class="data-table">
+  <div class="table-scroll">
+<table class="data-table">
     <tr>
       <th>표준적인 방법 (더 명확한 표현)</th>
       <th>간략한 표현법</th>
@@ -525,6 +546,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
       <td class="desc">x가 0이면 (거짓)</td>
     </tr>
   </table>
+</div>
 
   <!-- 2개 if vs if-else -->
   <div class="subsec"><h3>② 2개의 if 문 vs if-else 문</h3></div>
@@ -728,7 +750,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   <div class="callout warn">
     <div class="callout-title">⚠️ case label은 정수형 상수만 가능!</div>
     case 문에서 검사할 내용(label)은 <strong>정수형 상수(문자 상수 포함)만</strong> 가능합니다.
-    <table class="data-table" style="margin-top:10px">
+    <div class="table-scroll">
+<table class="data-table" style="margin-top:10px">
       <tr><th>case 레이블 종류</th><th>가능 여부</th><th>이유</th></tr>
       <tr><td class="code">case x:</td><td class="bad">❌ 불가</td><td class="desc">변수는 사용할 수 없다</td></tr>
       <tr><td class="code">case (x+2):</td><td class="bad">❌ 불가</td><td class="desc">변수가 들어간 수식 불가</td></tr>
@@ -737,6 +760,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
       <tr><td class="code">case 'a':</td><td class="good">✅ 가능</td><td class="desc">문자 상수는 정수형 데이터이므로</td></tr>
       <tr><td class="code">case 42:</td><td class="good">✅ 가능</td><td class="desc">정수 상수 사용 가능</td></tr>
     </table>
+</div>
   </div>
 </section>
 <!-- ══ 07. switch vs if-else ══ -->
@@ -814,7 +838,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 
   <div class="concept-card" style="margin-top:16px">
     <h3>📊 switch vs if-else 비교 요약</h3>
-    <table class="data-table" style="margin-top:10px">
+    <div class="table-scroll">
+<table class="data-table" style="margin-top:10px">
       <tr>
         <th>비교 항목</th>
         <th>switch</th>
@@ -841,6 +866,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         <td class="good">✅ 표현 가능</td>
       </tr>
     </table>
+</div>
   </div>
 </section>
 
@@ -1005,6 +1031,50 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.3 });
 sections.forEach(s => observer.observe(s));
+</script>
+<script>
+// ── Hamburger Drawer (auto-injected by patch_html.py) ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+
+  function open() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : open()
+  );
+  overlay.addEventListener('click', closeDrawer);
+
+  // 스크롤 활성 섹션 표시
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.drawer .nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
 </script>
 </body>
 </html>

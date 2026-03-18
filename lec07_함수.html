@@ -83,7 +83,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
 .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
 .copy-btn.copied { color: #39d353; border-color: #39d353; }
 .code-body { padding: 20px; overflow-x: auto; }
-.code-body pre { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; margin: 0; }
+.code-body pre { min-width: max-content; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; margin: 0; }
 .kw { color: #ff7b72; } .ty { color: #79c0ff; } .cm { color: #8b949e; font-style: italic; }
 .nm { color: #ffa657; } .st { color: #a5d6ff; } .fn { color: #d2a8ff; }
 .op { color: #e6edf3; } .nb { color: #79c0ff; } .pp { color: #ff7b72; }
@@ -232,8 +232,31 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
   .hero { padding: 24px; }
 }
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+    <a class="nav-item" href="#intro" onclick="closeDrawer()"><span class="dot"></span>함수의 필요성</a>
+    <a class="nav-item" href="#definition" onclick="closeDrawer()"><span class="dot"></span>함수 정의</a>
+    <a class="nav-item" href="#return" onclick="closeDrawer()"><span class="dot"></span>return 문</a>
+    <a class="nav-item" href="#call" onclick="closeDrawer()"><span class="dot"></span>함수 호출</a>
+    <a class="nav-item" href="#array-fn" onclick="closeDrawer()"><span class="dot"></span>배열과 함수</a>
+    <a class="nav-item" href="#prototype" onclick="closeDrawer()"><span class="dot"></span>함수 원형 선언</a>
+    <a class="nav-item" href="#scope" onclick="closeDrawer()"><span class="dot"></span>Scope (참조 범위)</a>
+    <a class="nav-item" href="#local-global" onclick="closeDrawer()"><span class="dot"></span>지역 / 전역 변수</a>
+    <a class="nav-item" href="#storage" onclick="closeDrawer()"><span class="dot"></span>Storage Classes</a>
+    <a class="nav-item" href="#recursion" onclick="closeDrawer()"><span class="dot"></span>재귀 함수</a>
+    <a class="nav-item" href="#quiz" onclick="closeDrawer()"><span class="dot"></span>퀴즈 🎯</a>
+</div>
+
+
 
 <!-- SIDEBAR -->
 <nav class="sidebar">
@@ -930,7 +953,8 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
     </div>
 
     <!-- 비교 테이블 -->
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <thead>
         <tr>
           <th></th>
@@ -966,6 +990,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
         </tr>
       </tbody>
     </table>
+</div>
 
     <div class="card-grid">
       <!-- 지역변수 코드 -->
@@ -1600,5 +1625,49 @@ const observer = new IntersectionObserver(entries => {
 sections.forEach(s => observer.observe(s));
 </script>
 
+<script>
+// ── Hamburger Drawer (auto-injected by patch_html.py) ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+
+  function open() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : open()
+  );
+  overlay.addEventListener('click', closeDrawer);
+
+  // 스크롤 활성 섹션 표시
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.drawer .nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
+</script>
 </body>
 </html>

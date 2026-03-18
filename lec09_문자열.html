@@ -189,8 +189,30 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   .hero{padding:24px}
 }
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+    <a class="nav-item" href="#intro" onclick="closeDrawer()"><span class="dot"></span>문자와 문자열</a>
+    <a class="nav-item" href="#init" onclick="closeDrawer()"><span class="dot"></span>문자 배열 초기화</a>
+    <a class="nav-item" href="#pointer" onclick="closeDrawer()"><span class="dot"></span>문자열과 포인터</a>
+    <a class="nav-item" href="#char-io" onclick="closeDrawer()"><span class="dot"></span>문자 입출력 함수</a>
+    <a class="nav-item" href="#ctype" onclick="closeDrawer()"><span class="dot"></span>문자 처리 (ctype.h)</a>
+    <a class="nav-item" href="#str-io" onclick="closeDrawer()"><span class="dot"></span>문자열 입출력 함수</a>
+    <a class="nav-item" href="#string-lib" onclick="closeDrawer()"><span class="dot"></span>string.h 라이브러리</a>
+    <a class="nav-item" href="#convert" onclick="closeDrawer()"><span class="dot"></span>문자열↔숫자 변환</a>
+    <a class="nav-item" href="#sprintf" onclick="closeDrawer()"><span class="dot"></span>sprintf / sscanf</a>
+    <a class="nav-item" href="#quiz" onclick="closeDrawer()"><span class="dot"></span>퀴즈 🎯</a>
+</div>
+
+
 
 <nav class="sidebar">
   <div class="sidebar-logo">
@@ -361,7 +383,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
       <div id="init-info" style="font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 12px;border-radius:6px;background:#010409;border:1px solid var(--border);margin-top:8px;min-height:32px"></div>
     </div>
 
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <thead><tr><th>선언</th><th>메모리 내용</th><th>배열 크기</th><th>비고</th></tr></thead>
       <tbody>
         <tr>
@@ -402,6 +425,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         </tr>
       </tbody>
     </table>
+</div>
 
     <div class="callout error">
       <span class="callout-icon">🚨</span>
@@ -550,7 +574,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
     <div class="card-grid">
       <div>
         <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--muted)">분류 함수 (0 아닌 값 = true)</h3>
-        <table class="data-table" style="margin:0">
+        <div class="table-scroll">
+<table class="data-table" style="margin:0">
           <thead><tr><th>함수</th><th>검사 내용</th></tr></thead>
           <tbody>
             <tr><td><code>isalpha(c)</code></td><td>영문자 (a-z, A-Z)</td></tr>
@@ -564,16 +589,19 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
             <tr><td><code>isprint(c)</code></td><td>출력 가능 문자</td></tr>
           </tbody>
         </table>
+</div>
       </div>
       <div>
         <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;color:var(--muted)">변환 함수</h3>
-        <table class="data-table" style="margin:0">
+        <div class="table-scroll">
+<table class="data-table" style="margin:0">
           <thead><tr><th>함수</th><th>동작</th></tr></thead>
           <tbody>
             <tr><td><code>toupper(c)</code></td><td>소문자 → 대문자<br>실패 시 c 그대로 반환</td></tr>
             <tr><td><code>tolower(c)</code></td><td>대문자 → 소문자<br>실패 시 c 그대로 반환</td></tr>
           </tbody>
         </table>
+</div>
 
         <!-- 인터랙티브 문자 분류기 -->
         <div class="demo-box" style="margin-top:12px">
@@ -931,7 +959,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
       <p>커맨드라인 인자(<code>argv[]</code>)로 받은 문자열을 숫자로 처리할 때 활용합니다.</p>
     </div>
 
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <thead><tr><th>함수</th><th>프로토타입</th><th>변환 결과</th><th>사용 예</th></tr></thead>
       <tbody>
         <tr>
@@ -960,6 +989,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         </tr>
       </tbody>
     </table>
+</div>
 
     <!-- 인터랙티브 변환기 -->
     <div class="demo-box">
@@ -1464,5 +1494,49 @@ const observer = new IntersectionObserver(entries => {
 sections.forEach(s => observer.observe(s));
 </script>
 
+<script>
+// ── Hamburger Drawer (auto-injected by patch_html.py) ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+
+  function open() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : open()
+  );
+  overlay.addEventListener('click', closeDrawer);
+
+  // 스크롤 활성 섹션 표시
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.drawer .nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
+</script>
 </body>
 </html>

@@ -181,7 +181,7 @@ body {
 .code-copy:hover { color: var(--accent); border-color: var(--accent); }
 .code-header-right { display: flex; align-items: center; gap: 8px; }
 .code-body { padding: 20px; overflow-x: auto; }
-.code-body pre {
+.code-body pre { min-width: max-content;
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px; line-height: 1.7; margin: 0;
 }
@@ -426,11 +426,168 @@ body {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg2); }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE — 모바일/태블릿 완전 대응
+   ══════════════════════════════════════════ */
+
+/* 햄버거 버튼 */
+.menu-btn {
+  display: none;
+  position: fixed; top: 14px; left: 14px; z-index: 300;
+  width: 40px; height: 40px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer;
+  flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  transition: border-color .2s;
+}
+.menu-btn:hover { border-color: var(--accent); }
+.menu-btn span {
+  display: block; width: 18px; height: 2px;
+  background: var(--text); border-radius: 2px;
+  transition: all .25s;
+}
+.menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* 드로어 오버레이 */
+.drawer-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(2px);
+  opacity: 0; transition: opacity .25s;
+}
+.drawer-overlay.open { opacity: 1; }
+
+/* 드로어 패널 */
+.drawer {
+  position: fixed; top: 0; left: 0; z-index: 250;
+  width: 260px; height: 100vh;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  overflow-y: auto; padding-bottom: 40px;
+  transform: translateX(-100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+}
+.drawer.open { transform: translateX(0); }
+
+/* 테이블 스크롤 */
+.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 16px 0; }
+.table-scroll > .data-table { margin: 0; }
+.data-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
+
+/* anatomy-wrap 스크롤 */
+.anatomy-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.anatomy-line { min-width: max-content; }
+
+/* 코드 블록 */
+.code-body { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.code-body pre { min-width: max-content; }
+
+/* ── 태블릿 (≤ 900px) ── */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0 !important; padding: 64px 24px 60px; }
+  .menu-btn { display: flex; }
+}
+
+/* ── 모바일 (≤ 640px) ── */
+@media (max-width: 640px) {
+  .main { padding: 58px 16px 48px; }
+
+  /* 히어로 */
+  .hero { padding: 20px 16px; margin-bottom: 28px; }
+  .hero h1 { font-size: clamp(20px, 5vw, 28px); }
+  .hero-sub { font-size: 13px; }
+  .hero-pill { font-size: 11px; padding: 3px 10px; }
+
+  /* 섹션 */
+  .section { margin-bottom: 32px; }
+  .section h2 { font-size: 17px; }
+
+  /* 그리드 → 1열 */
+  .two-col     { grid-template-columns: 1fr !important; }
+  .two-col-3   { grid-template-columns: 1fr !important; }
+  .compare-grid{ grid-template-columns: 1fr !important; }
+
+  /* 컨셉 카드 */
+  .concept-card { padding: 16px; }
+  .concept-card p, .concept-card li { font-size: 13px; }
+
+  /* 코드 블록 */
+  .code-header { padding: 7px 12px; flex-wrap: wrap; gap: 6px; }
+  .code-filename { font-size: 11px; }
+  .code-body { padding: 12px 10px; }
+  .code-body pre { font-size: 12px !important; }
+
+  /* 데이터 테이블 */
+  .data-table { white-space: normal; }
+  .data-table th, .data-table td { padding: 8px 10px; font-size: 12px; }
+
+  /* anatomy 프로그램 해부 */
+  .anatomy-wrap { font-size: 11px; }
+  .anatomy-code { padding: 4px 8px; font-size: 11px; }
+  .anatomy-tag  { min-width: 80px; font-size: 10px; padding: 4px 6px; }
+  .anatomy-lno  { min-width: 28px; padding: 4px 6px; }
+
+  /* TIOBE 바 */
+  .tiobe-bar-wrap { width: 80px; }
+  .tiobe-lang { font-size: 12px; }
+
+  /* 플로우 다이어그램 */
+  .flow-diagram { padding: 14px; gap: 8px; }
+  .flow-box { padding: 8px 12px; font-size: 12px; min-width: 70px; }
+  .flow-arrow { font-size: 14px; }
+
+  /* identifier demo */
+  .id-row { flex-wrap: wrap; gap: 8px; }
+  .id-reason { margin-left: 0; width: 100%; }
+
+  /* 콜아웃 */
+  .callout { padding: 11px 13px; font-size: 13px; }
+
+  /* 퀴즈 */
+  .quiz-section { padding: 18px 14px; }
+  .quiz-card { padding: 16px; }
+  .quiz-opt { padding: 9px 12px; font-size: 13px; }
+
+  /* fill-blank */
+  .blank-input { width: 140px; font-size: 12px; }
+}
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
 
-<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+  <div class="sidebar-logo" style="padding-top:56px">
+    <div class="course">C 프로그래밍 및 실습</div>
+    <div class="title">C 언어 기초 사항</div>
+    <div class="lec-num">LECTURE 01</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">목차</div>
+    <a href="#s1"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>프로그래밍 개념</a>
+    <a href="#s2"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>C 프로그래밍 언어</a>
+    <a href="#s3"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>C 프로그램 구성 요소</a>
+    <a href="#s4"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>Comments / Indentation</a>
+    <a href="#s5"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>Preprocessor</a>
+    <a href="#s6"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>Function (함수)</a>
+    <a href="#s7"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>Variables &amp; Identifier</a>
+    <a href="#s8"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>수식과 연산 / I/O</a>
+    <a href="#quiz" class="nav-item" onclick="closeDrawer()"><span class="dot"></span>Quiz</a>
+  </div>
+</div>
+
+<!-- ═══════════════════ SIDEBAR (데스크탑) ═══════════════════ -->
 <nav class="sidebar">
   <div class="sidebar-logo">
     <div class="course">C 프로그래밍 및 실습</div>
@@ -1100,7 +1257,8 @@ body {
         • 문자열 출력: 출력 대상 생략 가능 → <code>printf("Hello World!");</code><br>
         • 상수 값과 변수 값 출력: 형식 지정자(format specifier) 사용</div>
       </div>
-      <table class="data-table">
+      <div class="table-scroll">
+<table class="data-table">
         <thead><tr><th>형식 지정자</th><th>의미</th><th>출력 대상</th><th>예시</th></tr></thead>
         <tbody>
           <tr><td><code>%d</code></td><td>정수 형태로 출력</td><td>정수형 상수, 정수 타입 변수</td><td><code>printf("%d", 42)</code></td></tr>
@@ -1110,6 +1268,7 @@ body {
           <tr><td><code>%s</code></td><td>문자열 형태로 출력</td><td>문자열 상수, 문자 배열</td><td><code>printf("%s", str)</code></td></tr>
         </tbody>
       </table>
+</div>
       <div class="code-block" style="margin-top:8px">
         <div class="code-header">
           <span class="code-filename">printf_example.c</span>
@@ -1142,7 +1301,8 @@ body {
 <span class="fn">scanf</span>(<span class="st">"%d %f"</span>, <span class="op">&amp;</span><span class="nm">number</span>, <span class="op">&amp;</span><span class="nm">grade</span>);
 <span class="cm">/*         ↑      ↑  → & 기호로 변수의 주소를 전달 */</span></pre></div>
       </div>
-      <table class="data-table" style="margin-top:10px">
+      <div class="table-scroll">
+<table class="data-table" style="margin-top:10px">
         <thead><tr><th>형식 지정자</th><th>의미</th><th>예시</th></tr></thead>
         <tbody>
           <tr><td><code>%d</code></td><td>정수를 10진수로 입력</td><td><code>scanf("%d", &amp;i);</code></td></tr>
@@ -1152,6 +1312,7 @@ body {
           <tr><td><code>%s</code></td><td>문자열로 입력</td><td><code>scanf("%s", s);</code></td></tr>
         </tbody>
       </table>
+</div>
     </div>
   </section>
 
@@ -1291,6 +1452,46 @@ body {
 </main>
 
 <script>
+// ── 햄버거 드로어 ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+  function openDrawer() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : openDrawer()
+  );
+  overlay.addEventListener('click', closeDrawer);
+})();
+
+// ── 드로어 활성 섹션 표시 ──
+const drawerLinks = document.querySelectorAll('.drawer .nav-item');
+const drawerObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      drawerLinks.forEach(l => l.classList.remove('active'));
+      const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -60% 0px' });
+
 // ── Active nav highlight ──
 const navItems = document.querySelectorAll('.nav-item');
 const sections = document.querySelectorAll('section[id]');
@@ -1303,7 +1504,7 @@ const observer = new IntersectionObserver(entries => {
     }
   });
 }, { rootMargin: '-20% 0px -60% 0px' });
-sections.forEach(s => observer.observe(s));
+sections.forEach(s => { observer.observe(s); drawerObs.observe(s); });
 
 // ── TIOBE bar animation ──
 function animateBars() {

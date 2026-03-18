@@ -229,11 +229,51 @@ footer {
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 700px) {
+
+/* 태블릿 (≤ 900px) */
+@media (max-width: 900px) {
+  .header-inner { padding: 0 20px; }
   .wrap { padding: 0 20px 80px; }
-  .info-grid { grid-template-columns: 1fr; }
+  .lecture-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+}
+
+/* 모바일 (≤ 640px) */
+@media (max-width: 640px) {
+  /* 헤더 */
+  .header-inner { padding: 0 16px; height: 52px; }
   .header-right { display: none; }
-  .hero { padding: 48px 0 40px; }
+  .hl-name { font-size: 10px; }
+
+  /* 메인 래퍼 */
+  .wrap { padding: 0 16px 60px; }
+
+  /* 히어로 */
+  .hero { padding: 36px 0 28px; }
+  .hero-meta { font-size: 13px; gap: 6px; margin-bottom: 28px; }
+  /* clamp() 이미 있어서 h1 폰트는 자동 대응됨 */
+
+  /* 섹션 헤딩 */
+  .section-heading h2 { font-size: 16px; }
+
+  /* 강의 카드 그리드 */
+  .lecture-grid {
+    grid-template-columns: 1fr;   /* 한 줄에 카드 1개 */
+    gap: 12px;
+  }
+  .lec-card { padding: 18px; }
+  .card-title { font-size: 15px; }
+  .card-num-bg { font-size: 56px; bottom: -6px; right: 10px; }
+
+  /* 정보 그리드 */
+  .info-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 40px; }
+  .info-card { padding: 18px; }
+
+  /* 백그라운드 orb — 모바일에서 성능 절감 */
+  .orb { display: none; }
+
+  /* 푸터 */
+  footer { padding: 20px 16px; }
+  .footer-logo { font-size: 10px; }
 }
 
 /* ── FADE-IN ANIMATION ── */
@@ -254,6 +294,7 @@ footer {
 .lec-card:nth-child(11) { animation-delay: .48s; }
 .lec-card:nth-child(12) { animation-delay: .52s; }
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
 

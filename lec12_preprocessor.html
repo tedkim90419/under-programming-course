@@ -197,8 +197,30 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   .hero{padding:24px}
 }
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+    <a class="nav-item" href="#preprocessor" onclick="closeDrawer()"><span class="dot"></span>전처리기 개요</a>
+    <a class="nav-item" href="#include" onclick="closeDrawer()"><span class="dot"></span>#include 지시어</a>
+    <a class="nav-item" href="#headers" onclick="closeDrawer()"><span class="dot"></span>표준 헤더 파일</a>
+    <a class="nav-item" href="#define-simple" onclick="closeDrawer()"><span class="dot"></span>#define 단순 매크로</a>
+    <a class="nav-item" href="#define-param" onclick="closeDrawer()"><span class="dot"></span>#define 매개변수 매크로</a>
+    <a class="nav-item" href="#macro-pitfall" onclick="closeDrawer()"><span class="dot"></span>매크로 함정과 주의사항</a>
+    <a class="nav-item" href="#predefined" onclick="closeDrawer()"><span class="dot"></span>사전 정의 매크로</a>
+    <a class="nav-item" href="#conditional" onclick="closeDrawer()"><span class="dot"></span>조건부 컴파일</a>
+    <a class="nav-item" href="#gcc-d" onclick="closeDrawer()"><span class="dot"></span>컴파일러 옵션 -D</a>
+    <a class="nav-item" href="#quiz" onclick="closeDrawer()"><span class="dot"></span>퀴즈 🎯</a>
+</div>
+
+
 
 <nav class="sidebar">
   <div class="sidebar-logo">
@@ -368,7 +390,8 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
       <h2>대표적인 표준 헤더 파일</h2>
     </div>
 
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <thead>
         <tr><th>헤더 파일</th><th>주요 내용</th><th>대표 함수</th></tr>
       </thead>
@@ -400,6 +423,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         </tr>
       </tbody>
     </table>
+</div>
 
     <div class="callout warn">
       <span class="callout-icon">⚠️</span>
@@ -668,7 +692,8 @@ x = <span class="fn">SQUARE</span>(y);
       <p>프로그램 어디서나 사용 가능하며, 프로그래머가 <strong style="color:var(--accent3)">재정의할 수 없습니다</strong>. 이름은 두 개의 밑줄로 시작하고 끝납니다. 주로 <strong style="color:var(--accent5)">버전 관리</strong>와 <strong style="color:var(--accent5)">디버깅</strong>에 사용합니다.</p>
     </div>
 
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <thead><tr><th>매크로</th><th>값 (Value)</th><th>활용 예</th></tr></thead>
       <tbody>
         <tr>
@@ -698,6 +723,7 @@ x = <span class="fn">SQUARE</span>(y);
         </tr>
       </tbody>
     </table>
+</div>
 
     <div class="code-block">
       <div class="code-header"><span class="code-filename">사전 정의 매크로 활용 예시</span><div style="display:flex;gap:8px"><button class="copy-btn" onclick="copyCode(this)">복사</button><span class="code-lang">C</span></div></div>
@@ -1160,6 +1186,50 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.25 });
 sections.forEach(s => observer.observe(s));
+</script>
+<script>
+// ── Hamburger Drawer (auto-injected by patch_html.py) ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+
+  function open() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : open()
+  );
+  overlay.addEventListener('click', closeDrawer);
+
+  // 스크롤 활성 섹션 표시
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.drawer .nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
 </script>
 </body>
 </html>

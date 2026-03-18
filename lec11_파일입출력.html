@@ -192,8 +192,30 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   .hero{padding:24px}
 }
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+    <a class="nav-item" href="#stream" onclick="closeDrawer()"><span class="dot"></span>Stream 개념</a>
+    <a class="nav-item" href="#filetype" onclick="closeDrawer()"><span class="dot"></span>파일의 개념과 종류</a>
+    <a class="nav-item" href="#fopen" onclick="closeDrawer()"><span class="dot"></span>fopen / fclose</a>
+    <a class="nav-item" href="#char-io" onclick="closeDrawer()"><span class="dot"></span>문자 단위 입출력</a>
+    <a class="nav-item" href="#line-io" onclick="closeDrawer()"><span class="dot"></span>라인 단위 입출력</a>
+    <a class="nav-item" href="#binary-io" onclick="closeDrawer()"><span class="dot"></span>이진 파일 입출력</a>
+    <a class="nav-item" href="#fmt-io" onclick="closeDrawer()"><span class="dot"></span>형식 입출력 (fprintf/fscanf)</a>
+    <a class="nav-item" href="#summary" onclick="closeDrawer()"><span class="dot"></span>함수 요약표</a>
+    <a class="nav-item" href="#misc" onclick="closeDrawer()"><span class="dot"></span>기타 유틸리티 함수</a>
+    <a class="nav-item" href="#quiz" onclick="closeDrawer()"><span class="dot"></span>퀴즈 🎯</a>
+</div>
+
+
 
 <nav class="sidebar">
   <div class="sidebar-logo">
@@ -750,7 +772,8 @@ Student <span class="nm">buf</span>[<span class="nb">3</span>];
       <h2>파일 입출력 함수 요약 (stdio.h)</h2>
     </div>
 
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <thead>
         <tr>
           <th>종류</th>
@@ -797,6 +820,7 @@ Student <span class="nm">buf</span>[<span class="nb">3</span>];
         </tr>
       </tbody>
     </table>
+</div>
 
     <div class="callout info">
       <span class="callout-icon">📌</span>
@@ -840,7 +864,8 @@ Student <span class="nm">buf</span>[<span class="nb">3</span>];
     </div>
 
     <!-- 함수 요약 테이블 -->
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <thead>
         <tr><th>함수</th><th>프로토타입</th><th>동작</th></tr>
       </thead>
@@ -882,6 +907,7 @@ Student <span class="nm">buf</span>[<span class="nb">3</span>];
         </tr>
       </tbody>
     </table>
+</div>
 
     <!-- fseek offset 방향 시각화 -->
     <div class="concept-card">
@@ -1207,6 +1233,50 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.25 });
 sections.forEach(s => observer.observe(s));
+</script>
+<script>
+// ── Hamburger Drawer (auto-injected by patch_html.py) ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+
+  function open() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : open()
+  );
+  overlay.addEventListener('click', closeDrawer);
+
+  // 스크롤 활성 섹션 표시
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.drawer .nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
 </script>
 </body>
 </html>

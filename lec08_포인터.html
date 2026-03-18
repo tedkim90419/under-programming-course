@@ -84,7 +84,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
 .copy-btn:hover { color: var(--accent); border-color: var(--accent); }
 .copy-btn.copied { color: var(--accent2); border-color: var(--accent2); }
 .code-body { padding: 20px; overflow-x: auto; }
-.code-body pre { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; margin: 0; }
+.code-body pre { min-width: max-content; font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.7; margin: 0; }
 .kw{color:#ff7b72} .ty{color:#79c0ff} .cm{color:#8b949e;font-style:italic}
 .nm{color:#ffa657} .st{color:#a5d6ff} .fn{color:#d2a8ff}
 .op{color:#e6edf3} .nb{color:#79c0ff} .pp{color:#ff7b72}
@@ -214,8 +214,32 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
   .hero { padding: 24px; }
 }
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+    <a class="nav-item" href="#intro" onclick="closeDrawer()"><span class="dot"></span>변수와 메모리 주소</a>
+    <a class="nav-item" href="#declare" onclick="closeDrawer()"><span class="dot"></span>포인터 변수 선언</a>
+    <a class="nav-item" href="#operators" onclick="closeDrawer()"><span class="dot"></span>&amp; / * 연산자</a>
+    <a class="nav-item" href="#init" onclick="closeDrawer()"><span class="dot"></span>초기화 &amp; 주의사항</a>
+    <a class="nav-item" href="#arith" onclick="closeDrawer()"><span class="dot"></span>포인터 산술 연산</a>
+    <a class="nav-item" href="#array" onclick="closeDrawer()"><span class="dot"></span>포인터와 배열</a>
+    <a class="nav-item" href="#function" onclick="closeDrawer()"><span class="dot"></span>포인터와 함수</a>
+    <a class="nav-item" href="#advanced" onclick="closeDrawer()"><span class="dot"></span>고급 포인터</a>
+    <a class="nav-item" href="#const" onclick="closeDrawer()"><span class="dot"></span>const 키워드</a>
+    <a class="nav-item" href="#dynamic" onclick="closeDrawer()"><span class="dot"></span>동적 메모리 할당</a>
+    <a class="nav-item" href="#malloc" onclick="closeDrawer()"><span class="dot"></span>malloc / free</a>
+    <a class="nav-item" href="#quiz" onclick="closeDrawer()"><span class="dot"></span>퀴즈 🎯</a>
+</div>
+
+
 
 <!-- SIDEBAR -->
 <nav class="sidebar">
@@ -446,7 +470,8 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
     <div class="concept-card">
       <h3><span>📊</span>포인터 연산 표현식 예시</h3>
       <p style="font-size:12px;color:var(--muted)">int i=3, j=5, *p=&amp;i, *q=&amp;j, *r; double x;</p>
-      <table class="data-table" style="margin-top:8px">
+      <div class="table-scroll">
+<table class="data-table" style="margin-top:8px">
         <thead>
           <tr><th>수식</th><th>동일 표현</th><th>값/결과</th></tr>
         </thead>
@@ -458,6 +483,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
           <tr><td><code>*(r=&amp;j) *= *p</code></td><td><code>r=&amp;j; *r=(*r)*(*p);</code> → <code>j=j*i</code></td><td>j = 15</td></tr>
         </tbody>
       </table>
+</div>
     </div>
   </section>
 
@@ -561,7 +587,8 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
       </div>
     </div>
 
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <thead><tr><th>수식</th><th>동일 표현</th><th>설명</th></tr></thead>
       <tbody>
         <tr>
@@ -586,6 +613,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
         </tr>
       </tbody>
     </table>
+</div>
     <div class="callout warn">
       <span class="callout-icon">⚠️</span>
       <div class="callout-body">
@@ -957,7 +985,8 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
     </div>
 
     <!-- const 조합 테이블 -->
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <thead><tr><th>선언</th><th>*p (값) 변경</th><th>p (주소) 변경</th><th>특징</th></tr></thead>
       <tbody>
         <tr><td><code>int *p</code></td><td style="color:var(--accent2)">✅ 가능</td><td style="color:var(--accent2)">✅ 가능</td><td>일반 포인터</td></tr>
@@ -966,6 +995,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
         <tr><td><code>const int * const p</code></td><td style="color:var(--accent3)">❌ 불가</td><td style="color:var(--accent3)">❌ 불가</td><td>둘 다 보호 (완전 읽기전용)</td></tr>
       </tbody>
     </table>
+</div>
 
     <div class="callout tip">
       <span class="callout-icon">💡</span>
@@ -1035,7 +1065,8 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
     </div>
 
     <!-- 함수 테이블 -->
-    <table class="data-table">
+    <div class="table-scroll">
+<table class="data-table">
       <thead><tr><th>함수</th><th>프로토타입</th><th>설명</th><th>사용 예</th></tr></thead>
       <tbody>
         <tr>
@@ -1064,6 +1095,7 @@ body { background: var(--bg); color: var(--text); font-family: 'Noto Sans KR', s
         </tr>
       </tbody>
     </table>
+</div>
 
     <div class="callout info">
       <span class="callout-icon">📌</span>
@@ -1509,5 +1541,49 @@ const observer = new IntersectionObserver(entries => {
 sections.forEach(s => observer.observe(s));
 </script>
 
+<script>
+// ── Hamburger Drawer (auto-injected by patch_html.py) ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+
+  function open() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : open()
+  );
+  overlay.addEventListener('click', closeDrawer);
+
+  // 스크롤 활성 섹션 표시
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.drawer .nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
+</script>
 </body>
 </html>

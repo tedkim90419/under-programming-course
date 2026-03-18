@@ -294,7 +294,7 @@ body {
   padding: 20px;
   overflow-x: auto;
 }
-.code-body pre {
+.code-body pre { min-width: max-content;
   font-family: 'JetBrains Mono', monospace;
   font-size: 13px;
   line-height: 1.7;
@@ -720,8 +720,29 @@ body {
 .loop-badge.break-badge  { background: rgba(247,129,102,.15); color: var(--accent3); border: 1px solid rgba(247,129,102,.3); }
 .loop-badge.cont-badge   { background: rgba(63,185,80,.15);   color: var(--accent2); border: 1px solid rgba(63,185,80,.3); }
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+    <a class="nav-item" href="#intro" onclick="closeDrawer()"><span class="dot"></span>반복문 개요</a>
+    <a class="nav-item" href="#while" onclick="closeDrawer()"><span class="dot"></span>while 문</a>
+    <a class="nav-item" href="#dowhile" onclick="closeDrawer()"><span class="dot"></span>do-while 문</a>
+    <a class="nav-item" href="#for" onclick="closeDrawer()"><span class="dot"></span>for 문</a>
+    <a class="nav-item" href="#nested" onclick="closeDrawer()"><span class="dot"></span>중첩 반복문</a>
+    <a class="nav-item" href="#goodpractice" onclick="closeDrawer()"><span class="dot"></span>Good Practice</a>
+    <a class="nav-item" href="#break" onclick="closeDrawer()"><span class="dot"></span>break 문</a>
+    <a class="nav-item" href="#continue" onclick="closeDrawer()"><span class="dot"></span>continue 문</a>
+    <a class="nav-item" href="#quiz" onclick="closeDrawer()"><span class="dot"></span>퀴즈 🎯</a>
+</div>
+
+
 
 <!-- SIDEBAR -->
 <nav class="sidebar">
@@ -1286,7 +1307,8 @@ external_statement;</pre>
     <!-- 실행 흐름 시각화 -->
     <div class="concept-card">
       <h3 style="color:var(--accent2)"><span class="icon">📊</span>실행 흐름 테이블</h3>
-      <table class="data-table" style="margin-top:12px">
+      <div class="table-scroll">
+<table class="data-table" style="margin-top:12px">
         <thead>
           <tr>
             <th>y (outer)</th>
@@ -1302,6 +1324,7 @@ external_statement;</pre>
           <tr style="background:rgba(255,166,87,.05)"><td colspan="2"><strong>합계</strong></td><td><strong>15번</strong></td><td><strong>3번</strong></td></tr>
         </tbody>
       </table>
+</div>
     </div>
 
     <!-- 인터랙티브 별 그리기 -->
@@ -1386,7 +1409,8 @@ external_statement;</pre>
 
     <div class="concept-card">
       <h3 style="color:var(--accent2)"><span class="icon">📏</span>루프 제어 Best Practices 요약</h3>
-      <table class="data-table" style="margin-top:8px">
+      <div class="table-scroll">
+<table class="data-table" style="margin-top:8px">
         <thead>
           <tr>
             <th>상황</th>
@@ -1417,6 +1441,7 @@ external_statement;</pre>
           </tr>
         </tbody>
       </table>
+</div>
     </div>
   </section>
 
@@ -1877,5 +1902,49 @@ const observer = new IntersectionObserver(entries => {
 sections.forEach(s => observer.observe(s));
 </script>
 
+<script>
+// ── Hamburger Drawer (auto-injected by patch_html.py) ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+
+  function open() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : open()
+  );
+  overlay.addEventListener('click', closeDrawer);
+
+  // 스크롤 활성 섹션 표시
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.drawer .nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
+</script>
 </body>
 </html>

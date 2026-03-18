@@ -202,8 +202,32 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   .hero{padding:24px}
 }
 </style>
+  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
+<!-- 햄버거 버튼 (모바일/태블릿 전용) -->
+<button class="menu-btn" id="menuBtn" aria-label="메뉴 열기">
+  <span></span><span></span><span></span>
+</button>
+<!-- 드로어 오버레이 -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<!-- 드로어 패널 -->
+<div class="drawer" id="drawer">
+    <a class="nav-item" href="#intro" onclick="closeDrawer()"><span class="dot"></span>C 데이터 타입 개요</a>
+    <a class="nav-item" href="#typedef" onclick="closeDrawer()"><span class="dot"></span>typedef</a>
+    <a class="nav-item" href="#define" onclick="closeDrawer()"><span class="dot"></span>구조체 정의</a>
+    <a class="nav-item" href="#init" onclick="closeDrawer()"><span class="dot"></span>선언 &amp; 초기화</a>
+    <a class="nav-item" href="#member" onclick="closeDrawer()"><span class="dot"></span>멤버 접근 (. / ->)</a>
+    <a class="nav-item" href="#ops" onclick="closeDrawer()"><span class="dot"></span>허용 연산자</a>
+    <a class="nav-item" href="#array" onclick="closeDrawer()"><span class="dot"></span>구조체 배열</a>
+    <a class="nav-item" href="#nested" onclick="closeDrawer()"><span class="dot"></span>중첩 구조체</a>
+    <a class="nav-item" href="#func" onclick="closeDrawer()"><span class="dot"></span>구조체와 함수</a>
+    <a class="nav-item" href="#union" onclick="closeDrawer()"><span class="dot"></span>공용체 (Union)</a>
+    <a class="nav-item" href="#enum" onclick="closeDrawer()"><span class="dot"></span>열거형 (Enum)</a>
+    <a class="nav-item" href="#quiz" onclick="closeDrawer()"><span class="dot"></span>퀴즈 🎯</a>
+</div>
+
+
 
 <nav class="sidebar">
   <div class="sidebar-logo">
@@ -577,7 +601,8 @@ Complex <span class="nm">a</span>[<span class="nb">3</span>][<span class="nb">3<
     <div class="concept-card">
       <h3><span>📊</span>멤버 접근 표현식 예시 테이블</h3>
       <p style="font-size:12px;color:var(--muted)">struct student s1; struct student *p = &amp;s1; — s1.last_name="Kim", s1.student_id=910017, s1.grade='A'</p>
-      <table class="data-table" style="margin-top:8px">
+      <div class="table-scroll">
+<table class="data-table" style="margin-top:8px">
         <thead><tr><th>수식</th><th>동일 표현</th><th>값</th></tr></thead>
         <tbody>
           <tr><td><code>s1.grade</code></td><td><code>p->grade</code></td><td><code>'A'</code></td></tr>
@@ -587,6 +612,7 @@ Complex <span class="nm">a</span>[<span class="nb">3</span>][<span class="nb">3<
           <tr><td><code>*(p->last_name + 2)</code></td><td><code>(p->last_name)[2]</code></td><td><code>'m'</code></td></tr>
         </tbody>
       </table>
+</div>
     </div>
 
     <!-- 인터랙티브 연산자 퀴즈 -->
@@ -1343,6 +1369,50 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.25 });
 sections.forEach(s => observer.observe(s));
+</script>
+<script>
+// ── Hamburger Drawer (auto-injected by patch_html.py) ──
+(function() {
+  const btn     = document.getElementById('menuBtn');
+  const drawer  = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if (!btn) return;
+
+  function open() {
+    overlay.style.display = 'block';
+    requestAnimationFrame(() => {
+      overlay.classList.add('open');
+      drawer.classList.add('open');
+      btn.classList.add('open');
+      btn.setAttribute('aria-label', '메뉴 닫기');
+    });
+  }
+  window.closeDrawer = function() {
+    overlay.classList.remove('open');
+    drawer.classList.remove('open');
+    btn.classList.remove('open');
+    btn.setAttribute('aria-label', '메뉴 열기');
+    setTimeout(() => { overlay.style.display = 'none'; }, 280);
+  };
+  btn.addEventListener('click', () =>
+    drawer.classList.contains('open') ? closeDrawer() : open()
+  );
+  overlay.addEventListener('click', closeDrawer);
+
+  // 스크롤 활성 섹션 표시
+  const sections = document.querySelectorAll('section[id]');
+  const links    = document.querySelectorAll('.drawer .nav-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector(`.drawer a[href="#${e.target.id}"]`);
+        if (a) a.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => obs.observe(s));
+})();
 </script>
 </body>
 </html>

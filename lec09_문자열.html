@@ -162,7 +162,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .quiz-card .q-num{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:8px}
 .quiz-card .q-text{font-size:14px;font-weight:700;margin-bottom:14px;line-height:1.5}
 .quiz-options{display:flex;flex-direction:column;gap:8px}
-.quiz-opt{padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s;display:flex;align-items:flex-start;gap:10px;text-align:left}
+.quiz-opt{padding:10px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s;display:flex;align-items:flex-start;gap:10px;text-align:left;color:var(--text)}
 .quiz-opt:hover{border-color:var(--accent);background:rgba(244,114,182,.05)}
 .quiz-opt.correct{border-color:var(--accent2);background:rgba(63,185,80,.1);color:var(--accent2)}
 .quiz-opt.wrong  {border-color:var(--accent3);background:rgba(247,129,102,.1);color:var(--accent3)}
@@ -188,6 +188,28 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
   .card-grid,.card-grid-3{grid-template-columns:1fr}
   .hero{padding:24px}
 }
+/* 리가쳐 비활성화 */
+.code-body pre,.data-table td,.quiz-opt,code,[style*="JetBrains Mono"]{font-feature-settings:"liga" 0,"calt" 0;font-variant-ligatures:none}
+/* 햄버거 버튼 */
+.menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:300;width:40px;height:40px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:border-color .2s}
+.menu-btn:hover{border-color:var(--accent)}
+.menu-btn span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .25s}
+.menu-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.menu-btn.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.menu-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+/* 드로어 오버레이 */
+.drawer-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);opacity:0;transition:opacity .25s}
+.drawer-overlay.open{opacity:1}
+/* 드로어 패널 */
+.drawer{position:fixed;top:0;left:0;z-index:250;width:260px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding-bottom:40px;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.drawer.open{transform:translateX(0)}
+/* 코드 블록 스크롤 */
+.code-body{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.code-body pre{min-width:max-content}
+/* 태블릿 (≤ 900px) */
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0 !important;padding:64px 24px 60px}.menu-btn{display:flex}}
+/* 모바일 (≤ 640px) */
+@media(max-width:640px){.main{padding:58px 16px 48px}.hero{padding:20px 16px;margin-bottom:28px}.hero h1{font-size:clamp(20px,5vw,28px)}.hero-sub{font-size:13px}.hero-pill{font-size:11px;padding:3px 10px}.section{margin-bottom:32px}.section h2{font-size:17px}.two-col,.three-col{grid-template-columns:1fr !important}.concept-card{padding:16px}.concept-card p,.concept-card li{font-size:13px}.code-header{padding:7px 12px;flex-wrap:wrap;gap:6px}.code-filename{font-size:11px}.code-body{padding:12px 10px}.code-body pre{font-size:12px !important}.data-table{white-space:normal}.data-table th,.data-table td{padding:8px 10px;font-size:12px}.callout{padding:11px 13px;font-size:13px}.quiz-section{padding:18px 14px}.quiz-card{padding:16px}.quiz-opt{padding:9px 12px;font-size:13px}}
 </style>
   <link rel="stylesheet" href="responsive-patch.css">
 </head>
@@ -1102,10 +1124,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         <div class="q-num">QUIZ 01 / 06</div>
         <div class="q-text"><code>char str[] = "hello";</code> 일 때, <code>sizeof(str)</code>과 <code>strlen(str)</code>의 값은?</div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">A</span> sizeof=5, strlen=5</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'correct')"><span class="opt-label">B</span> sizeof=6, strlen=5</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">C</span> sizeof=6, strlen=6</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">D</span> sizeof=5, strlen=4</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">A</span> sizeof=5, strlen=5</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">B</span> sizeof=6, strlen=5</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">C</span> sizeof=6, strlen=6</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">D</span> sizeof=5, strlen=4</div>
         </div>
         <div class="quiz-feedback" id="qf1">
           ✅ <strong>정답: B — sizeof=6, strlen=5</strong><br>
@@ -1124,10 +1146,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 ③ <span class="ty">char</span> *<span class="nm">p</span> = <span class="st">"Hello"</span>;   <span class="nm">p</span> = <span class="st">"World"</span>;
 ④ <span class="ty">char</span> <span class="nm">s</span>[] = <span class="st">"Hello"</span>;   <span class="fn">printf</span>(<span class="st">"%s"</span>, <span class="nm">s</span>+<span class="nb">1</span>);</pre></div></div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">A</span> ①</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'correct')"><span class="opt-label">B</span> ②</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">C</span> ③</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">D</span> ④</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">A</span> ①</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">B</span> ②</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">C</span> ③</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">D</span> ④</div>
         </div>
         <div class="quiz-feedback" id="qf2">
           ✅ <strong>정답: B — ②</strong><br>
@@ -1141,10 +1163,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         <div class="q-num">QUIZ 03 / 06</div>
         <div class="q-text"><code>strcmp("Apple", "apple")</code>의 결과는?</div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">A</span> 0 (같음)</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'correct')"><span class="opt-label">B</span> 음수 ("Apple" &lt; "apple")</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">C</span> 양수 ("Apple" &gt; "apple")</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">D</span> 컴파일 에러</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">A</span> 0 (같음)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">B</span> 음수 ("Apple" &lt; "apple")</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">C</span> 양수 ("Apple" &gt; "apple")</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">D</span> 컴파일 에러</div>
         </div>
         <div class="quiz-feedback" id="qf3">
           ✅ <strong>정답: B — 음수</strong><br>
@@ -1159,10 +1181,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         <div class="q-num">QUIZ 04 / 06</div>
         <div class="q-text"><code>char str[4] = "abcde";</code> 선언 후 <code>printf("%s", str)</code>의 결과는?</div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">A</span> "abcde" 출력</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">B</span> "abc" 출력 (안전하게 잘림)</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">C</span> 컴파일 에러</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'correct')"><span class="opt-label">D</span> 정의되지 않은 동작 (Undefined Behavior)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">A</span> "abcde" 출력</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">B</span> "abc" 출력 (안전하게 잘림)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">C</span> 컴파일 에러</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">D</span> 정의되지 않은 동작 (Undefined Behavior)</div>
         </div>
         <div class="quiz-feedback" id="qf4">
           ✅ <strong>정답: D — 정의되지 않은 동작 (UB)</strong><br>
@@ -1180,10 +1202,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 <span class="fn">strcat</span>(<span class="nm">s1</span>, <span class="nm">s2</span>);
 <span class="fn">strcat</span>(<span class="nm">s1</span>, <span class="st">"!"</span>);</pre></div></div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">A</span> "beautiful "</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">B</span> "beautiful day"</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'correct')"><span class="opt-label">C</span> "beautiful day!"</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">D</span> "day!"</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">A</span> "beautiful "</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">B</span> "beautiful day"</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">C</span> "beautiful day!"</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">D</span> "day!"</div>
         </div>
         <div class="quiz-feedback" id="qf5">
           ✅ <strong>정답: C — "beautiful day!"</strong><br>
@@ -1198,10 +1220,10 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
         <div class="q-num">QUIZ 06 / 06</div>
         <div class="q-text">getchar()의 반환 타입이 <code>char</code>가 아닌 <code>int</code>인 이유는?</div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">A</span> char는 반환 타입으로 사용할 수 없어서</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,6,'correct')"><span class="opt-label">B</span> EOF(-1)를 구분하기 위해 char 범위보다 큰 타입이 필요해서</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">C</span> ASCII 코드가 항상 정수이기 때문에</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,6,'wrong')"><span class="opt-label">D</span> 성능 최적화를 위해</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6)"><span class="opt-label">A</span> char는 반환 타입으로 사용할 수 없어서</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6)"><span class="opt-label">B</span> EOF(-1)를 구분하기 위해 char 범위보다 큰 타입이 필요해서</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6)"><span class="opt-label">C</span> ASCII 코드가 항상 정수이기 때문에</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,6)"><span class="opt-label">D</span> 성능 최적화를 위해</div>
         </div>
         <div class="quiz-feedback" id="qf6">
           ✅ <strong>정답: B</strong><br>
@@ -1454,24 +1476,50 @@ function runSprintf() {
 }
 
 // ── QUIZ ──
-const answers = {};
-function checkQuiz(opt, qNum, result) {
-  const card = document.getElementById('qcard' + qNum);
-  const fb   = document.getElementById('qf' + qNum);
-  if (card.dataset.answered) return;
-  card.dataset.answered = 'true';
-  answers[qNum] = result;
-  card.querySelectorAll('.quiz-opt').forEach(o => o.style.pointerEvents = 'none');
-  opt.classList.add(result);
-  if (result === 'wrong') {
-    card.querySelectorAll('.quiz-opt').forEach(o => {
-      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct');
-    });
+const correctAnswers = {
+  1: 1,
+  2: 1,
+  3: 1,
+  4: 3,
+  5: 2,
+  6: 1,
+};
+
+function checkQuiz(opt, qNum) {
+  const item = opt.closest('.quiz-card') || opt.closest('.quiz-item');
+  if (item.dataset.answered) return;
+  item.dataset.answered = 'true';
+
+  const opts = item.querySelectorAll('.quiz-opt');
+  const selectedIdx = Array.from(opts).indexOf(opt);
+  const correctIdx = correctAnswers[qNum];
+  const isCorrect = selectedIdx === correctIdx;
+
+  // Disable all options
+  opts.forEach(o => {
+    o.style.pointerEvents = 'none';
+    o.disabled = true;
+    o.style.cursor = 'default';
+  });
+
+  // Add correct class to selected option
+  opt.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  // If wrong, show correct answer
+  if (!isCorrect && opts[correctIdx]) {
+    opts[correctIdx].classList.add('correct');
   }
-  fb.className = 'quiz-feedback show ' + result;
+
+  // Show explanation
+  const explain = item.querySelector('.quiz-feedback');
+  if (explain) explain.classList.add('show');
 }
+
 function showScore() {
-  const correct = Object.values(answers).filter(v => v === 'correct').length;
+  const correct = Array.from(document.querySelectorAll('.quiz-card .quiz-opt.correct')).filter(opt => {
+    const item = opt.closest('.quiz-card');
+    return item.dataset.answered === 'true';
+  }).length;
   document.getElementById('score-display').textContent = correct + '/6';
   const pct = correct / 6;
   document.getElementById('score-msg').textContent =

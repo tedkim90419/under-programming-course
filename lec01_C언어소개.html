@@ -358,6 +358,12 @@ body {
   display: none;
 }
 .quiz-explanation.show { display: block; }
+.btn-score{background:var(--accent);color:var(--bg);border:none;padding:10px 24px;border-radius:6px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-score:hover{opacity:.85;}
+.quiz-score{text-align:center;padding:24px;background:var(--bg3);border-radius:8px;margin-top:20px;display:none;}
+.quiz-score.show{display:block;}
+.score-num{font-family:'Space Mono',monospace;font-size:48px;font-weight:700;color:var(--accent);line-height:1;}
+.score-label{color:var(--muted);font-size:14px;margin-top:8px;}
 
 /* ── FILL BLANK ── */
 .fill-blank-area {
@@ -553,6 +559,12 @@ body {
   /* fill-blank */
   .blank-input { width: 140px; font-size: 12px; }
 }
+
+/* ── 리가쳐 완전 비활성화 ── */
+.code-body pre, .data-table td, .quiz-opt, code, [style*="JetBrains Mono"] {
+  font-feature-settings: "liga" 0, "calt" 0;
+  font-variant-ligatures: none;
+}
 </style>
   <link rel="stylesheet" href="responsive-patch.css">
 </head>
@@ -583,7 +595,7 @@ body {
     <a href="#s6"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>Function (함수)</a>
     <a href="#s7"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>Variables &amp; Identifier</a>
     <a href="#s8"   class="nav-item" onclick="closeDrawer()"><span class="dot"></span>수식과 연산 / I/O</a>
-    <a href="#quiz" class="nav-item" onclick="closeDrawer()"><span class="dot"></span>Quiz</a>
+    <a href="#quiz" class="nav-item" onclick="closeDrawer()"><span class="dot"></span>퀴즈 🎯</a>
   </div>
 </div>
 
@@ -604,7 +616,7 @@ body {
     <a href="#s6" class="nav-item"><span class="dot"></span>Function (함수)</a>
     <a href="#s7" class="nav-item"><span class="dot"></span>Variables &amp; Identifier</a>
     <a href="#s8" class="nav-item"><span class="dot"></span>수식과 연산 / I/O</a>
-    <a href="#quiz" class="nav-item"><span class="dot"></span>Quiz</a>
+    <a href="#quiz" class="nav-item"><span class="dot"></span>퀴즈 🎯</a>
   </div>
 </nav>
 
@@ -1447,6 +1459,13 @@ body {
       </div>
 
     </div><!-- end quiz-section -->
+    <div style="text-align:center;margin-top:20px">
+      <button class="btn-score" onclick="showScore()">결과 확인하기</button>
+    </div>
+    <div class="quiz-score" id="quiz-score">
+      <div class="score-num" id="score-display">0/6</div>
+      <div class="score-label" id="score-msg">결과를 확인하세요!</div>
+    </div>
   </section>
 
 </main>
@@ -1520,10 +1539,13 @@ const tiobeEl = document.getElementById('tiobe-list');
 if (tiobeEl) tiobeObs.observe(tiobeEl);
 
 // ── Quiz ──
+const answers = {};
 function checkQuiz(el, isCorrect) {
   const card = el.closest('.quiz-card');
   if (card.dataset.answered) return;
   card.dataset.answered = '1';
+  const qNum = Array.from(document.querySelectorAll('.quiz-card')).indexOf(card) + 1;
+  answers[qNum] = isCorrect;
   card.querySelectorAll('.quiz-opt').forEach(o => o.classList.add('disabled'));
   el.classList.add(isCorrect ? 'correct' : 'wrong');
   if (!isCorrect) {
@@ -1532,6 +1554,20 @@ function checkQuiz(el, isCorrect) {
     });
   }
   card.querySelector('.quiz-explanation').classList.add('show');
+}
+function showScore() {
+  const total = document.querySelectorAll('.quiz-card').length;
+  const correct = Object.values(answers).filter(v => v === true).length;
+  const score = document.getElementById('quiz-score');
+  const disp = document.getElementById('score-display');
+  const msg = document.getElementById('score-msg');
+  disp.textContent = correct + '/' + total;
+  const pct = correct / total;
+  msg.textContent = pct === 1 ? '🎉 완벽합니다! C 언어 개념 마스터!' :
+                    pct >= .8 ? '👍 훌륭해요! 거의 다 맞혔습니다!' :
+                    pct >= .6 ? '🙂 잘 했어요! 틀린 부분을 복습해봐요.' :
+                                '📚 C 언어 개념을 다시 한 번 살펴봐요!';
+  score.classList.add('show');
 }
 
 // ── Fill blank check ──

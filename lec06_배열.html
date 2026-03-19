@@ -353,7 +353,7 @@ body {
 .quiz-opt {
   padding: 10px 16px; background: var(--bg2); border: 1px solid var(--border);
   border-radius: 6px; cursor: pointer; font-size: 13px; transition: all .15s;
-  display: flex; align-items: flex-start; gap: 10px; text-align: left;
+  display: flex; align-items: flex-start; gap: 10px; text-align: left; color: var(--text);
 }
 .quiz-opt:hover { border-color: var(--accent); background: rgba(210,168,255,.05); }
 .quiz-opt.correct { border-color: var(--accent2); background: rgba(63,185,80,.1); color: var(--accent2); }
@@ -428,6 +428,33 @@ body {
   .card-grid, .card-grid-3 { grid-template-columns: 1fr; }
   .hero { padding: 24px; }
 }
+
+/* ── 리가쳐 완전 비활성화 ── */
+.code-body pre, .data-table td, .quiz-opt, code, [style*="JetBrains Mono"] {
+  font-feature-settings: "liga" 0, "calt" 0;
+  font-variant-ligatures: none;
+}
+
+/* ── 햄버거 버튼 ── */
+.menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:300;width:40px;height:40px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:border-color .2s;}
+.menu-btn:hover{border-color:var(--accent);}
+.menu-btn span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .25s;}
+.menu-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.menu-btn.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.menu-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+/* ── 드로어 오버레이 ── */
+.drawer-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);opacity:0;transition:opacity .25s;}
+.drawer-overlay.open{opacity:1;}
+/* ── 드로어 패널 ── */
+.drawer{position:fixed;top:0;left:0;z-index:250;width:260px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding-bottom:40px;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);}
+.drawer.open{transform:translateX(0);}
+/* ── 코드 블록 스크롤 ── */
+.code-body{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.code-body pre{min-width:max-content;}
+/* ── 태블릿 (≤ 900px) ── */
+@media(max-width:900px){.sidebar{display:none;}.main{margin-left:0 !important;padding:64px 24px 60px;}.menu-btn{display:flex;}}
+/* ── 모바일 (≤ 640px) ── */
+@media(max-width:640px){.main{padding:58px 16px 48px;}.hero{padding:20px 16px;margin-bottom:28px;}.hero h1{font-size:clamp(20px,5vw,28px);}.hero-sub{font-size:13px;}.hero-pill{font-size:11px;padding:3px 10px;}.section{margin-bottom:32px;}.section h2{font-size:17px;}.two-col,.three-col{grid-template-columns:1fr !important;}.concept-card{padding:16px;}.concept-card p,.concept-card li{font-size:13px;}.code-header{padding:7px 12px;flex-wrap:wrap;gap:6px;}.code-filename{font-size:11px;}.code-body{padding:12px 10px;}.code-body pre{font-size:12px !important;}.data-table{white-space:normal;}.data-table th,.data-table td{padding:8px 10px;font-size:12px;}.callout{padding:11px 13px;font-size:13px;}.quiz-section{padding:18px 14px;}.quiz-card{padding:16px;}.quiz-opt{padding:9px 12px;font-size:13px;}}
 </style>
   <link rel="stylesheet" href="responsive-patch.css">
 </head>
@@ -1223,10 +1250,10 @@ body {
 ④ <span class="ty">int</span> <span class="nm">arr</span>[<span class="nb">3</span>] = { <span class="nb">10</span>, <span class="nb">20</span>, <span class="nb">30</span> };
 ⑤ <span class="ty">int</span> <span class="nm">arr</span>[ ];</pre></div></div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">A</span> ①만 잘못됨</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">B</span> ③과 ④가 잘못됨</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'correct')"><span class="opt-label">C</span> ⑤만 잘못됨</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">D</span> ①과 ⑤가 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">A</span> ①만 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">B</span> ③과 ④가 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">C</span> ⑤만 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">D</span> ①과 ⑤가 잘못됨</div>
         </div>
         <div class="quiz-feedback" id="qf1">
           ✅ <strong>정답: C — ⑤만 잘못됨</strong><br>
@@ -1248,10 +1275,10 @@ body {
 ④ <span class="ty">char</span> <span class="nm">str</span>[] = <span class="st">"ABCDE"</span>;
 ⑤ <span class="ty">char</span> <span class="nm">str</span>[<span class="nb">6</span>] = <span class="st">'A'</span>,<span class="st">'B'</span>,<span class="st">'C'</span>,<span class="st">'D'</span>,<span class="st">'E'</span>,<span class="st">'\0'</span>;</pre></div></div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">A</span> ②만 잘못됨</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'correct')"><span class="opt-label">B</span> ②와 ⑤가 잘못됨</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">C</span> ①, ③, ⑤가 잘못됨</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">D</span> ②, ④, ⑤가 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">A</span> ②만 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">B</span> ②와 ⑤가 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">C</span> ①, ③, ⑤가 잘못됨</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">D</span> ②, ④, ⑤가 잘못됨</div>
         </div>
         <div class="quiz-feedback" id="qf2">
           ✅ <strong>정답: B — ②와 ⑤</strong><br>
@@ -1266,10 +1293,10 @@ body {
         <div class="q-num">QUIZ 03 / 05</div>
         <div class="q-text"><code>int a[100] = &#123; 10 &#125;;</code> 으로 선언된 배열에서 <code>a[99]</code>의 초기값은?</div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">A</span> 가비지 값이 들어간다.</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'correct')"><span class="opt-label">B</span> 0</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">C</span> 99</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">D</span> 시스템에 따라 달라진다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">A</span> 가비지 값이 들어간다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">B</span> 0</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">C</span> 99</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">D</span> 시스템에 따라 달라진다.</div>
         </div>
         <div class="quiz-feedback" id="qf3">
           ✅ <strong>정답: B — 0</strong><br>
@@ -1282,10 +1309,10 @@ body {
         <div class="q-num">QUIZ 04 / 05</div>
         <div class="q-text"><code>int a[2][2] = &#123; 1, 2, 3, 4 &#125;;</code> 로 선언된 배열에서 <code>a[1][1]</code>의 값은?</div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">A</span> 1</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">B</span> 2</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">C</span> 3</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'correct')"><span class="opt-label">D</span> 4</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">A</span> 1</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">B</span> 2</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">C</span> 3</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">D</span> 4</div>
         </div>
         <div class="quiz-feedback" id="qf4">
           ✅ <strong>정답: D — 4</strong><br>
@@ -1311,10 +1338,10 @@ body {
   <span class="kw">return</span> <span class="nb">0</span>;
 }</pre></div></div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">A</span> (가)만 오류</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">B</span> (나)만 오류</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">C</span> (가)와 (나) 오류</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'correct')"><span class="opt-label">D</span> (가), (나), (다) 모두 오류</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">A</span> (가)만 오류</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">B</span> (나)만 오류</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">C</span> (가)와 (나) 오류</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">D</span> (가), (나), (다) 모두 오류</div>
         </div>
         <div class="quiz-feedback" id="qf5">
           ✅ <strong>정답: D — 세 곳 모두 오류</strong><br>
@@ -1454,30 +1481,55 @@ build2DInit('init2d-1', [[1,2,3],[4,5,6]], 2, 3);
 build2DInit('init2d-partial', [[1,2,3],[4,0,0]], 2, 3);
 
 // ── QUIZ ──
-const answers = {};
-function checkQuiz(opt, qNum, result) {
-  const card = document.getElementById('qcard' + qNum);
-  const fb   = document.getElementById('qf' + qNum);
-  if (card.dataset.answered) return;
-  card.dataset.answered = 'true';
-  answers[qNum] = result;
-  card.querySelectorAll('.quiz-opt').forEach(o => o.style.pointerEvents='none');
-  opt.classList.add(result);
-  if (result === 'wrong') {
-    card.querySelectorAll('.quiz-opt').forEach(o => {
-      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct');
-    });
+const correctAnswers = {
+  1: 2,
+  2: 1,
+  3: 1,
+  4: 3,
+  5: 3,
+};
+
+function checkQuiz(opt, qNum) {
+  const item = opt.closest('.quiz-card') || opt.closest('.quiz-item');
+  if (item.dataset.answered) return;
+  item.dataset.answered = 'true';
+
+  const opts = item.querySelectorAll('.quiz-opt');
+  const selectedIdx = Array.from(opts).indexOf(opt);
+  const correctIdx = correctAnswers[qNum];
+  const isCorrect = selectedIdx === correctIdx;
+
+  // Disable all options
+  opts.forEach(o => {
+    o.style.pointerEvents = 'none';
+    o.disabled = true;
+    o.style.cursor = 'default';
+  });
+
+  // Add correct class to selected option
+  opt.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  // If wrong, show correct answer
+  if (!isCorrect && opts[correctIdx]) {
+    opts[correctIdx].classList.add('correct');
   }
-  fb.className = 'quiz-feedback show ' + result;
+
+  // Show explanation
+  const explain = item.querySelector('.quiz-feedback');
+  if (explain) explain.classList.add('show');
 }
+
 function showScore() {
-  const correct = Object.values(answers).filter(v=>v==='correct').length;
-  document.getElementById('score-display').textContent = correct+'/5';
-  const pct = correct/5;
+  const correct = Array.from(document.querySelectorAll('.quiz-card .quiz-opt.correct')).filter(opt => {
+    const item = opt.closest('.quiz-card');
+    return item.dataset.answered === 'true';
+  }).length;
+  document.getElementById('score-display').textContent = correct + '/5';
+  const pct = correct / 5;
   document.getElementById('score-msg').textContent =
-    pct===1 ? '🎉 완벽합니다! 배열 마스터!' :
-    pct>=.8 ? '👍 훌륭해요! 거의 다 맞혔습니다!' :
-    pct>=.6 ? '🙂 잘 했어요! 틀린 부분을 복습해봐요.' :
+    pct === 1 ? '🎉 완벽합니다! 배열 마스터!' :
+    pct >= .8 ? '👍 훌륭해요! 거의 다 맞혔습니다!' :
+    pct >= .6 ? '🙂 잘 했어요! 틀린 부분을 복습해봐요.' :
               '📚 배열 개념을 다시 한 번 살펴봐요!';
   document.getElementById('quiz-score').classList.add('show');
 }

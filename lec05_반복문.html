@@ -115,7 +115,7 @@ body {
 .main {
   margin-left: 240px;
   padding: 40px 48px 80px;
-  max-width: 960px;
+  max-width: 1040px;
 }
 
 /* ── HERO ── */
@@ -697,13 +697,8 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 800px) {
-  .sidebar { display: none; }
-  .main { margin-left: 0; padding: 20px 20px 60px; }
-  .card-grid { grid-template-columns: 1fr; }
-  .compare-grid { grid-template-columns: 1fr; }
-  .hero { padding: 24px; }
-}
+@media(max-width:900px){.sidebar{display:none;}.main{margin-left:0 !important;padding:64px 24px 60px;}}
+@media(max-width:640px){.main{padding:58px 16px 48px;}.hero{padding:20px 16px;margin-bottom:28px;}.hero h1{font-size:clamp(20px,5vw,28px);}.hero-sub{font-size:13px;}.hero-pill{font-size:11px;padding:3px 10px;}.section{margin-bottom:32px;}.section h2{font-size:17px;}.two-col,.three-col{grid-template-columns:1fr !important;}.concept-card{padding:16px;}.concept-card p,.concept-card li{font-size:13px;}.code-header{padding:7px 12px;flex-wrap:wrap;gap:6px;}.code-filename{font-size:11px;}.code-body{padding:12px 10px;}.code-body pre{font-size:12px !important;}.data-table{white-space:normal;}.data-table th,.data-table td{padding:8px 10px;font-size:12px;}.callout{padding:11px 13px;font-size:13px;}.quiz-section{padding:18px 14px;}.quiz-card{padding:16px;}.quiz-opt{padding:9px 12px;font-size:13px;}}
 
 /* ── LOOP TYPE BADGE ── */
 .loop-badge {
@@ -719,8 +714,46 @@ body {
 .loop-badge.for-badge    { background: rgba(255,166,87,.15);  color: var(--accent5); border: 1px solid rgba(255,166,87,.3); }
 .loop-badge.break-badge  { background: rgba(247,129,102,.15); color: var(--accent3); border: 1px solid rgba(247,129,102,.3); }
 .loop-badge.cont-badge   { background: rgba(63,185,80,.15);   color: var(--accent2); border: 1px solid rgba(63,185,80,.3); }
+
+/* ── 리가쳐 완전 비활성화 ── */
+.code-body pre,
+.data-table td,
+.truth-table,
+.quiz-option,
+.tbox,
+.expr-viz,
+.demo-box,
+.ic,
+.prec-ops,
+.bit-cell,
+.bit-lbl,
+code, [style*="JetBrains Mono"] {
+  font-feature-settings: "liga" 0, "calt" 0;
+  font-variant-ligatures: none;
+}
+
+/* ── 햄버거 버튼 ── */
+.menu-btn{display:none;position:fixed;top:14px;left:14px;z-index:300;width:40px;height:40px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:border-color .2s;}
+.menu-btn:hover{border-color:var(--accent);}
+.menu-btn span{display:block;width:18px;height:2px;background:var(--text);border-radius:2px;transition:all .25s;}
+.menu-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.menu-btn.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.menu-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+/* ── 드로어 오버레이 ── */
+.drawer-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);opacity:0;transition:opacity .25s;}
+.drawer-overlay.open{opacity:1;}
+/* ── 드로어 패널 ── */
+.drawer{position:fixed;top:0;left:0;z-index:250;width:260px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding-bottom:40px;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);}
+.drawer.open{transform:translateX(0);}
+/* ── 코드 블록 스크롤 ── */
+.code-body{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.code-body pre{min-width:max-content;}
+/* ── 태블릿 (≤ 900px) ── */
+@media(max-width:900px){.sidebar{display:none;}.main{margin-left:0 !important;padding:64px 24px 60px;}.menu-btn{display:flex;}}
+/* ── 모바일 (≤ 640px) ── */
+@media(max-width:640px){.main{padding:58px 16px 48px;}.hero{padding:20px 16px;margin-bottom:28px;}.hero h1{font-size:clamp(20px,5vw,28px);}.hero-sub{font-size:13px;}.hero-pill{font-size:11px;padding:3px 10px;}.section{margin-bottom:32px;}.section h2{font-size:17px;}.two-col,.three-col{grid-template-columns:1fr !important;}.concept-card{padding:16px;}.concept-card p,.concept-card li{font-size:13px;}.code-header{padding:7px 12px;flex-wrap:wrap;gap:6px;}.code-filename{font-size:11px;}.code-body{padding:12px 10px;}.code-body pre{font-size:12px !important;}.data-table{white-space:normal;}.data-table th,.data-table td{padding:8px 10px;font-size:12px;}.callout{padding:11px 13px;font-size:13px;}.quiz-section{padding:18px 14px;}.quiz-card{padding:16px;}.quiz-opt{padding:9px 12px;font-size:13px;}}
+
 </style>
-  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
 <!-- 햄버거 버튼 (모바일/태블릿 전용) -->
@@ -768,23 +801,22 @@ body {
 <!-- MAIN -->
 <main class="main">
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-tag">Lecture 05</div>
-    <h1>Iteration Statement<br><span>반복문</span></h1>
-    <p class="hero-sub">프로그래밍방법론및실습 — 서울시립대학교 기계정보공학과</p>
-    <div class="hero-pills">
-      <span class="hero-pill">while</span>
-      <span class="hero-pill">do-while</span>
-      <span class="hero-pill">for</span>
-      <span class="hero-pill">Nested Loop</span>
-      <span class="hero-pill">break</span>
-      <span class="hero-pill">continue</span>
-      <span class="hero-pill">Infinite Loop</span>
-    </div>
+<div class="hero">
+  <div class="hero-tag">Lecture 05</div>
+  <h1>Iteration Statement<br><span>반복문</span></h1>
+  <p class="hero-sub">프로그래밍방법론및실습 — 서울시립대학교 기계정보공학과</p>
+  <div class="hero-pills">
+    <span class="hero-pill">while</span>
+    <span class="hero-pill">do-while</span>
+    <span class="hero-pill">for</span>
+    <span class="hero-pill">Nested Loop</span>
+    <span class="hero-pill">break</span>
+    <span class="hero-pill">continue</span>
+    <span class="hero-pill">Infinite Loop</span>
   </div>
+</div>
 
-  <!-- ── SECTION 1: 반복문 개요 ── -->
+<!-- ── SECTION 1: 반복문 개요 ── -->
   <section class="section" id="intro">
     <div class="section-header">
       <div class="section-num">01</div>
@@ -1642,10 +1674,10 @@ external_statement;</pre>
 ⑤ <span class="ty">int</span> <span class="nm">i</span>=<span class="nb">1</span>; <span class="kw">do</span> <span class="fn">printf</span>(<span class="st">"i=%d\n"</span>,<span class="nm">i</span>++); <span class="kw">while</span> (<span class="nm">i</span>&lt;<span class="nb">10</span>)</pre></div></div>
         </div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">A</span> ①만 에러</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'correct')"><span class="opt-label">B</span> ④와 ⑤에서 에러</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">C</span> ②와 ③에서 에러</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,1,'wrong')"><span class="opt-label">D</span> ③과 ④에서 에러</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">A</span> ①만 에러</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">B</span> ④와 ⑤에서 에러</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">C</span> ②와 ③에서 에러</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,1)"><span class="opt-label">D</span> ③과 ④에서 에러</div>
         </div>
         <div class="quiz-feedback" id="qf1">
           ✅ <strong>정답: B — ④와 ⑤</strong><br>
@@ -1667,10 +1699,10 @@ external_statement;</pre>
           </div>
         </div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">A</span> 0번 (처음부터 조건 거짓)</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">B</span> 1번</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'wrong')"><span class="opt-label">C</span> 32767번</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,2,'correct')"><span class="opt-label">D</span> 무한히 실행 (무한 루프)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">A</span> 0번 (처음부터 조건 거짓)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">B</span> 1번</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">C</span> 32767번</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,2)"><span class="opt-label">D</span> 무한히 실행 (무한 루프)</div>
         </div>
         <div class="quiz-feedback" id="qf2">
           ✅ <strong>정답: D — 무한 루프</strong><br>
@@ -1683,10 +1715,10 @@ external_statement;</pre>
         <div class="q-num">QUIZ 03 / 05</div>
         <div class="q-text">분기문 또는 조건문에서 쓰이는 C 키워드들의 이름과 역할이 <strong>올바르게 짝지어진 것</strong>을 고르시오.</div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">①</span> continue — 함수를 호출한 곳으로 돌아간다.</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">②</span> return — 특정 레이블 위치로 이동한다.</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'correct')"><span class="opt-label">③</span> break — 루프나 조건문을 빠져나온다.</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,3,'wrong')"><span class="opt-label">④</span> switch — 루프의 시작 부분으로 돌아간다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">①</span> continue — 함수를 호출한 곳으로 돌아간다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">②</span> return — 특정 레이블 위치로 이동한다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">③</span> break — 루프나 조건문을 빠져나온다.</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,3)"><span class="opt-label">④</span> switch — 루프의 시작 부분으로 돌아간다.</div>
         </div>
         <div class="quiz-feedback" id="qf3">
           ✅ <strong>정답: ③ break — 루프나 조건문을 빠져나온다.</strong><br>
@@ -1701,10 +1733,10 @@ external_statement;</pre>
         <div class="q-num">QUIZ 04 / 05</div>
         <div class="q-text">다음 중 <code>do-while</code> 문을 사용하기에 가장 적합한 상황은?</div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">A</span> 반복 횟수를 미리 알 수 있는 경우 (예: 100번 반복)</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">B</span> 조건에 따라 한 번도 실행되지 않아도 되는 경우</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'correct')"><span class="opt-label">C</span> 사용자 입력을 최소 한 번 받아야 하는 메뉴 선택</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,4,'wrong')"><span class="opt-label">D</span> 배열 원소를 순서대로 처리하는 경우</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">A</span> 반복 횟수를 미리 알 수 있는 경우 (예: 100번 반복)</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">B</span> 조건에 따라 한 번도 실행되지 않아도 되는 경우</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">C</span> 사용자 입력을 최소 한 번 받아야 하는 메뉴 선택</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,4)"><span class="opt-label">D</span> 배열 원소를 순서대로 처리하는 경우</div>
         </div>
         <div class="quiz-feedback" id="qf4">
           ✅ <strong>정답: C</strong><br>
@@ -1726,10 +1758,10 @@ external_statement;</pre>
           </div>
         </div>
         <div class="quiz-options">
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">A</span> 1 2 3 4 5 6</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'correct')"><span class="opt-label">B</span> 1 3 5</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">C</span> 1 3 5 7</div>
-          <div class="quiz-opt" onclick="checkQuiz(this,5,'wrong')"><span class="opt-label">D</span> 1 3 5 9</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">A</span> 1 2 3 4 5 6</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">B</span> 1 3 5</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">C</span> 1 3 5 7</div>
+          <div class="quiz-opt" onclick="checkQuiz(this,5)"><span class="opt-label">D</span> 1 3 5 9</div>
         </div>
         <div class="quiz-feedback" id="qf5">
           ✅ <strong>정답: B — 1 3 5</strong><br>
@@ -1854,27 +1886,57 @@ function drawNestedLoop() {
 drawNestedLoop();
 
 // ── QUIZ ──
-const answers = {};
-function checkQuiz(opt, qNum, result) {
-  const card = document.getElementById('qcard' + qNum);
-  const fb   = document.getElementById('qf' + qNum);
-  if (card.dataset.answered) return;
-  card.dataset.answered = 'true';
-  answers[qNum] = result;
+const correctAnswers = {
+  1: 1,  // Q1: B - ④와 ⑤에서 에러
+  2: 3,  // Q2: D - 무한히 실행 (무한 루프)
+  3: 2,  // Q3: ③ break — 루프나 조건문을 빠져나온다
+  4: 2,  // Q4: C - 사용자 입력을 최소 한 번 받아야 하는 메뉴 선택
+  5: 1   // Q5: B - 1 3 5
+};
 
-  card.querySelectorAll('.quiz-opt').forEach(o => o.style.pointerEvents = 'none');
-  opt.classList.add(result);
-  if (result === 'wrong') {
-    card.querySelectorAll('.quiz-opt').forEach(o => {
-      if (o.getAttribute('onclick') && o.getAttribute('onclick').includes("'correct'")) o.classList.add('correct');
-    });
+const answers = {};
+function checkQuiz(opt, qNum) {
+  const item = opt.closest('.quiz-card');
+  if (item.dataset.answered) return;
+  item.dataset.answered = 'true';
+
+  const opts = item.querySelectorAll('.quiz-opt');
+  const selectedIdx = Array.from(opts).indexOf(opt);
+  const correctIdx = correctAnswers[qNum];
+  const isCorrect = Array.isArray(correctIdx) ? correctIdx.includes(selectedIdx) : selectedIdx === correctIdx;
+
+  // Disable all options
+  opts.forEach(o => {
+    o.style.pointerEvents = 'none';
+    o.disabled = true;
+    o.style.cursor = 'default';
+  });
+
+  // Add correct class to selected option
+  opt.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  // If wrong, show correct answer(s)
+  if (!isCorrect) {
+    if (Array.isArray(correctIdx)) {
+      correctIdx.forEach(idx => {
+        if (opts[idx] !== opt) opts[idx].classList.add('correct');
+      });
+    } else {
+      if (opts[correctIdx] !== opt) opts[correctIdx].classList.add('correct');
+    }
   }
-  fb.className = 'quiz-feedback show ' + result;
+
+  // Show explanation
+  const explain = item.querySelector('.quiz-feedback');
+  if (explain) explain.classList.add('show');
+
+  // Track answer
+  answers[qNum] = isCorrect ? 1 : 0;
 }
 
 function showScore() {
   const total = 5;
-  const correct = Object.values(answers).filter(v => v === 'correct').length;
+  const correct = Object.values(answers).filter(v => v === 1).length;
   const score = document.getElementById('quiz-score');
   const disp = document.getElementById('score-display');
   const msg = document.getElementById('score-msg');

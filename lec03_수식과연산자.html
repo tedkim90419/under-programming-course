@@ -85,7 +85,19 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .data-table tr:hover td{background:rgba(255,255,255,.02);}
 .data-table td.desc{font-family:'Noto Sans KR',sans-serif;font-size:13px;}
 .data-table td.result{color:var(--accent2);font-weight:700;}
-.data-table td.op-cell{color:var(--accent5);font-weight:700;font-size:15px;text-align:center;}
+/*.data-table td.op-cell{color:var(--accent5);font-weight:700;font-size:15px;text-align:center;}*/
+/* 연산자 셀: 연산자 끊김 방지 0319 */
+/*.data-table td.op-cell {color: var(--accent5);font-weight: 700;font-size: 15px;text-align: center;white-space: nowrap;}*/
+.data-table td.op-cell{
+  color:var(--accent5);
+  font-weight:700;
+  font-size:15px;
+  text-align:center;
+  font-family:'JetBrains Mono',monospace;
+
+  white-space:nowrap;
+  font-variant-ligatures:none;      /* 리그처 끄기 */
+}
 .data-table td.hi{color:var(--accent);}
 .data-table td.warn-cell{color:var(--accent3);}
 
@@ -102,7 +114,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .quiz-q{font-size:14px;font-weight:500;margin-bottom:14px;color:var(--text);line-height:1.6;}
 .qnum{display:inline-block;background:var(--accent5);color:var(--bg);font-family:'Space Mono',monospace;font-size:10px;font-weight:700;padding:1px 8px;border-radius:3px;margin-right:8px;}
 .quiz-options{display:flex;flex-direction:column;gap:8px;}
-.quiz-option{padding:9px 14px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);font-size:13px;cursor:pointer;transition:all .15s;font-family:'JetBrains Mono',monospace;text-align:left;}
+.quiz-option{padding:9px 14px;border-radius:6px;background:var(--bg3);border:1px solid var(--border);font-size:13px;cursor:pointer;transition:all .15s;font-family:'JetBrains Mono',monospace;text-align:left; color: var(--text);}
 .quiz-option:hover{border-color:var(--accent5);color:var(--accent5);}
 .quiz-option.correct{background:rgba(63,185,80,.15);border-color:var(--accent2);color:var(--accent2);}
 .quiz-option.wrong{background:rgba(247,129,102,.1);border-color:var(--accent3);color:var(--accent3);}
@@ -162,8 +174,108 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 .bit-cell.b1{background:rgba(88,166,255,.18);border-color:rgba(88,166,255,.5);color:var(--accent);}
 .bit-cell.shifted{background:rgba(255,166,87,.15);border-color:rgba(255,166,87,.4);color:var(--accent5);}
 .bit-lbl{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:11px;min-width:55px;}
+/* ── 리가쳐 완전 비활성화 ── */
+.code-body pre,
+.data-table td,
+.truth-table,
+.quiz-option,
+.tbox,
+.expr-viz,
+.demo-box,
+.ic,
+.prec-ops,
+.bit-cell,
+.bit-lbl,
+code, [style*="JetBrains Mono"] {
+  font-feature-settings: "liga" 0, "calt" 0;
+  font-variant-ligatures: none;
+}
+
+.btn-score{background:var(--accent5);color:var(--bg);border:none;padding:10px 24px;border-radius:6px;font-family:'Noto Sans KR',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;}
+.btn-score:hover{opacity:.85;}
+.quiz-score{text-align:center;padding:24px;background:var(--bg3);border-radius:8px;margin-top:20px;display:none;}
+.quiz-score.show{display:block;}
+.score-num{font-family:'Space Mono',monospace;font-size:48px;font-weight:700;color:var(--accent5);line-height:1;}
+.score-label{color:var(--muted);font-size:14px;margin-top:8px;}
+
+/* ── 햄버거 버튼 ── */
+.menu-btn {
+  display: none;
+  position: fixed; top: 14px; left: 14px; z-index: 300;
+  width: 40px; height: 40px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer;
+  flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+  transition: border-color .2s;
+}
+.menu-btn:hover { border-color: var(--accent5); }
+.menu-btn span {
+  display: block; width: 18px; height: 2px;
+  background: var(--text); border-radius: 2px;
+  transition: all .25s;
+}
+.menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ── 드로어 오버레이 ── */
+.drawer-overlay {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,.55); backdrop-filter: blur(2px);
+  opacity: 0; transition: opacity .25s;
+}
+.drawer-overlay.open { opacity: 1; }
+
+/* ── 드로어 패널 ── */
+.drawer {
+  position: fixed; top: 0; left: 0; z-index: 250;
+  width: 260px; height: 100vh;
+  background: var(--bg2); border-right: 1px solid var(--border);
+  overflow-y: auto; padding-bottom: 40px;
+  transform: translateX(-100%);
+  transition: transform .28s cubic-bezier(.4,0,.2,1);
+}
+.drawer.open { transform: translateX(0); }
+
+/* ── 코드 블록 스크롤 ── */
+.code-body { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.code-body pre { min-width: max-content; }
+
+/* ── 태블릿 (≤ 900px) ── */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0 !important; padding: 64px 24px 60px; }
+  .menu-btn { display: flex; }
+}
+
+/* ── 모바일 (≤ 640px) ── */
+@media (max-width: 640px) {
+  .main { padding: 58px 16px 48px; }
+  .hero { padding: 20px 16px; margin-bottom: 28px; }
+  .hero h1 { font-size: clamp(20px, 5vw, 28px); }
+  .hero-sub { font-size: 13px; }
+  .hero-pill { font-size: 11px; padding: 3px 10px; }
+  .section { margin-bottom: 32px; }
+  .section h2 { font-size: 17px; }
+  .two-col, .two-col-3, .compare-grid { grid-template-columns: 1fr !important; }
+  .concept-card { padding: 16px; }
+  .concept-card p, .concept-card li { font-size: 13px; }
+  .code-header { padding: 7px 12px; flex-wrap: wrap; gap: 6px; }
+  .code-filename { font-size: 11px; }
+  .code-body { padding: 12px 10px; }
+  .code-body pre { font-size: 12px !important; }
+  .data-table { white-space: normal; }
+  .data-table th, .data-table td { padding: 8px 10px; font-size: 12px; }
+  /* 모바일에서는 좁아서 연산자도 줄바꿈 허용 */
+  .data-table td.op-cell { white-space: normal; }
+  .callout { padding: 11px 13px; font-size: 13px; }
+  .quiz-section { padding: 18px 14px; }
+  .quiz-card { padding: 16px; }
+  .quiz-option { padding: 9px 12px; font-size: 13px; }
+  .table-scroll { margin: 10px 0; }
+  .prec-ops { font-size: 11px; }
+}
 </style>
-  <link rel="stylesheet" href="responsive-patch.css">
 </head>
 <body>
 <!-- 햄버거 버튼 (모바일/태블릿 전용) -->
@@ -174,19 +286,30 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
 <div class="drawer-overlay" id="drawerOverlay"></div>
 <!-- 드로어 패널 -->
 <div class="drawer" id="drawer">
+  <div class="sidebar-logo" style="padding-top:56px">
+    <div class="course">C 프로그래밍 및 실습</div>
+    <div class="title">수식과 연산자</div>
+    <div class="lec-num">LECTURE 03</div>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Part I — 기초 연산자</div>
     <a class="nav-item" href="#intro" onclick="closeDrawer()"><span class="dot"></span>수식과 연산 개념</a>
     <a class="nav-item" href="#arithmetic" onclick="closeDrawer()"><span class="dot"></span>산술 연산자</a>
     <a class="nav-item" href="#incr" onclick="closeDrawer()"><span class="dot"></span>증감 연산자</a>
     <a class="nav-item" href="#assign" onclick="closeDrawer()"><span class="dot"></span>대입 연산자</a>
     <a class="nav-item" href="#prec1" onclick="closeDrawer()"><span class="dot"></span>우선순위와 결합규칙</a>
     <a class="nav-item" href="#typeconv" onclick="closeDrawer()"><span class="dot"></span>형 변환</a>
-    <a class="nav-item" href="#quiz1" onclick="closeDrawer()"><span class="dot"></span>Quiz — Part I</a>
+    <a class="nav-item" href="#quiz1" onclick="closeDrawer()"><span class="dot"></span>Quiz — Part I 🎯</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-title">Part II — 논리·비트</div>
     <a class="nav-item" href="#relational" onclick="closeDrawer()"><span class="dot"></span>관계/동치 연산자</a>
     <a class="nav-item" href="#logical" onclick="closeDrawer()"><span class="dot"></span>논리 연산자</a>
     <a class="nav-item" href="#conditional" onclick="closeDrawer()"><span class="dot"></span>조건/콤마 연산자</a>
     <a class="nav-item" href="#bitwise" onclick="closeDrawer()"><span class="dot"></span>비트 연산자</a>
     <a class="nav-item" href="#prec2" onclick="closeDrawer()"><span class="dot"></span>전체 우선순위 표</a>
-    <a class="nav-item" href="#quiz2" onclick="closeDrawer()"><span class="dot"></span>Quiz — Part II</a>
+    <a class="nav-item" href="#quiz2" onclick="closeDrawer()"><span class="dot"></span>Quiz — Part II 🎯</a>
+  </div>
 </div>
 
 
@@ -205,7 +328,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
     <a class="nav-item" href="#assign"><span class="dot"></span>대입 연산자</a>
     <a class="nav-item" href="#prec1"><span class="dot"></span>우선순위와 결합규칙</a>
     <a class="nav-item" href="#typeconv"><span class="dot"></span>형 변환</a>
-    <a class="nav-item" href="#quiz1"><span class="dot"></span>Quiz — Part I</a>
+    <a class="nav-item" href="#quiz1"><span class="dot"></span>Quiz — Part I 🎯</a>
   </div>
   <div class="nav-section">
     <div class="nav-section-title">Part II — 논리·비트</div>
@@ -214,7 +337,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
     <a class="nav-item" href="#conditional"><span class="dot"></span>조건/콤마 연산자</a>
     <a class="nav-item" href="#bitwise"><span class="dot"></span>비트 연산자</a>
     <a class="nav-item" href="#prec2"><span class="dot"></span>전체 우선순위 표</a>
-    <a class="nav-item" href="#quiz2"><span class="dot"></span>Quiz — Part II</a>
+    <a class="nav-item" href="#quiz2"><span class="dot"></span>Quiz — Part II 🎯</a>
   </div>
 </nav>
 
@@ -276,12 +399,12 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
     <div>
       <p style="font-size:13px;color:var(--muted);margin-bottom:8px">① 기능에 따른 분류</p>
       <div class="table-scroll">
-<table class="data-table">
+      <table class="data-table">
         <tr><th>기능</th><th style="text-align:center">기호</th></tr>
         <tr><td class="desc">증감</td><td class="op-cell">++ &nbsp;--</td></tr>
         <tr><td class="desc">산술</td><td class="op-cell">+ &nbsp;- &nbsp;* &nbsp;/ &nbsp;%</td></tr>
         <tr><td class="desc">대입</td><td class="op-cell">= &nbsp;+= &nbsp;-= ...</td></tr>
-        <tr><td class="desc">관계/동치</td><td class="op-cell">&gt; &lt; &gt;= &lt;= == !=</td></tr>
+        <tr><td class="desc">관계/동치</td><td class="op-cell"> &gt; &nbsp; &lt; &nbsp; &gt;= &nbsp; &lt;= &nbsp; == &nbsp; !=</td></tr>
         <tr><td class="desc">논리</td><td class="op-cell">! &nbsp;&amp;&amp; &nbsp;||</td></tr>
         <tr><td class="desc">비트</td><td class="op-cell">~ &amp; | ^ &lt;&lt; &gt;&gt;</td></tr>
         <tr><td class="desc">조건</td><td class="op-cell">? :</td></tr>
@@ -323,7 +446,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
     <tr><td class="desc">덧셈 Addition</td><td class="op-cell">+</td><td><span class="ic">7 + 4</span></td><td class="result">11</td><td class="desc">두 값의 합</td></tr>
     <tr><td class="desc">뺄셈 Subtraction</td><td class="op-cell">-</td><td><span class="ic">7 - 4</span></td><td class="result">3</td><td class="desc">두 값의 차</td></tr>
     <tr><td class="desc">곱셈 Multiplication</td><td class="op-cell">*</td><td><span class="ic">7 * 4</span></td><td class="result">28</td><td class="desc">두 값의 곱</td></tr>
-    <tr><td class="desc">나눗셈 Division</td><td class="op-cell">/</td><td><span class="ic">7 / 4</span></td><td class="result">1</td><td class="desc">정수÷정수 → 몫만 (소수점 버림)</td></tr>
+    <tr><td class="desc">나눗셈 Division</td><td class="op-cell">/</td><td><span class="ic">7 / 4</span></td><td class="result">1</td><td class="desc">정수/정수 → 몫만 (소수점 버림)</td></tr>
     <tr><td class="desc">나머지 Modulus</td><td class="op-cell">%</td><td><span class="ic">7 % 4</span></td><td class="result">3</td><td class="desc">정수에만 적용 가능</td></tr>
   </table>
 </div>
@@ -420,7 +543,7 @@ body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-seri
     <p>변수의 값을 <strong>1만큼만 증가 또는 감소</strong>시키는 단항(unary) 연산자. 주로 반복문에서 카운터 제어에 사용.</p>
     <ul>
       <li><strong>전위(Prefix)</strong>와 <strong>후위(Postfix)</strong> 두 가지 형태 존재</li>
-      <li>단독 사용 시: <span class="ic">++x;</span> ≡ <span class="ic">x++;</span> ≡ <span class="ic">x = x + 1;</span></li>
+      <li>단독 사용 시: <span class="ic">++x;</span> <span style="color:var(--comment);font-size:12px">/* = */</span> <span class="ic">x++;</span> <span style="color:var(--comment);font-size:12px">/* = */</span> <span class="ic">x = x + 1;</span></li>
       <li>다른 연산자와 함께 쓰일 때 동작이 달라짐!</li>
     </ul>
   </div>
@@ -715,29 +838,29 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
     <h2>Quiz — Part I</h2>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard1">
     <div class="quiz-q"><span class="qnum">Q1</span>다음 중 우선순위가 가장 높은 연산자는?</div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">① 대입 연산자 =</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">② 전위 증감 연산자 ++x</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">③ 산술 연산자 * / %</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">④ 괄호 연산자 ( )</button>
+      <button class="quiz-option" onclick="checkQuiz(this,1)">① 대입 연산자 =</button>
+      <button class="quiz-option" onclick="checkQuiz(this,1)">② 전위 증감 연산자 ++x</button>
+      <button class="quiz-option" onclick="checkQuiz(this,1)">③ 산술 연산자 * / %</button>
+      <button class="quiz-option" onclick="checkQuiz(this,1)">④ 괄호 연산자 ( )</button>
     </div>
-    <div class="quiz-explain">✅ <strong>④ 괄호 연산자</strong>가 가장 높은 우선순위입니다.<br>순서: ( ) &gt; 단항(++/--) &gt; * / % &gt; + - &gt; 대입(=)</div>
+    <div class="quiz-explain" id="qf1">✅ <strong>④ 괄호 연산자</strong>가 가장 높은 우선순위입니다.<br>순서: ( ) &gt; 단항(++/--) &gt; * / % &gt; + - &gt; 대입(=)</div>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard2">
     <div class="quiz-q"><span class="qnum">Q2</span><code style="font-family:'JetBrains Mono',monospace">int x=10; int y=20;</code> 으로 선언 시 올바른 수식이 <strong>아닌</strong> 것은?</div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">① x = 10 + y; &nbsp;&nbsp;→ x에 30 저장 ✓</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">② 5 = x + y; &nbsp;&nbsp;→ 잘못된 수식! ❌</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">③ x %= 20; &nbsp;&nbsp;&nbsp;&nbsp;→ x에 10 저장 ✓</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">④ x=y=2; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ x,y 모두 2 저장 ✓</button>
+      <button class="quiz-option" onclick="checkQuiz(this,2)">① x = 10 + y; &nbsp;&nbsp;→ x에 30 저장</button>
+      <button class="quiz-option" onclick="checkQuiz(this,2)">② 5 = x + y; &nbsp;&nbsp;→ 잘못된 수식!</button>
+      <button class="quiz-option" onclick="checkQuiz(this,2)">③ x %= 20; &nbsp;&nbsp;&nbsp;&nbsp;→ x에 10 저장</button>
+      <button class="quiz-option" onclick="checkQuiz(this,2)">④ x=y=2; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ x,y 모두 2 저장</button>
     </div>
-    <div class="quiz-explain">✅ <strong>② 5 = x + y;</strong> 는 잘못된 수식.<br>대입 연산자 좌변(l-value)은 반드시 <strong>변수</strong>여야 합니다. 상수 5는 l-value가 될 수 없음.</div>
+    <div class="quiz-explain" id="qf2">✅ <strong>② 5 = x + y;</strong> 는 잘못된 수식.<br>대입 연산자 좌변(l-value)은 반드시 <strong>변수</strong>여야 합니다. 상수 5는 l-value가 될 수 없음.</div>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard3">
     <div class="quiz-q"><span class="qnum">Q3</span>아래 수식들의 예상 결과 값은? (C 프로그램으로 작성 시)<br>
       <code style="font-family:'JetBrains Mono',monospace">
         (a) 1.0 + 1.0 / 2.0 &nbsp;&nbsp;
@@ -747,12 +870,12 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
       </code>
     </div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">모두 1.5</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">(a) 1.5 &nbsp;&nbsp;(b) 1.0 &nbsp;&nbsp;(c) 1.5 &nbsp;&nbsp;(d) 1.5</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">(a) 1.5 &nbsp;&nbsp;(b) 1.5 &nbsp;&nbsp;(c) 1.0 &nbsp;&nbsp;(d) 1.5</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">모두 1.0</button>
+      <button class="quiz-option" onclick="checkQuiz(this,3)">모두 1.5</button>
+      <button class="quiz-option" onclick="checkQuiz(this,3)">(a) 1.5 &nbsp;&nbsp;(b) 1.0 &nbsp;&nbsp;(c) 1.5 &nbsp;&nbsp;(d) 1.5</button>
+      <button class="quiz-option" onclick="checkQuiz(this,3)">(a) 1.5 &nbsp;&nbsp;(b) 1.5 &nbsp;&nbsp;(c) 1.0 &nbsp;&nbsp;(d) 1.5</button>
+      <button class="quiz-option" onclick="checkQuiz(this,3)">모두 1.0</button>
     </div>
-    <div class="quiz-explain">
+    <div class="quiz-explain" id="qf3">
       ✅ <strong>(a) 1.5</strong> — double/double = 0.5, 1.0+0.5 = 1.5<br>
       ✅ <strong>(b) 1.0</strong> — <code>1/2</code>는 정수 나눗셈 = 0, 1.0+0 = 1.0<br>
       ✅ <strong>(c) 1.5</strong> — <code>1.0/2</code>에서 2가 double로 승격 → 0.5, 1.0+0.5 = 1.5<br>
@@ -760,38 +883,38 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
     </div>
   </div>
 
-  <div class="quiz-item">
-    <div class="quiz-q"><span class="qnum">Q4</span>형 변환에 대한 다음 설명 중 <strong>잘못된 것</strong>을 모두 고르시오.</div>
+  <div class="quiz-item" id="qcard4">
+    <div class="quiz-q"><span class="qnum">Q4</span>형 변환에 대한 다음 설명 중 <strong>잘못된 것을 두 개 고르시오.</strong></div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">① 형 변환에는 암시적 형 변환과 명시적 형 변환이 있다. ✓</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">② "short + short" 연산 결과는 short 타입이다. ❌</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">③ "float + float" 연산 결과는 double 타입이다. ❌</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">④ "int / int" 연산 결과는 int 타입이다. ✓</button>
+      <button class="quiz-option" onclick="checkQuiz(this,4)">① 형 변환에는 암시적 형 변환과 명시적 형 변환이 있다.</button>
+      <button class="quiz-option" onclick="checkQuiz(this,4)">② "short + short" 연산 결과는 short 타입이다.</button>
+      <button class="quiz-option" onclick="checkQuiz(this,4)">③ "float + float" 연산 결과는 double 타입이다.</button>
+      <button class="quiz-option" onclick="checkQuiz(this,4)">④ "int / int" 연산 결과는 int 타입이다.</button>
     </div>
-    <div class="quiz-explain">
+    <div class="quiz-explain" id="qf4">
       ✅ <strong>②③ 이 잘못된 설명</strong><br>
       ② short + short → Integral Promotion에 의해 <strong>int</strong>로 승격되어 연산<br>
       ③ float + float → 결과는 <strong>float</strong> (double이 아님)<br>
-      ⑤ 실수→int 명시적 형변환: 소수점 이하 <strong>버림</strong> (반올림 ❌)
+      ⑤ 실수→int 명시적 형변환: 소수점 이하 <strong>버림</strong> (반올림 아님)
     </div>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard5">
     <div class="quiz-q"><span class="qnum">Q5</span>아래 수식에서 각 연산이 실행되는 순서를 올바르게 쓰시오.<br>
       <code style="font-family:'JetBrains Mono',monospace;font-size:15px">z = x + y * z / 8 % 2 - 3;</code>
     </div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">z= → +x → *y → /8 → %2 → -3</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">① y*z → ÷8 → %2 → x+… → …-3 → z=</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">x+y → *z → /8 → %2 → -3 → z=</button>
+      <button class="quiz-option" onclick="checkQuiz(this,5)">z= → +x → *y → /8 → %2 → -3</button>
+      <button class="quiz-option" onclick="checkQuiz(this,5)">① y*z → /8 → %2 → x+… → …-3 → z=</button>
+      <button class="quiz-option" onclick="checkQuiz(this,5)">x+y → *z → /8 → %2 → -3 → z=</button>
     </div>
-    <div class="quiz-explain">
+    <div class="quiz-explain" id="qf5">
       ✅ 우선순위: <code>* / %</code> &gt; <code>+ -</code> &gt; <code>=</code><br>
       ① <code>y*z</code> &nbsp;② <code>(y*z)/8</code> &nbsp;③ <code>((y*z)/8)%2</code> &nbsp;④ <code>x + …</code> &nbsp;⑤ <code>… - 3</code> &nbsp;⑥ <code>z = …</code>
     </div>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard6">
     <div class="quiz-q"><span class="qnum">Q6</span>아래 코드들의 실행 결과를 각각 쓰시오.<br>
       <code style="font-family:'JetBrains Mono',monospace">
         (a) int i=5; i=i/3; printf("%d",i);<br>
@@ -800,15 +923,22 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
       </code>
     </div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">(a)1 &nbsp;(b)14 &nbsp;(c)-4</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">(a)1 &nbsp;(b)15 &nbsp;(c)-1</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">(a)2 &nbsp;(b)15 &nbsp;(c)-3</button>
+      <button class="quiz-option" onclick="checkQuiz(this,6)">(a)1 &nbsp;(b)14 &nbsp;(c)-4</button>
+      <button class="quiz-option" onclick="checkQuiz(this,6)">(a)1 &nbsp;(b)15 &nbsp;(c)-1</button>
+      <button class="quiz-option" onclick="checkQuiz(this,6)">(a)2 &nbsp;(b)15 &nbsp;(c)-3</button>
     </div>
-    <div class="quiz-explain">
+    <div class="quiz-explain" id="qf6">
       ✅ (a) <code>5/3 = 1</code><br>
       ✅ (b) <code>2*9=18, 18/3=6, 6+9=15</code><br>
       ✅ (c) <code>-5%2 = -1</code> (나머지는 나누어지는 수의 부호 따름), <code>-1*3 = -3</code>, <code>-3/2 = -1</code>
     </div>
+  </div>
+  <div style="text-align:center;margin-top:20px">
+    <button class="btn-score" onclick="showScore1()">결과 확인하기</button>
+  </div>
+  <div class="quiz-score" id="quiz-score1">
+    <div class="score-num" id="score-display1">0/6</div>
+    <div class="score-label" id="score-msg1">결과를 확인하세요!</div>
   </div>
 </section>
 
@@ -942,7 +1072,7 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
       </div>
       <div class="code-body"><pre><span class="ty">unsigned int</span> i;
 <span class="fn">scanf</span>(<span class="st">"%d"</span>, &amp;i);     <span class="cm">// -1 을 입력하면 unsigned이므로 매우 큰 수</span>
-<span class="kw">if</span> (i &lt; <span class="nm">0</span> &amp;&amp; <span class="nm">1</span>) {    <span class="cm">// unsigned는 항상 ≥ 0 이므로 i&lt;0 이 거짓</span>
+<span class="kw">if</span> (i &lt; <span class="nm">0</span> &amp;&amp; <span class="nm">1</span>) {    <span class="cm">// unsigned는 항상 >= 0 이므로 i&lt;0 이 거짓</span>
     <span class="fn">printf</span>(<span class="st">"negative value\n"</span>);
 } <span class="kw">else</span> {
     <span class="fn">printf</span>(<span class="st">"0 or positive value\n"</span>);
@@ -953,7 +1083,7 @@ divResult <span class="op">=</span> (<span class="ty">double</span>) num1 <span 
   <div class="callout tip">
     <div class="callout-title">💡 !! 연산에 주의</div>
     <code style="font-family:'JetBrains Mono',monospace">!!5 = !(!(5)) = !(0) = 1</code><br>
-    <code style="font-family:'JetBrains Mono',monospace">!!s ≠ s</code> &nbsp;(s=5이면 !!s=1, s=5는 다름)
+    <code style="font-family:'JetBrains Mono',monospace">!!s != s</code> &nbsp;(s=5이면 !!s=1, s=5는 다름)
   </div>
 
   <div class="subsec"><h3>논리 연산자 활용 예시</h3></div>
@@ -1196,7 +1326,7 @@ a <span class="op">|</span> b  <span class="cm">// 11111111 11111110 11010010 00
       </div>
       <div class="callout tip" style="margin-top:8px">
         <div class="callout-title">💡 수식</div>
-        <code style="font-family:'JetBrains Mono',monospace">n &lt;&lt; k = n × 2<sup>k</sup></code> (unsigned 기준)
+        <code style="font-family:'JetBrains Mono',monospace">n &lt;&lt; k &nbsp;= n * 2<sup>k</sup></code> (unsigned 기준)
       </div>
     </div>
     <div class="concept-card">
@@ -1215,7 +1345,7 @@ a <span class="op">|</span> b  <span class="cm">// 11111111 11111110 11010010 00
       </div>
       <div class="callout tip" style="margin-top:8px">
         <div class="callout-title">💡 수식</div>
-        <code style="font-family:'JetBrains Mono',monospace">n &gt;&gt; k = n ÷ 2<sup>k</sup></code> (unsigned 기준)
+        <code style="font-family:'JetBrains Mono',monospace">n &gt;&gt; k &nbsp;= n / 2<sup>k</sup></code> (unsigned 기준)
       </div>
     </div>
   </div>
@@ -1341,57 +1471,57 @@ a <span class="op">|</span> b  <span class="cm">// 11111111 11111110 11010010 00
     <h2>Quiz — Part II</h2>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard7">
     <div class="quiz-q"><span class="qnum">Q1</span>다음 논리 연산자 중 우선순위가 가장 높은 것은?</div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">① || (논리 OR)</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">② &amp;&amp; (논리 AND)</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">③ ! (논리 NOT)</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">④ 모두 같다</button>
+      <button class="quiz-option" onclick="checkQuiz(this,7)">① || (논리 OR)</button>
+      <button class="quiz-option" onclick="checkQuiz(this,7)">② &amp;&amp; (논리 AND)</button>
+      <button class="quiz-option" onclick="checkQuiz(this,7)">③ ! (논리 NOT)</button>
+      <button class="quiz-option" onclick="checkQuiz(this,7)">④ 모두 같다</button>
     </div>
-    <div class="quiz-explain">✅ <strong>③ ! (논리 NOT)</strong>이 단항 연산자로 가장 높음.<br>우선순위: ! &gt; &amp;&amp; &gt; ||<br>또한 논리 연산자들은 모두 산술·관계 연산자보다 낮은 우선순위를 가짐.</div>
+    <div class="quiz-explain" id="qf7">✅ <strong>③ ! (논리 NOT)</strong>이 단항 연산자로 가장 높음.<br>우선순위: ! &gt; &amp;&amp; &gt; ||<br>또한 논리 연산자들은 모두 산술·관계 연산자보다 낮은 우선순위를 가짐.</div>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard8">
     <div class="quiz-q"><span class="qnum">Q2</span>Short-Circuit Evaluation에 대한 설명으로 옳은 것은?</div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">① A &amp;&amp; B 에서 B가 거짓이면 A는 실행하지 않는다</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">② A &amp;&amp; B 에서 A가 거짓이면 B는 실행하지 않는다</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">③ A || B 에서 A가 거짓이면 B는 실행하지 않는다</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">④ 단축 계산은 C에서 지원하지 않는다</button>
+      <button class="quiz-option" onclick="checkQuiz(this,8)">① A &amp;&amp; B 에서 B가 거짓이면 A는 실행하지 않는다</button>
+      <button class="quiz-option" onclick="checkQuiz(this,8)">② A &amp;&amp; B 에서 A가 거짓이면 B는 실행하지 않는다</button>
+      <button class="quiz-option" onclick="checkQuiz(this,8)">③ A || B 에서 A가 거짓이면 B는 실행하지 않는다</button>
+      <button class="quiz-option" onclick="checkQuiz(this,8)">④ 단축 계산은 C에서 지원하지 않는다</button>
     </div>
-    <div class="quiz-explain">
+    <div class="quiz-explain" id="qf8">
       ✅ <strong>②</strong> A &amp;&amp; B 에서 A가 거짓(0)이면 전체는 이미 거짓이므로 B 실행 안 함.<br>
       || 에서는 A가 참(1)이면 전체가 이미 참이므로 B 실행 안 함.
     </div>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard9">
     <div class="quiz-q"><span class="qnum">Q3</span>다음 조건 연산자 수식의 결과값과 타입은?<br>
       <code style="font-family:'JetBrains Mono',monospace">int i=3, j=4; double x=2.5; &nbsp;&nbsp;i &lt; j ? i + 1 : x</code>
     </div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">4 (int 타입)</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">4.0 (double 타입)</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">2.5 (double 타입)</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">컴파일 에러</button>
+      <button class="quiz-option" onclick="checkQuiz(this,9)">4 (int 타입)</button>
+      <button class="quiz-option" onclick="checkQuiz(this,9)">4.0 (double 타입)</button>
+      <button class="quiz-option" onclick="checkQuiz(this,9)">2.5 (double 타입)</button>
+      <button class="quiz-option" onclick="checkQuiz(this,9)">컴파일 에러</button>
     </div>
-    <div class="quiz-explain">
+    <div class="quiz-explain" id="qf9">
       ✅ <strong>4.0 (double 타입)</strong><br>
       i &lt; j 는 참이므로 i+1 = 4가 선택됨.<br>
       그런데 조건 연산자의 두 값의 타입이 다를 때 더 큰 타입으로 자동 변환 → int 4가 <strong>double 4.0</strong>으로 변환됨.
     </div>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard10">
     <div class="quiz-q"><span class="qnum">Q4</span>비트 연산에 관한 다음 설명 중 <strong>옳은</strong> 것은?</div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">① 비트 연산자는 실수형 변수에도 사용 가능하다</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">② ~(a|b) 와 (~a)&amp;(~b) 는 항상 다른 결과를 낸다</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">③ n &lt;&lt; k 는 unsigned 기준으로 n × 2^k 와 같다</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">④ &gt;&gt; 연산은 항상 최상위 비트에 0을 채운다</button>
+      <button class="quiz-option" onclick="checkQuiz(this,10)">① 비트 연산자는 실수형 변수에도 사용 가능하다</button>
+      <button class="quiz-option" onclick="checkQuiz(this,10)">② ~(a|b) 와 (~a)&amp;(~b) 는 항상 다른 결과를 낸다</button>
+      <button class="quiz-option" onclick="checkQuiz(this,10)">③ n &lt;&lt; k 는 unsigned 기준으로 n * 2^k 와 같다</button>
+      <button class="quiz-option" onclick="checkQuiz(this,10)">④ &gt;&gt; 연산은 항상 최상위 비트에 0을 채운다</button>
     </div>
-    <div class="quiz-explain">
+    <div class="quiz-explain" id="qf10">
       ✅ <strong>③</strong> 맞음. <code>n &lt;&lt; k == n * 2^k</code> (unsigned 기준)<br>
       ① 비트 연산자는 <strong>정수 타입에만</strong> 적용 가능<br>
       ② <code>~(a|b) == (~a)&amp;(~b)</code> — De Morgan's Law로 <strong>항상 같음</strong><br>
@@ -1399,7 +1529,7 @@ a <span class="op">|</span> b  <span class="cm">// 11111111 11111110 11010010 00
     </div>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard11">
     <div class="quiz-q"><span class="qnum">Q5</span>다음 코드의 출력 결과는?<br>
       <code style="font-family:'JetBrains Mono',monospace">
         int x = 5, y = 3;<br>
@@ -1409,12 +1539,12 @@ a <span class="op">|</span> b  <span class="cm">// 11111111 11111110 11010010 00
       </code>
     </div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">1, 0, 1</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">0, 1, 0</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">1, 1, 0</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">1, 0, 0</button>
+      <button class="quiz-option" onclick="checkQuiz(this,11)">1, 0, 1</button>
+      <button class="quiz-option" onclick="checkQuiz(this,11)">0, 1, 0</button>
+      <button class="quiz-option" onclick="checkQuiz(this,11)">1, 1, 0</button>
+      <button class="quiz-option" onclick="checkQuiz(this,11)">1, 0, 0</button>
     </div>
-    <div class="quiz-explain">
+    <div class="quiz-explain" id="qf11">
       ✅ 출력: <code>1 &nbsp;1 &nbsp;0</code><br>
       ① <code>x&gt;3</code>은 참, <code>y&lt;5</code>는 참 → <code>1 &amp;&amp; 1 = 1</code><br>
       ② <code>x==5</code>는 참 → <code>1 || ... = 1</code> (short-circuit)<br>
@@ -1422,37 +1552,172 @@ a <span class="op">|</span> b  <span class="cm">// 11111111 11111110 11010010 00
     </div>
   </div>
 
-  <div class="quiz-item">
+  <div class="quiz-item" id="qcard12">
     <div class="quiz-q"><span class="qnum">Q6</span><code style="font-family:'JetBrains Mono',monospace">unsigned char c = 0x55;</code> 일 때 <code style="font-family:'JetBrains Mono',monospace">~c</code>를 int로 출력하면?<br>
       (0x55 = 0101 0101<sub>(2)</sub>)
     </div>
     <div class="quiz-options">
-      <button class="quiz-option" onclick="answerQuiz(this,false)">0xAA (170)</button>
-      <button class="quiz-option" onclick="answerQuiz(this,true)">0xFFFFFFAA (-86 혹은 4294967210)</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">0x00 (0)</button>
-      <button class="quiz-option" onclick="answerQuiz(this,false)">0x55 (85)</button>
+      <button class="quiz-option" onclick="checkQuiz(this,12)">0xAA (170)</button>
+      <button class="quiz-option" onclick="checkQuiz(this,12)">0xFFFFFFAA (-86 혹은 4294967210)</button>
+      <button class="quiz-option" onclick="checkQuiz(this,12)">0x00 (0)</button>
+      <button class="quiz-option" onclick="checkQuiz(this,12)">0x55 (85)</button>
     </div>
-    <div class="quiz-explain">
+    <div class="quiz-explain" id="qf12">
       ✅ <strong>0xFFFFFFAA</strong><br>
       c는 char 타입이므로 ~ 연산 전 <strong>int로 승격</strong>됨: <code>0x00000055</code><br>
       ~ 적용 → <code>0xFFFFFFAA</code><br>
       <code>printf("%#x\n", ~c);</code> 출력: <code>0xffffffaa</code>
     </div>
   </div>
+  <div style="text-align:center;margin-top:20px">
+    <button class="btn-score" onclick="showScore2()">결과 확인하기</button>
+  </div>
+  <div class="quiz-score" id="quiz-score2">
+    <div class="score-num" id="score-display2">0/6</div>
+    <div class="score-label" id="score-msg2">결과를 확인하세요!</div>
+  </div>
 </section>
 </main><!-- end .main -->
 
 <script>
-function answerQuiz(btn, isCorrect) {
-  const item = btn.closest('.quiz-item');
+var answers = {};
+
+// Define correct answers for each question (option index: 0-based)
+const correctAnswers = {
+  1: 3,       // Q1: ④ 괄호 연산자
+  2: 1,       // Q2: ② 5 = x + y;
+  3: 1,       // Q3: (a) 1.5...
+  4: [1, 2],  // Q4: ②③ (MULTIPLE correct - options that are wrong)
+  5: 1,       // Q5: ① y*z → /8 → %2 → x+…
+  6: 1,       // Q6: ② (a)1 (b)15 (c)-1
+  7: 2,       // Q7: ③ ! (논리 NOT)
+  8: 1,       // Q8: ② A && B에서 A가 거짓...
+  9: 1,       // Q9: ② 4.0 (double 타입)
+  10: 2,      // Q10: ③ n << k
+  11: 2,      // Q11: ③ 1, 1, 0
+  12: 1       // Q12: ② 0xFFFFFFAA
+};
+
+function checkQuiz(opt, qNum) {
+  const item = opt.closest('.quiz-item');
+  if (item.dataset.answered) return;
+
   const opts = item.querySelectorAll('.quiz-option');
-  const explain = item.querySelector('.quiz-explain');
-  opts.forEach(o => {
-    o.disabled = true;
-    o.style.cursor = 'default';
-  });
-  btn.classList.add(isCorrect ? 'correct' : 'wrong');
-  if (explain) explain.classList.add('show');
+  const selectedIdx = Array.from(opts).indexOf(opt);
+  const correctIdx = correctAnswers[qNum];
+  const isMultiSelect = Array.isArray(correctIdx);
+
+  // Handle multi-select questions (like Q4 with 2+ correct answers)
+  if (isMultiSelect) {
+    const isCorrectChoice = correctIdx.includes(selectedIdx);
+
+    // If user selects a wrong answer
+    if (!isCorrectChoice) {
+      item.dataset.answered = 'true';
+      opt.classList.add('wrong');
+      opts.forEach(o => {
+        o.style.pointerEvents = 'none';
+        o.disabled = true;
+        o.style.cursor = 'default';
+      });
+      // Show all correct answers
+      correctIdx.forEach(idx => {
+        opts[idx].classList.add('correct');
+      });
+      const explain = item.querySelector('.quiz-explain');
+      if (explain) explain.classList.add('show');
+      answers[qNum] = 0;
+      return;
+    }
+
+    // User selected a correct answer
+    opt.classList.add('correct');
+    opt.disabled = true;
+    opt.style.cursor = 'default';
+    opt.style.pointerEvents = 'none';
+
+    // Count how many correct answers have been selected
+    const selectedCorrect = Array.from(opts).filter(o => o.classList.contains('correct')).length;
+
+    // If all required correct answers are selected
+    if (selectedCorrect === correctIdx.length) {
+      item.dataset.answered = 'true';
+      opts.forEach(o => {
+        o.style.pointerEvents = 'none';
+        o.disabled = true;
+        o.style.cursor = 'default';
+      });
+      const explain = item.querySelector('.quiz-explain');
+      if (explain) explain.classList.add('show');
+      answers[qNum] = 1;
+    }
+  } else {
+    // Single answer question
+    item.dataset.answered = 'true';
+    const isCorrect = selectedIdx === correctIdx;
+
+    opts.forEach(o => {
+      o.style.pointerEvents = 'none';
+      o.disabled = true;
+      o.style.cursor = 'default';
+    });
+
+    opt.classList.add(isCorrect ? 'correct' : 'wrong');
+
+    // If wrong, show correct answer
+    if (!isCorrect) {
+      opts[correctIdx].classList.add('correct');
+    }
+
+    const explain = item.querySelector('.quiz-explain');
+    if (explain) explain.classList.add('show');
+
+    answers[qNum] = isCorrect ? 1 : 0;
+  }
+}
+
+function showScore1() {
+  const score = Object.keys(answers).filter(k => parseInt(k) >= 1 && parseInt(k) <= 6).reduce((sum, k) => sum + answers[k], 0);
+  const total = 6;
+  const scoreDisplay = document.getElementById('score-display1');
+  const scoreMsg = document.getElementById('score-msg1');
+  scoreDisplay.textContent = score + '/' + total;
+  if (score === total) {
+    scoreMsg.textContent = '완벽합니다!';
+    scoreMsg.style.color = 'var(--accent2)';
+  } else if (score >= 4) {
+    scoreMsg.textContent = '좋습니다!';
+    scoreMsg.style.color = 'var(--accent2)';
+  } else if (score >= 2) {
+    scoreMsg.textContent = '조금 더 복습하세요.';
+    scoreMsg.style.color = 'var(--accent5)';
+  } else {
+    scoreMsg.textContent = '다시 한 번 확인해보세요.';
+    scoreMsg.style.color = 'var(--accent3)';
+  }
+  document.getElementById('quiz-score1').classList.add('show');
+}
+
+function showScore2() {
+  const score = Object.keys(answers).filter(k => parseInt(k) >= 7 && parseInt(k) <= 12).reduce((sum, k) => sum + answers[k], 0);
+  const total = 6;
+  const scoreDisplay = document.getElementById('score-display2');
+  const scoreMsg = document.getElementById('score-msg2');
+  scoreDisplay.textContent = score + '/' + total;
+  if (score === total) {
+    scoreMsg.textContent = '완벽합니다!';
+    scoreMsg.style.color = 'var(--accent2)';
+  } else if (score >= 4) {
+    scoreMsg.textContent = '좋습니다!';
+    scoreMsg.style.color = 'var(--accent2)';
+  } else if (score >= 2) {
+    scoreMsg.textContent = '조금 더 복습하세요.';
+    scoreMsg.style.color = 'var(--accent5)';
+  } else {
+    scoreMsg.textContent = '다시 한 번 확인해보세요.';
+    scoreMsg.style.color = 'var(--accent3)';
+  }
+  document.getElementById('quiz-score2').classList.add('show');
 }
 
 function copyCode(btn) {
